@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
+         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
+
+    <changeSet id="createMessageTable" author="TMN">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="message"/>
+            </not>
+        </preConditions>
+        <createTable tableName="message">
+            <column name="id" type="int">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="message" type="MEDIUMTEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="msg_group_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="msg_user_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addAutoIncrement columnDataType="int"
+                          columnName="id"
+                          defaultOnNull="false"
+                          generationType="ALWAYS"
+                          incrementBy="1"
+                          tableName="message"/>
+        <addForeignKeyConstraint
+                baseColumnNames="msg_user_id"
+                baseTableName="message"
+                constraintName="fk_message_user"
+                referencedColumnNames="id"
+                referencedTableName="user"/>
+        <addForeignKeyConstraint
+                baseColumnNames="msg_group_id"
+                baseTableName="message"
+                constraintName="fk_message_group"
+                referencedColumnNames="id"
+                referencedTableName="chat_group"/>
+        <rollback>
+            <dropTable tableName="message"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

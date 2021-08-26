@@ -1,0 +1,9 @@
+.sidebar {
+    width: 420px;
+}
+
+@media (max-width: 1250px) {
+    .sidebar {
+        width: 200px;
+    }
+}

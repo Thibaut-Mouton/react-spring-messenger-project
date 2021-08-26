@@ -1,0 +1,62 @@
+.idea/**
+/frontend-web/build/
+/frontend-web/.idea/**
+/backend/src/main/resources/public/images/
+livraison.sh
+/backend/uploads/
+
+# dependencies
+/frontend-web/node_modules
+/frontend-web/.pnp
+/frontend-web/.pnp.js
+
+# testing
+/frontend-web/coverage
+
+# production
+/build
+
+# misc
+/frontend-web/.DS_Store
+/frontend-web/.env.local
+/frontend-web/.env.development.local
+/frontend-web/.env.test.local
+/frontend-web/.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+
+/backend/HELP.md
+/backend/target/
+/backend/uploads/
+/backend/!.mvn/wrapper/maven-wrapper.jar
+/backend/!**/src/main/**/target/
+/backend/!**/src/test/**/target/
+
+
+### IntelliJ IDEA ###
+/backend/.idea/**
+/backend/.mvn/**
+/backend/*.iws
+/backend/*.iml
+/backend/*.ipr
+
+### NetBeans ###
+/backend/nbproject/private/
+/backend/nbbuild/
+/backend/dist/
+/backend/nbdist/
+/backend/.nb-gradle/
+/backend/build/
+/backend/!**/src/main/**/build/
+/backend/!**/src/test/**/build/
+
+### VS Code ###
+/backend/.vscode/
+/backend/src/main/resources/application-prod.properties
+/backend/src/main/resources/static/**
+/backend/src/main/resources/ssl/**

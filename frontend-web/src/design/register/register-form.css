@@ -1,0 +1,17 @@
+.main-register-form {
+    padding-top: 4%;
+    padding-bottom: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: 32%;
+    margin-right: 32%;
+}
+
+@media (max-width: 1250px) {
+    .main-register-form {
+        margin-left: 20%;
+        margin-right: 20%;
+    }
+}

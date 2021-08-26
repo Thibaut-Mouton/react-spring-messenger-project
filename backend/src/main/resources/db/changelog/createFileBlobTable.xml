@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
+         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
+
+    <changeSet id="createFileBlobTable" author="TMN">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="file_storage"/>
+            </not>
+        </preConditions>
+        <createTable tableName="file_storage">
+            <column name="id" type="int">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="fk_message_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="url" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="filename" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addAutoIncrement columnDataType="int"
+                          columnName="id"
+                          defaultOnNull="false"
+                          generationType="ALWAYS"
+                          incrementBy="1"
+                          tableName="file_storage"/>
+        <addForeignKeyConstraint baseTableName="file_storage"
+                                 baseColumnNames="fk_message_id"
+                                 constraintName="fk_message_filename"
+                                 referencedTableName="message"
+                                 referencedColumnNames="id"/>
+        <rollback>
+            <dropTable tableName="file_storage"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
