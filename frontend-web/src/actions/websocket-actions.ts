@@ -1,19 +1,25 @@
 import {
     ADD_CHAT_HISTORY,
     CURRENT_ACTIVE_GROUP,
-    FETCH_GROUP_MESSAGES, GET_GROUP_MESSAGES, GRANT_USER_ADMIN,
-    INIT_WS_CONNECTION, MARK_MESSAGE_AS_SEEN, SEND_GROUP_MESSAGE, SET_CHAT_HISTORY,
-    SET_WS_GROUPS, UNSUBSCRIBE_ALL, WS_CHECK_CONNECTED
+    FETCH_GROUP_MESSAGES,
+    GRANT_USER_ADMIN,
+    INIT_WS_CONNECTION,
+    MARK_MESSAGE_AS_SEEN,
+    SEND_GROUP_MESSAGE,
+    SET_ALL_MESSAGES_FETCHED,
+    SET_CHAT_HISTORY,
+    SET_WS_GROUPS,
+    UNSUBSCRIBE_ALL,
+    WS_CHECK_CONNECTED
 } from "../utils/redux-constants";
-import {Client} from "@stomp/stompjs";
 import {GroupModel} from "../model/group-model";
 import {ReduxModel} from "../model/redux-model";
 import {MessageModel} from "../model/message-model";
 import {FullMessageModel} from "../model/full-message-model";
 
-export const initWsConnection = (client: Client) => ({
+export const initWsConnection = (reduxModel: ReduxModel) => ({
     type: INIT_WS_CONNECTION,
-    payload: client
+    payload: reduxModel
 })
 
 export const wsHealthCheckConnected = (isWsConnected: boolean) => ({
@@ -46,11 +52,15 @@ export const setGroupMessages = (messages: MessageModel[]) => ({
     payload: messages
 })
 
+export const setAllMessagesFetched = (isLastMessage: boolean) => ({
+    type: SET_ALL_MESSAGES_FETCHED,
+    payload: isLastMessage
+})
+
 export const addChatHistory = (model: FullMessageModel) => ({
     type: ADD_CHAT_HISTORY,
     payload: model
 })
-
 
 export const fetchGroupMessages = (model: ReduxModel) => ({
     type: FETCH_GROUP_MESSAGES,
@@ -66,7 +76,7 @@ export const unsubscribeAll = () => ({
     type: UNSUBSCRIBE_ALL
 })
 
-export const markMessageAsSeen = (groupUrl: string) => ({
+export const markMessageAsSeen = (model: ReduxModel) => ({
     type: MARK_MESSAGE_AS_SEEN,
-    payload: groupUrl
+    payload: model
 })

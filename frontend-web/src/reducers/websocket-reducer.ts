@@ -1,17 +1,20 @@
 import {
     ADD_CHAT_HISTORY,
     CURRENT_ACTIVE_GROUP, INIT_WS_CONNECTION,
-    INIT_WS_TOKEN, SET_CHAT_HISTORY,
+    INIT_WS_TOKEN, SET_ACTIVE_GROUP, SET_ALL_MESSAGES_FETCHED, SET_CHAT_HISTORY,
     SET_WS_GROUPS,
     WS_CHECK_CONNECTED
 } from "../utils/redux-constants";
+import {WsReducerInitType} from "./types";
 
-const initialState = {
+
+const initialState: WsReducerInitType = {
     isWsConnected: false,
     wsObject: null,
-    wsUserTokenValue: null,
+    wsUserTokenValue: "",
     wsUserGroups: [],
-    currentActiveGroup: null,
+    currentActiveGroup: "",
+    allMessagesFetched: false,
     usersInConversationList: [],
     chatHistory: []
 }
@@ -26,6 +29,10 @@ const WebSocketReducer = (state = initialState, action: any) => {
             return {...state, wsUserGroups: action.payload};
         case WS_CHECK_CONNECTED:
             return {...state, isWsConnected: action.payload};
+        case SET_ACTIVE_GROUP:
+            return {...state, activeGroup: action.payload};
+        case SET_ALL_MESSAGES_FETCHED:
+            return {...state, allMessagesFetched: action.payload};
         case CURRENT_ACTIVE_GROUP:
             return {...state, currentActiveGroup: action.payload};
         case SET_CHAT_HISTORY:

@@ -20,8 +20,11 @@ export const ImagePreviewComponent: React.FunctionComponent<ImagePreviewComponen
     const {theme} = useThemeContext();
 
     useEffect(() => {
-        document.addEventListener("keyup", closeDisplayImagePreview, false);
-    }, [])
+        document.addEventListener('keyup', closeDisplayImagePreview)
+        return () => {
+            document.removeEventListener('keyup', closeDisplayImagePreview)
+        }
+    }, [closeDisplayImagePreview])
 
     function handleImagePreview(event: any, action: string) {
         event.preventDefault();

@@ -2,12 +2,15 @@ package com.mercure.controller;
 
 import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
+import com.mercure.dto.OutputTransportDTO;
 import com.mercure.entity.FileEntity;
 import com.mercure.entity.MessageEntity;
 import com.mercure.service.GroupService;
 import com.mercure.service.MessageService;
 import com.mercure.service.StorageService;
+import com.mercure.service.UserSeenMessageService;
 import com.mercure.utils.MessageTypeEnum;
+import com.mercure.utils.TransportActionEnum;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +45,9 @@ public class WsFileController {
     @Autowired
     private StorageService storageService;
 
+    @Autowired
+    private UserSeenMessageService seenMessageService;
+
     /**
      * Receive file to put in DB and send it back to the group conversation
      *
@@ -52,18 +58,17 @@ public class WsFileController {
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadFile(@RequestParam(name = "file") MultipartFile file, @RequestParam(name = "userId") int userId, @RequestParam(name = "groupUrl") String groupUrl) {
-        FileEntity fileEntity = new FileEntity();
         int groupId = groupService.findGroupByUrl(groupUrl);
         try {
             MessageEntity messageEntity = messageService.createAndSaveMessage(userId, groupId, MessageTypeEnum.FILE.toString(), "has send a file");
             storageService.store(file, messageEntity.getId());
+            OutputTransportDTO res = new OutputTransportDTO();
             NotificationDTO notificationDTO = messageService.createNotificationDTO(messageEntity);
+            res.setAction(TransportActionEnum.NOTIFICATION_MESSAGE);
+            res.setObject(notificationDTO);
+            seenMessageService.saveMessageNotSeen(messageEntity, groupId);
             List<Integer> toSend = messageService.createNotificationList(userId, groupUrl);
-            toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/user/" + toUserId, notificationDTO));
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("url", fileEntity.getUrl());
-//            jsonObject.put("date", fileEntity.getCreatedAt());
-//            jsonObject.put("name", fileEntity.getFilename());
+            toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/user/" + toUserId, res));
         } catch (Exception e) {
             log.error("Cannot save file, caused by {}", e.getMessage());
             return ResponseEntity.status(500).build();

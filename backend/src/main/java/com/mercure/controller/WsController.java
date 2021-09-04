@@ -2,11 +2,8 @@ package com.mercure.controller;
 
 import com.mercure.dto.*;
 import com.mercure.entity.MessageEntity;
-import com.mercure.entity.UserEntity;
-import com.mercure.service.GroupService;
-import com.mercure.service.GroupUserJoinService;
-import com.mercure.service.MessageService;
-import com.mercure.service.UserService;
+import com.mercure.entity.MessageUserEntity;
+import com.mercure.service.*;
 import com.mercure.utils.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -52,6 +49,9 @@ public class WsController {
     @Autowired
     private GroupUserJoinService groupUserJoinService;
 
+    @Autowired
+    private UserSeenMessageService seenMessageService;
+
     @GetMapping
     public String testRoute(HttpServletRequest request) {
         String requestTokenHeader = request.getHeader("authorization");
@@ -63,7 +63,7 @@ public class WsController {
 
     @MessageMapping("/message")
     public void mainChannel(InputTransportDTO dto, @Header("simpSessionId") String sessionId) {
-        Map<Integer, String> sessions = userService.getMyMap();
+        Map<Integer, String> sessions = userService.getWsSessions();
         TransportActionEnum action = dto.getAction();
         switch (action) {
             case INIT_USER_DATA:
@@ -82,22 +82,26 @@ public class WsController {
                     if (dto.getGroupUrl().equals("") || groupUserJoinService.checkIfUserIsAuthorizedInGroup(dto.getUserId(), groupId)) {
                         break;
                     }
-                    List<MessageDTO> messages = this.getConversationMessage(dto.getGroupUrl());
+                    WrapperMessageDTO messages = this.getConversationMessage(dto.getGroupUrl(), dto.getMessageId());
                     OutputTransportDTO resMessages = new OutputTransportDTO();
-                    resMessages.setAction(TransportActionEnum.FETCH_GROUP_MESSAGES);
+                    if (dto.getMessageId() == -1) {
+                        resMessages.setAction(TransportActionEnum.FETCH_GROUP_MESSAGES);
+                    } else {
+                        resMessages.setAction(TransportActionEnum.ADD_CHAT_HISTORY);
+                    }
                     resMessages.setObject(messages);
                     this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), resMessages);
                 }
                 break;
-//            case GRANT_USER_ADMIN:
-//                String grantResponse = doUserAction(dto.getWsToken(), dto.getUserId(), dto.getGroupUrl(), dto.getAction());
-//                OutputTransportDTO res = new OutputTransportDTO();
-//                res.setAction(TransportActionEnum.GRANT_USER_ADMIN);
-//                MessageDTO m = new MessageDTO();
-//                m.setSender();
-//                m.setMessage(grantResponse);
-//                res.setObject(grantResponse);
-//                break;
+            case MARK_MESSAGE_AS_SEEN:
+                if (!dto.getGroupUrl().equals("")) {
+                    int messageId = messageService.findLastMessageIdByGroupId(groupService.findGroupByUrl(dto.getGroupUrl()));
+                    MessageUserEntity messageUserEntity = seenMessageService.findByMessageId(messageId, dto.getUserId());
+                    if (messageUserEntity == null) break;
+                    messageUserEntity.setSeen(true);
+                    seenMessageService.saveMessageUserEntity(messageUserEntity);
+                }
+                break;
             default:
                 break;
         }
@@ -138,14 +142,18 @@ public class WsController {
         }
         MessageEntity messageEntity = new MessageEntity(userId, groupId, MessageTypeEnum.TEXT.toString(), message);
         MessageEntity msg = messageService.save(messageEntity);
-        MessageDTO messageDTO = messageService.createNotificationMessageDTO(msg);
         List<Integer> toSend = messageService.createNotificationList(userId, groupUrl);
+
+        // Save seen message
+        seenMessageService.saveMessageNotSeen(msg, groupId);
+
         OutputTransportDTO dto = new OutputTransportDTO();
         dto.setAction(TransportActionEnum.NOTIFICATION_MESSAGE);
-        dto.setObject(messageDTO);
-        toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/user/" + toUserId, dto));
-        messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage());
-
+        toSend.forEach(toUserId -> {
+            MessageDTO messageDTO = messageService.createNotificationMessageDTO(msg, toUserId);
+            dto.setObject(messageDTO);
+            messagingTemplate.convertAndSend("/topic/user/" + toUserId, dto);
+        });
     }
 
     @MessageMapping("/message/call/{userId}/group/{groupUrl}")
@@ -181,44 +189,24 @@ public class WsController {
      * @param url The group url to map
      * @return List of message
      */
-    public List<MessageDTO> getConversationMessage(String url) {
+    public WrapperMessageDTO getConversationMessage(String url, int messageId) {
+        WrapperMessageDTO wrapper = new WrapperMessageDTO();
         if (url != null) {
             List<MessageDTO> messageDTOS = new ArrayList<>();
             int groupId = groupService.findGroupByUrl(url);
-            messageService.findByGroupId(groupId).forEach(msg -> {
-                messageDTOS.add(messageService.createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()));
-            });
-            return messageDTOS;
+            List<MessageEntity> newMessages = messageService.findByGroupId(groupId, messageId);
+            int lastMessageId = newMessages != null && newMessages.size() != 0 ? newMessages.get(0).getId() : 0;
+            List<MessageEntity> afterMessages = messageService.findByGroupId(groupId, lastMessageId);
+            if (newMessages != null) {
+                wrapper.setLastMessage(afterMessages != null && afterMessages.size() == 0);
+                newMessages.forEach(msg ->
+                        messageDTOS.add(messageService
+                                .createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()))
+                );
+            }
+            wrapper.setMessages(messageDTOS);
+            return wrapper;
         }
         return null;
     }
-
-//    private String doUserAction(String wsToken, Integer userIdToChange, String groupUrl, TransportActionEnum action) {
-//        int groupId = groupService.findGroupByUrl(groupUrl);
-//        int userAdminRequestId = userService.findUserIdWithToken(wsToken);
-//        UserEntity userEntity = userService.findById(userIdToChange);
-//        if (userEntity != null) {
-//            int adminUserId = userEntity.getId();
-//            if (action.equals("removeUser")) {
-//                groupUserJoinService.removeUserFromConversation(userAdminRequestId, groupId);
-//            }
-//            if (userService.checkIfUserIsAdmin(adminUserId, groupId)) {
-//                try {
-//                    if (action.equals(TransportActionEnum.GRANT_USER_ADMIN)) {
-//                        groupUserJoinService.grantUserAdminInConversation(userIdToChange, groupId);
-//                        return userEntity.getFirstName() + " has been granted administrator to " + groupService.getGroupName(groupUrl);
-//                    }
-//                    if (action.equals("delete")) {
-//                        groupUserJoinService.removeUserFromConversation(userIdToChange, groupId);
-//                    }
-//                    if (action.equals("removeAdmin")) {
-//                        groupUserJoinService.removeUserAdminFromConversation(userIdToChange, groupId);
-//                    }
-//                } catch (Exception e) {
-//                    log.warn("Error during performing {} : {}", action, e.getMessage());
-//                }
-//            }
-//        }
-//        return "";
-//    }
 }

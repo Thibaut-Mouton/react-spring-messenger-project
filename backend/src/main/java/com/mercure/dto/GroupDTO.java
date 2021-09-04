@@ -28,6 +28,8 @@ public class GroupDTO {
 
     private String groupType;
 
+    private String lastMessageSender;
+
     private String lastMessage;
 
     private String lastMessageDate;
@@ -64,6 +66,14 @@ public class GroupDTO {
 
     public void setGroupType(String groupType) {
         this.groupType = groupType;
+    }
+
+    public String getLastMessageSender() {
+        return lastMessageSender;
+    }
+
+    public void setLastMessageSender(String lastMessageSender) {
+        this.lastMessageSender = lastMessageSender;
     }
 
     public String getLastMessage() {

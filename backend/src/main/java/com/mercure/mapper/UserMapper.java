@@ -6,6 +6,7 @@ import com.mercure.dto.LightUserDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.UserEntity;
+import com.mercure.service.UserSeenMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class UserMapper {
 
     @Autowired
     private GroupMapper groupMapper;
+
+    @Autowired
+    private UserSeenMessageService seenMessageService;
 
     /**
      * Map a UserEntity to a UserDTO
@@ -49,7 +53,8 @@ public class UserMapper {
         userDTO.setExpiration_date(userEntity.getExpiration_date());
         userDTO.setJwt(userEntity.getJwt());
         userDTO.setAuthorities(userEntity.getAuthorities());
-        userEntity.getGroupSet().forEach(groupEntity -> groupEntitySet.add(groupMapper.toGroupDTO(groupEntity)));
+        userEntity.getGroupSet().forEach(groupEntity ->
+                groupEntitySet.add(groupMapper.toGroupDTO(groupEntity, userEntity.getId())));
         userDTO.setGroupList(groupEntitySet);
         return userDTO;
     }

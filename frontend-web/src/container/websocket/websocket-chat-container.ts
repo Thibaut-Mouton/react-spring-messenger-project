@@ -3,19 +3,28 @@ import {WebSocketChatComponent} from "../../components/websocket/websocket-chat-
 import {
     fetchGroupMessages, getGroupMessages, markMessageAsSeen,
     sendWsMessage,
-    setCurrentActiveGroup, setGroupMessages
+    setCurrentActiveGroup
 } from "../../actions/websocket-actions";
 import {Dispatch} from "redux";
 import {ReduxModel} from "../../model/redux-model";
 
+
 const mapStateToProps = (state: any) => {
-    const {isWsConnected, currentActiveGroup, chatHistory, wsObject, wsUserGroups} = state.WebSocketReducer;
+    const {
+        isWsConnected,
+        currentActiveGroup,
+        chatHistory,
+        wsObject,
+        wsUserGroups,
+        allMessagesFetched
+    } = state.WebSocketReducer;
     return {
+        allMessagesFetched,
         currentActiveGroup,
         chatHistory,
         wsUserGroups,
         wsObject,
-        isWsConnected
+        isWsConnected,
     };
 }
 
@@ -25,7 +34,7 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
         getGroupMessages: (model: ReduxModel) => dispatch(getGroupMessages(model)),
         setCurrentActiveGroup: (groupUrl: string) => dispatch(setCurrentActiveGroup(groupUrl)),
         sendWsMessage: (message: ReduxModel) => dispatch(sendWsMessage(message)),
-        markMessageAsSeen: (groupUrl: string) => dispatch(markMessageAsSeen(groupUrl))
+        markMessageAsSeen: (model: ReduxModel) => dispatch(markMessageAsSeen(model))
     }
 }
 

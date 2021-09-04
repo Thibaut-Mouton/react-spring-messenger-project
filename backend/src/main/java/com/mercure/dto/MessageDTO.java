@@ -5,7 +5,7 @@ public class MessageDTO {
     public MessageDTO() {
     }
 
-    public MessageDTO(int id, String type, String message, int userId, int groupId, String groupUrl, String sender, String time, String initials, String color, String fileUrl) {
+    public MessageDTO(int id, String type, String message, int userId, int groupId, String groupUrl, String sender, String time, String initials, String color, String fileUrl, boolean isMessageSeen) {
         this.id = id;
         this.type = type;
         this.message = message;
@@ -17,6 +17,7 @@ public class MessageDTO {
         this.initials = initials;
         this.color = color;
         this.fileUrl = fileUrl;
+        this.isMessageSeen = isMessageSeen;
     }
 
     private int id;
@@ -40,6 +41,8 @@ public class MessageDTO {
     private String color;
 
     private String fileUrl;
+
+    private boolean isMessageSeen;
 
     public int getId() {
         return id;
@@ -127,5 +130,13 @@ public class MessageDTO {
 
     public void setFileUrl(String fileUrl) {
         this.fileUrl = fileUrl;
+    }
+
+    public boolean isMessageSeen() {
+        return isMessageSeen;
+    }
+
+    public void setMessageSeen(boolean messageSeen) {
+        isMessageSeen = messageSeen;
     }
 }

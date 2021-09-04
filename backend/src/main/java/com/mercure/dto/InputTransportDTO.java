@@ -14,6 +14,8 @@ public class InputTransportDTO {
 
     private String message;
 
+    private int messageId;
+
     public int getUserId() {
         return userId;
     }
@@ -32,5 +34,9 @@ public class InputTransportDTO {
 
     public String getMessage() {
         return message;
+    }
+
+    public int getMessageId() {
+        return messageId;
     }
 }

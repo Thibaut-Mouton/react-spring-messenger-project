@@ -18,5 +18,7 @@ export function initWebSocket(userToken: string | undefined): Client {
         reconnectDelay: 5000,
         heartbeatIncoming: 4000,
         heartbeatOutgoing: 4000,
+        // maxWebSocketChunkSize: 8 * 1024,
+        // splitLargeFrames: true
     });
 }

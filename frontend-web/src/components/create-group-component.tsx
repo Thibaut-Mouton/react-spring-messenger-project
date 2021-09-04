@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Typography from "@material-ui/core/Typography";
@@ -18,6 +18,11 @@ export const CreateGroupComponent = () => {
     const [groupName, setGroupName] = useState("");
     const {theme} = useThemeContext();
     const {alerts, setAlerts} = useAlertContext();
+
+
+    useEffect(() => {
+        document.title = "Create group | FLM"
+    }, []);
 
     function handleChange(event: any) {
         event.preventDefault();

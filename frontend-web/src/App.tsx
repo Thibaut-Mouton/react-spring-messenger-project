@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import './App.css';
 import {createBrowserHistory} from 'history';
 import {
@@ -55,7 +55,6 @@ export const App = () => {
                     <RegisterFormComponent
                         {...props}
                         history={history}
-                        // isDarkModeEnable={this.state.isDarkModeEnabled}
                     />}
                 />
                 <Route exact path="/login" render={(props: any) =>

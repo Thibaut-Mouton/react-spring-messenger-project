@@ -16,25 +16,27 @@ import {AxiosError} from "axios";
 import {FullMessageModel} from "../../model/full-message-model";
 import {GroupActionEnum} from "./group-action-enum";
 import {TypeMessageEnum} from "../../utils/type-message-enum";
-import {Box} from "@material-ui/core";
+import {Box, CircularProgress} from "@material-ui/core";
 import {useLoaderContext} from "../../context/loader-context";
 import {useAlertContext} from "../../context/alert-context";
 import {FeedbackModel} from "../../model/feedback-model";
 import UUIDv4 from "../../utils/uuid-generator";
 
 interface WebsocketChatComponentType {
-    getGroupMessages: (groupUrl: ReduxModel) => {},
+    getGroupMessages: (model: ReduxModel) => {},
     currentActiveGroup: () => {},
     sendWsMessage: (model: ReduxModel) => {},
-    markMessageAsSeen: (message: string) => {},
-    fetchMessages: (groupUrl: ReduxModel) => {},
+    markMessageAsSeen: (model: ReduxModel) => {},
+    fetchMessages: (model: ReduxModel) => {},
     chatHistory: FullMessageModel[],
     wsUserGroups: GroupModel[],
+    allMessagesFetched: boolean,
     isWsConnected: boolean,
     groupName: string
 }
 
 export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatComponentType> = ({
+                                                                                                allMessagesFetched,
                                                                                                 getGroupMessages,
                                                                                                 currentActiveGroup,
                                                                                                 sendWsMessage,
@@ -50,6 +52,10 @@ export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatCompon
     const {setLoading} = useLoaderContext();
     const {alerts, setAlerts} = useAlertContext();
     const [isPreviewImageOpen, setPreviewImageOpen] = React.useState(false);
+
+    const [lastMessageId, setLastMessageId] = React.useState(0);
+    const [loadingOldMessages, setLoadingOldMessages] = React.useState<boolean>(false);
+
     const [imgSrc, setImgSrc] = React.useState("");
     const [file, setFile] = React.useState<File | null>(null);
     const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string>("");
@@ -60,17 +66,23 @@ export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatCompon
 
     useEffect(() => {
         if (isWsConnected) {
-            fetchMessages(new ReduxModel(undefined, undefined, groupUrl, user?.id, undefined));
+            fetchMessages(new ReduxModel(undefined, undefined, groupUrl, user?.id, undefined, -1));
             setLoading(false);
         }
     }, [isWsConnected])
 
     useEffect(() => {
-        fetchMessages(new ReduxModel(undefined, undefined, groupUrl, user?.id, undefined));
+        fetchMessages(new ReduxModel(undefined, undefined, groupUrl, user?.id, undefined, -1));
     }, [groupUrl])
 
     useEffect(() => {
-        scrollToEnd()
+        if (!loadingOldMessages) {
+            scrollToEnd()
+        }
+        setLoadingOldMessages(false)
+        if (chatHistory && chatHistory.length > 0) {
+            setLastMessageId(chatHistory[0].id)
+        }
     }, [chatHistory])
 
     function styleSelectedMessage() {
@@ -114,7 +126,6 @@ export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatCompon
 
     function submitMessage(event: any) {
         if (message !== "") {
-            console.log(event)
             if (event.key !== undefined && event.shiftKey && event.keyCode === 13) {
                 return;
             }
@@ -140,7 +151,6 @@ export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatCompon
             setMessage("")
         }
         if (file !== null) {
-            console.log("Publishing file");
             const userId: string = String(user?.id)
             const formData = new FormData();
             formData.append("file", file)
@@ -154,7 +164,6 @@ export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatCompon
             setFile(null)
             setImagePreviewUrl("")
         }
-        // updateGroupsOnMessage(groupUrl, wsUserGroups)
     }
 
     function scrollToEnd() {
@@ -180,11 +189,22 @@ export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatCompon
     }
 
     function markMessageSeen() {
-        // markMessageAsSeen(groupUrl)
+        markMessageAsSeen(new ReduxModel(undefined, undefined, groupUrl, user?.id))
+    }
+
+    function handleScroll(event: any) {
+        if (event.target.scrollTop === 0) {
+            if (!allMessagesFetched) {
+                setLoadingOldMessages(true)
+                fetchMessages(new ReduxModel(undefined, undefined, groupUrl, user?.id, undefined, lastMessageId));
+            }
+        } else {
+            setLoadingOldMessages(false)
+        }
     }
 
     return (
-        <div style={{display: "flex", flex: "1", flexDirection: "column"}}>
+        <div style={{display: "flex", flex: "1", flexDirection: "column", maxWidth: "45%"}}>
             <div style={{
                 width: "100%",
                 height: "50px",
@@ -194,37 +214,47 @@ export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatCompon
                     <span style={{fontSize: "20px", fontWeight: "bold"}}>{groupName}</span>
                 </Box>
             </div>
-            <div style={{
-                backgroundColor: "transparent",
-                width: "100%",
-                height: "calc(100% - 56px)",
-                overflowY: "scroll"
-            }}>
-                {/*<div style={{*/}
-                {/*    width: "inherit",*/}
-                {/*    boxSizing: "border-box",*/}
-                {/*    height: "40px",*/}
-                {/*    backgroundColor: "#5588dd",*/}
-                {/*    position: "fixed",*/}
-                {/*    display: "flex",*/}
-                {/*    justifyContent: "center"*/}
-                {/*}}>*/}
-                {/*    <CircularProgress size={20}/>*/}
-                {/*</div>*/}
+            <div
+                onScroll={(event) => handleScroll(event)}
+                style={{
+                    backgroundColor: "transparent",
+                    width: "100%",
+                    height: "calc(100% - 56px)",
+                    overflowY: "scroll"
+                }}>
+                {
+                    !allMessagesFetched && loadingOldMessages &&
+                    <div style={{
+                        width: "inherit",
+                        boxSizing: "border-box",
+                        height: "40px",
+                        position: "relative",
+                        display: "flex",
+                        justifyContent: "center"
+                    }}>
+                        <div style={{display: "flex", flexDirection: "column"}}>
+                            <div style={{display: 'flex', justifyContent: 'center'}}>
+                                <CircularProgress style={{margin: "5px"}} size={15}/>
+                            </div>
+                            <span style={{fontSize: "10px"}}>Loading older messages ....</span>
+                        </div>
+                    </div>
+                }
                 <ImagePreviewComponent imgSrc={imgSrc}
                                        displayImagePreview={isPreviewImageOpen}
                                        setDisplayImagePreview={handlePopupState}/>
                 {chatHistory && chatHistory.map((val, index, array) => (
                     <Tooltip
                         key={index}
-                        enterDelay={700}
+                        enterDelay={1000}
                         leaveDelay={0}
                         title={new Date(val.time).getHours() + ":" + new Date(val.time).getMinutes()}
                         placement="left">
                         <div className={'msg ' + styleSelectedMessage()} key={index}
-                             style={{display: "flex", alignItems: "center"}}>
+                             style={{display: "flex"}}>
                             {index >= 1 && array[index - 1].userId === array[index].userId ?
                                 <div style={{
+                                    minWidth: "40px",
                                     width: "40px",
                                     height: "40px",
                                 }}/>
@@ -233,6 +263,7 @@ export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatCompon
                                     fontFamily: "Segoe UI,SegoeUI,\"Helvetica Neue\",Helvetica,Arial,sans-serif",
                                     backgroundColor: `${val.color}`,
                                     letterSpacing: "1px",
+                                    minWidth: "40px",
                                     width: "40px",
                                     height: "40px",
                                     textAlign: "center",
@@ -254,7 +285,7 @@ export const WebSocketChatComponent: React.FunctionComponent<WebsocketChatCompon
                                 }
                                 {
                                     val.type === TypeMessageEnum.TEXT ?
-                                        <div>
+                                        <div style={{overflowWrap: "break-word"}}>
                                             {val.message}
                                         </div>
                                         :

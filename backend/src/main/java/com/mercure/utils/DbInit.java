@@ -7,18 +7,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.util.ArrayUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Class used to fill the database on startup
- * Uncomment @Service annotation to enable CommandLineRunner
+ * Class used to fill the database on startup if no data detected
  */
-//@Service
+@Service
 public class DbInit implements CommandLineRunner {
 
     static Logger log = LoggerFactory.getLogger(DbInit.class);
@@ -34,21 +31,25 @@ public class DbInit implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        List<String> sourceList = Arrays.asList("Thibaut", "Gatien", "John", "Luc", "Antoine");
-        sourceList.forEach(val -> {
-            UserEntity user = new UserEntity();
-            user.setFirstName(val);
-            user.setLastName("Doe" + val);
-            user.setPassword(passwordEncoder.encode("root"));
-            user.setMail(val + ".fastlitemessage@software.com");
-            user.setEnabled(true);
-            user.setCredentialsNonExpired(true);
-            user.setAccountNonLocked(true);
-            user.setAccountNonExpired(true);
-            user.setWsToken(UUID.randomUUID().toString());
-            user.setRole(1);
-            userService.save(user);
-            log.info("UserEntity has been created");
-        });
+        if (userService.findAll().size() == 0) {
+            List<String> sourceList = Arrays.asList("Thibaut", "Mark", "John", "Luke", "Steve");
+            sourceList.forEach(val -> {
+                UserEntity user = new UserEntity();
+                user.setFirstName(val);
+                user.setLastName("Doe" + val.toLowerCase());
+                user.setPassword(passwordEncoder.encode("root"));
+                user.setMail(val.toLowerCase() + "@fastlitemessage.com");
+                user.setEnabled(true);
+                user.setCredentialsNonExpired(true);
+                user.setAccountNonLocked(true);
+                user.setAccountNonExpired(true);
+                user.setWsToken(UUID.randomUUID().toString());
+                user.setRole(1);
+                userService.save(user);
+            });
+            log.info("No entries detected in User table, data created");
+        } else {
+            log.info("Data already set in User table, skipping init step");
+        }
     }
 }

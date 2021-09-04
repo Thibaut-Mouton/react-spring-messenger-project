@@ -11,8 +11,10 @@ export class FullMessageModel {
     color: string
     name: string
     fileUrl: string
+    lastMessage: boolean
+    isMessageSeen: boolean
 
-    constructor(id: number, type: string, message: string, userId: number, groupId: number, groupUrl: string, sender: string, time: string, initials: string, color: string, name: string, fileUrl: string) {
+    constructor(id: number, type: string, message: string, userId: number, groupId: number, groupUrl: string, sender: string, time: string, initials: string, color: string, name: string, fileUrl: string, isMessageSeen: boolean, lastMessage: boolean) {
         this.id = id;
         this.type = type;
         this.message = message;
@@ -25,5 +27,7 @@ export class FullMessageModel {
         this.color = color;
         this.name = name;
         this.fileUrl = fileUrl;
+        this.lastMessage = lastMessage;
+        this.isMessageSeen = isMessageSeen;
     }
 }

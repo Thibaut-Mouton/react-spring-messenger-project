@@ -25,7 +25,7 @@ body {
 }
 
 .msg {
-    white-space: pre;
+    white-space: pre-wrap;
     padding: 2px 0 2px 5px;
 }
 

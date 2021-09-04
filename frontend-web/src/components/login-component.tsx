@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {generateIconColorMode, generateLinkColorMode} from "../design/style/enable-dark-mode";
 import LockIcon from "@material-ui/icons/Lock";
 import Typography from "@material-ui/core/Typography";
@@ -6,7 +6,6 @@ import Grid from "@material-ui/core/Grid";
 import {CustomTextField} from "../design/partials/custom-material-textfield";
 import Button from "@material-ui/core/Button";
 import {Link} from "react-router-dom";
-import Box from "@material-ui/core/Box";
 import AuthService from "../service/auth-service";
 import {useHistory} from "react-router-dom";
 import {useThemeContext} from "../context/theme-context";
@@ -17,6 +16,7 @@ import {useAlertContext} from "../context/alert-context";
 import {FeedbackModel} from "../model/feedback-model";
 import UUIDv4 from "../utils/uuid-generator";
 import {useLoaderContext} from "../context/loader-context";
+import {FooterComponent} from "../design/utils/footer-component";
 
 interface LoginComponentType {
 
@@ -30,6 +30,11 @@ export const LoginComponent: React.FunctionComponent<LoginComponentType> = () =>
     const {setUser} = useAuthContext();
     const {setLoading} = useLoaderContext();
     const {alerts, setAlerts} = useAlertContext();
+
+
+    useEffect(() => {
+        document.title = 'Login | FLM'
+    }, []);
 
     function handleChange(e: any) {
         e.preventDefault();
@@ -138,22 +143,7 @@ export const LoginComponent: React.FunctionComponent<LoginComponentType> = () =>
                         </Link>
                     </Grid>
                 </div>
-                <Box mt={5}>
-                    <Typography variant="body2" color="inherit" align="center">
-                        {/*<Link target="_blank" to="https://github.com/Thibaut-Mouton/react-spring-messenger-project"*/}
-                        {/*      className={"lnk"}*/}
-                        {/*      style={{color: generateLinkColorMode(theme)}}*/}
-                        {/*>*/}
-                        {/*    FastLiteMessage - Open source software -*/}
-                        {/*</Link>*/}
-                        <a target={"_blank"} className={"clrcstm lnk"}
-                           href={"https://github.com/Thibaut-Mouton/react-spring-messenger-project"}>
-                            FastLiteMessage - Open source software -
-                        </a>
-                        {' '}
-                        {new Date().getFullYear()}
-                    </Typography>
-                </Box>
+                <FooterComponent/>
             </div>
         </div>
     )

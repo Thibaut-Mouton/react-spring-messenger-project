@@ -5,6 +5,7 @@
     "module": "esnext",
     "strict": true,
     "allowJs": true,
+    "strictNullChecks": true,
     "lib": [
       "dom",
       "dom.iterable",

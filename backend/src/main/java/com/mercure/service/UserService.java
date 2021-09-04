@@ -1,7 +1,6 @@
 package com.mercure.service;
 
 import com.mercure.dto.GroupMemberDTO;
-import com.mercure.dto.LightUserDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
@@ -31,14 +30,14 @@ public class UserService {
     @Autowired
     private GroupUserJoinService groupUserJoinService;
 
-    private Map<Integer, String> myMap = new HashMap<>();
+    private Map<Integer, String> wsSessions = new HashMap<>();
 
-    public Map<Integer, String> getMyMap() {
-        return myMap;
+    public Map<Integer, String> getWsSessions() {
+        return wsSessions;
     }
 
-    public void setMyMap(Map<Integer, String> myMap) {
-        this.myMap = myMap;
+    public void setWsSessions(Map<Integer, String> wsSessions) {
+        this.wsSessions = wsSessions;
     }
 
     public void deleteAll() {
@@ -47,6 +46,10 @@ public class UserService {
 
     public void flush() {
         userRepository.flush();
+    }
+
+    public List<UserEntity> findAll() {
+        return userRepository.findAll();
     }
 
     @Transactional

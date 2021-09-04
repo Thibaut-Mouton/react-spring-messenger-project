@@ -62,10 +62,9 @@ export const WebsocketGroupsComponent: React.FunctionComponent<WebsocketGroupsCo
                                                                                                     setGroupName
                                                                                                 }) => {
     const history = useHistory();
-    const [loading, setLoading] = React.useState(true);
+    const [loadingState, setLoadingState] = React.useState(true);
     const {theme} = useThemeContext();
     const groupUrl = window.location.pathname.split("/").slice(-1)[0];
-
 
     function changeGroupName(url: string) {
         const val = wsUserGroups.find((elt) => elt.url === url)
@@ -75,12 +74,13 @@ export const WebsocketGroupsComponent: React.FunctionComponent<WebsocketGroupsCo
     useEffect(() => {
         if (wsUserGroups) {
             changeGroupName(groupUrl);
-            setLoading(false);
+            setLoadingState(false);
         }
     }, [wsUserGroups])
 
     function redirectToGroup(id: number, url: string) {
         changeGroupName(url);
+        // setLoading(true)
         setCurrentActiveGroup(url);
         history.push("/t/messages/" + url);
     }
@@ -124,7 +124,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<WebsocketGroupsCo
                 </div>
             </div>
             {
-                !loading && wsUserGroups && wsUserGroups.length === 0 &&
+                !loadingState && wsUserGroups && wsUserGroups.length === 0 &&
                 <div
                     className={generateColorMode(theme)}
                     style={{
@@ -146,7 +146,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<WebsocketGroupsCo
                 </div>
             }
             <List>
-                {!loading && wsUserGroups && wsUserGroups.map(data => (
+                {!loadingState && wsUserGroups && wsUserGroups.map(data => (
                     <ListItem className={styleSelectedGroup(data.url)} button key={data.id}
                               onClick={() => redirectToGroup(data.id, data.url)}>
                         <Avatar>
@@ -162,13 +162,13 @@ export const WebsocketGroupsComponent: React.FunctionComponent<WebsocketGroupsCo
                             primary={
                                 <React.Fragment>
                                     <span
-                                        className={styleUnreadMessage(data.isLastMessageSeen)}>{data.name}
+                                        className={styleUnreadMessage(!data.lastMessageSeen)}>{data.name}
                                     </span>
                                 </React.Fragment>}
                             secondary={
                                 <React.Fragment>
                                         <span
-                                            className={styleUnreadMessage(data.isLastMessageSeen) + " group-subtitle-color"}
+                                            className={styleUnreadMessage(!data.lastMessageSeen) + " group-subtitle-color"}
                                             style={{
                                                 display: "flex",
                                                 justifyContent: "space-between"
@@ -180,25 +180,21 @@ export const WebsocketGroupsComponent: React.FunctionComponent<WebsocketGroupsCo
                                                 whiteSpace: "nowrap",
                                                 textOverflow: "ellipsis"
                                             }}>
-                                            {data.lastMessage} <span style={{fontWeight: "bold"}}> · </span><Clock
-                                            date={data.lastMessageDate}/>
+                                            {data.lastMessageSender ? data.lastMessageSender + ": " : ""}
+                                            {data.lastMessage ? data.lastMessage :
+                                                <span style={{fontStyle: "italic"}}>No message for the moment</span>}
+                                            {data.lastMessage ? <span style={{fontWeight: "bold"}}> · </span> : ''}
+                                            <Clock date={data.lastMessageDate}/>
                                         </span>
-                                            {/*<span className={"clrcstm"} style={{fontWeight: "inherit"}}>*/}
-                                            {/*   <Clock date={data.lastMessageDate}/>*/}
-                                            {/*</span>*/}
                                         </span>
                                 </React.Fragment>}
                         />
                     </ListItem>
                 ))}
                 {
-                    loading && <SkeletonLoader/>
+                    loadingState && <SkeletonLoader/>
                 }
             </List>
-            {/*<AllUsersDialog closeDialog={handleAddUserAction}*/}
-            {/*                doUserDialogAction={createConversation}*/}
-            {/*                open={popupOpen}*/}
-            {/*                dialogTitleText={"Start conversation with someone"}/>*/}
         </div>
     )
 }

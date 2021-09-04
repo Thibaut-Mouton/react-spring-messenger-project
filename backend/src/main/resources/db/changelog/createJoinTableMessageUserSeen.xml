@@ -7,36 +7,35 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
          http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
 
-    <changeSet id="createJoinTableUserGroup" author="TMN">
+    <changeSet id="createMessageUserSeenTable" author="TMN">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="group_user"/>
+                <tableExists tableName="message_user"/>
             </not>
         </preConditions>
-        <createTable tableName="group_user">
-            <column name="group_id" type="INT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_group_user_table"/>
+        <createTable tableName="message_user">
+            <column name="message_id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_message_user_table"/>
             </column>
             <column name="user_id" type="INT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_group_user_table"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_message_user_table"/>
             </column>
-            <column name="role" type="INT">
+            <column name="seen" type="boolean">
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addForeignKeyConstraint baseTableName="group_user"
-                                 baseColumnNames="group_id"
-                                 constraintName="fk_group_join"
-                                 referencedTableName="chat_group"
+        <addForeignKeyConstraint baseTableName="message_user"
+                                 baseColumnNames="message_id"
+                                 constraintName="fk_message_join"
+                                 referencedTableName="message"
                                  referencedColumnNames="id"/>
-        <addForeignKeyConstraint baseTableName="group_user"
+        <addForeignKeyConstraint baseTableName="message_user"
                                  baseColumnNames="user_id"
-                                 constraintName="fk_user_join"
+                                 constraintName="fk_user_message_join"
                                  referencedTableName="user"
                                  referencedColumnNames="id"/>
         <rollback>
-            <dropTable tableName="group_user"/>
+            <dropTable tableName="message_user"/>
         </rollback>
     </changeSet>
-
 </databaseChangeLog>

@@ -11,17 +11,17 @@ import {ReduxModel} from "../../model/redux-model";
 import {useLoaderContext} from "../../context/loader-context";
 
 interface WebsocketMainComponentType {
-    setWsObject: (model: ReduxModel | null) => {}
-    wsCheckConnected: (isConnected: boolean) => {}
-    initCallWebRTC: () => {}
+    setWsObject: (model: ReduxModel) => {}
+    wsCheckConnected: (isConnected: boolean) => void
     unsubscribeAll: () => {}
+    setCurrentActiveGroup: (groupUrl: string) => void
 }
+
 
 export const WebSocketMainComponent: React.FunctionComponent<WebsocketMainComponentType> = ({
                                                                                                 setWsObject,
                                                                                                 wsCheckConnected,
-                                                                                                initCallWebRTC,
-                                                                                                unsubscribeAll,
+                                                                                                unsubscribeAll
                                                                                             }) => {
     const {theme} = useThemeContext();
     const {user} = useAuthContext();
@@ -29,14 +29,18 @@ export const WebSocketMainComponent: React.FunctionComponent<WebsocketMainCompon
     const [groupName, setGroupName] = React.useState<string>("");
 
     useEffect(() => {
+        document.title = 'Messages | FLM'
+    }, []);
+
+    useEffect(() => {
         if (user && user.wsToken !== null) {
             setLoading(true)
             initWs()
         }
         return () => {
-            setWsObject(null);
             wsCheckConnected(false);
             unsubscribeAll()
+            setWsObject(new ReduxModel(undefined));
         }
     }, [user?.wsToken])
 

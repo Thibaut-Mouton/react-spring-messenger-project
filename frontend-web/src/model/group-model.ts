@@ -12,15 +12,18 @@ export class GroupModel {
 
     public lastMessageDate: string;
 
-    public isLastMessageSeen: boolean;
+    public lastMessageSeen: boolean;
 
-    constructor(id: number, url: string, name: string, groupType: string, lastMessage: string, lastMessageDate: string, iLastMessageSeen: boolean) {
+    public lastMessageSender: string;
+
+    constructor(id: number, url: string, name: string, groupType: string, lastMessage: string, lastMessageDate: string, iLastMessageSeen: boolean, lastMessageSender: string) {
         this.id = id;
         this.url = url;
         this.name = name;
         this.groupType = groupType;
         this.lastMessage = lastMessage;
         this.lastMessageDate = lastMessageDate;
-        this.isLastMessageSeen = iLastMessageSeen;
+        this.lastMessageSeen = iLastMessageSeen;
+        this.lastMessageSender = lastMessageSender;
     }
 }

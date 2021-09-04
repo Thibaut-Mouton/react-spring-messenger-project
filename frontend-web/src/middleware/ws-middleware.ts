@@ -11,7 +11,13 @@ import {
     SET_WS_GROUPS,
     UNSUBSCRIBE_ALL,
 } from "../utils/redux-constants";
-import {addChatHistory, setGroupMessages, setWsUserGroups, wsHealthCheckConnected} from "../actions/websocket-actions";
+import {
+    addChatHistory, setAllMessagesFetched,
+    setCurrentActiveGroup,
+    setGroupMessages,
+    setWsUserGroups,
+    wsHealthCheckConnected
+} from "../actions/websocket-actions";
 import {handleRTCActions} from "./webRTC-middleware";
 import {Client, IMessage, StompSubscription} from "@stomp/stompjs";
 import {ReduxModel} from "../model/redux-model";
@@ -21,52 +27,65 @@ import {GroupModel} from "../model/group-model";
 import {TransportModel} from "../model/transport-model";
 import {TransportActionEnum} from "../utils/transport-action-enum";
 import {OutputTransportDTO} from "../model/input-transport-model";
-import {MessageModel} from "../model/message-model";
 import {playNotificationSound} from "../config/play-sound-notification";
+import {getPayloadSize} from "../utils/string-size-calculator";
+import {WrapperMessageModel} from "../model/wrapper-message-model";
 
 let mainSubscribe: StompSubscription;
-
-function initWsAndSubscribe(wsClient: Client, store: Store, reduxModel: ReduxModel) {
-    const wsUserTokenValue = reduxModel.userToken;
-    const userId = reduxModel.userId;
-    wsClient.onConnect = () => {
-        store.dispatch(store.dispatch(wsHealthCheckConnected(true)))
-        mainSubscribe = wsClient.subscribe(`/topic/user/${userId}`, (res: IMessage) => {
-            const data: OutputTransportDTO = JSON.parse(res.body);
-            switch (data.action) {
-                case TransportActionEnum.INIT_USER_DATA:
-                    store.dispatch(setWsUserGroups(data.object as GroupModel[]))
-                    break;
-                case TransportActionEnum.FETCH_GROUP_MESSAGES:
-                    store.dispatch(setGroupMessages(data.object as MessageModel[]));
-                    break;
-                case TransportActionEnum.SEND_GROUP_MESSAGE:
-                    break;
-                case TransportActionEnum.NOTIFICATION_MESSAGE:
-                    const message = data.object as FullMessageModel;
-                    updateGroupsWithLastMessageSent(store, message, userId || 0);
-                    store.dispatch(addChatHistory(message))
-                    if (message.userId !== userId) {
-                        playNotificationSound();
-                    }
-                    break;
-                default:
-                    break;
-            }
-        });
-        publishWs(wsClient, new TransportModel(userId || 0, TransportActionEnum.INIT_USER_DATA, wsUserTokenValue));
-    }
-
-    wsClient.onWebSocketClose = () => {
-        console.log("ERROR DURING HANDSHAKE WITH SERVER")
-        store.dispatch(wsHealthCheckConnected(false))
-    }
-    wsClient.activate();
-}
 
 interface ReduxActionType {
     type: string
     payload: any
+}
+
+function initWsAndSubscribe(wsClient: Client, store: Store, reduxModel: ReduxModel) {
+    const wsUserTokenValue = reduxModel.userToken;
+    const userId = reduxModel.userId;
+    if (wsClient) {
+        wsClient.onConnect = () => {
+            store.dispatch(store.dispatch(wsHealthCheckConnected(true)))
+            mainSubscribe = wsClient.subscribe(`/topic/user/${userId}`, (res: IMessage) => {
+                const data: OutputTransportDTO = JSON.parse(res.body);
+                switch (data.action) {
+                    case TransportActionEnum.INIT_USER_DATA:
+                        store.dispatch(setWsUserGroups(data.object as GroupModel[]))
+                        break;
+                    case TransportActionEnum.FETCH_GROUP_MESSAGES:
+                        const result = data.object as WrapperMessageModel
+                        store.dispatch(setGroupMessages(result.messages))
+                        store.dispatch(setAllMessagesFetched(result.lastMessage))
+                        break;
+                    case TransportActionEnum.ADD_CHAT_HISTORY:
+                        const wrapper = data.object as WrapperMessageModel
+                        store.dispatch(setAllMessagesFetched(wrapper.lastMessage))
+                        const newMessages = wrapper.messages
+                        const currentMessages: FullMessageModel[] = store.getState().WebSocketReducer.chatHistory;
+                        store.dispatch(setGroupMessages(newMessages.concat(currentMessages)))
+                        break;
+                    case TransportActionEnum.SEND_GROUP_MESSAGE:
+                        break;
+                    case TransportActionEnum.NOTIFICATION_MESSAGE:
+                        const message = data.object as FullMessageModel;
+                        store.dispatch(setCurrentActiveGroup(message.groupUrl));
+                        updateGroupsWithLastMessageSent(store, message, userId || 0);
+                        store.dispatch(addChatHistory(message))
+                        if (message.userId !== userId) {
+                            playNotificationSound();
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            });
+            publishWs(wsClient, new TransportModel(userId || 0, TransportActionEnum.INIT_USER_DATA, wsUserTokenValue));
+        }
+
+        wsClient.onWebSocketClose = () => {
+            console.log("ERROR DURING HANDSHAKE WITH SERVER")
+            store.dispatch(wsHealthCheckConnected(false))
+        }
+        wsClient.activate();
+    }
 }
 
 function publishWs(wsClient: Client, transportModel: TransportModel) {
@@ -92,26 +111,32 @@ const WsClientMiddleWare = () => {
                 initWsAndSubscribe(wsClient, store, action.payload);
                 break;
             case FETCH_GROUP_MESSAGES:
-                store.dispatch(setGroupMessages([]));
-                publishWs(wsClient, new TransportModel(model.userId || 0, TransportActionEnum.FETCH_GROUP_MESSAGES, undefined, model.groupUrl, undefined))
+                // store.dispatch(setGroupMessages([]));
+                publishWs(wsClient, new TransportModel(model.userId || 0, TransportActionEnum.FETCH_GROUP_MESSAGES, undefined, model.groupUrl, undefined, model.messageId))
                 break;
             case SEND_GROUP_MESSAGE:
-                publishWs(wsClient, new TransportModel(model.userId || 0, TransportActionEnum.SEND_GROUP_MESSAGE, undefined, model.groupUrl, model.message));
+                //TODO send back alert to UI
+                if (getPayloadSize(model.message!) < 8192) {
+                    publishWs(wsClient, new TransportModel(model.userId || 0, TransportActionEnum.SEND_GROUP_MESSAGE, undefined, model.groupUrl, model.message));
+                }
                 break;
             case MARK_MESSAGE_AS_SEEN:
-                markMessageAsSeen(store, action.payload.groupUrl || "")
+                markMessageAsSeen(store, model.groupUrl || "")
+                publishWs(wsClient, new TransportModel(model.userId || 0, TransportActionEnum.MARK_MESSAGE_AS_SEEN, undefined, model.groupUrl))
                 break;
             case UNSUBSCRIBE_ALL:
+                console.log(`unsubscribe mainSubscribe with value ! ${mainSubscribe}`)
+                if (mainSubscribe) {
+                    mainSubscribe.unsubscribe();
+                }
                 break;
             case HANDLE_RTC_ACTIONS:
                 handleRTCActions(wsClient, store, action.payload);
                 break;
             case HANDLE_RTC_OFFER:
-                console.log("Create offer ...")
                 handleRTCActions(wsClient, store, action.payload);
                 break;
             case HANDLE_RTC_ANSWER:
-                console.log("Create answer ...")
                 handleRTCActions(wsClient, store, action.payload);
                 break;
             case SEND_TO_SERVER:
@@ -121,7 +146,7 @@ const WsClientMiddleWare = () => {
                 publishWs(wsClient, new TransportModel(model.userId || 0, TransportActionEnum.GRANT_USER_ADMIN, model.userToken, model.groupUrl))
                 break;
             default:
-                // console.log(`Unhandled action : ${action.type}`);
+                console.log(`Unhandled action : ${action.type}`);
                 return next(action);
         }
     };
@@ -138,7 +163,6 @@ const WsClientMiddleWare = () => {
 function updateGroupsWithLastMessageSent(store: Store, value: FullMessageModel, userId: number) {
     const groupIdToUpdate = value.groupId;
     const groups: GroupModel[] = store.getState().WebSocketReducer.wsUserGroups;
-
     let groupToPlaceInFirstPosition = groups.findIndex((elt) => elt.id === groupIdToUpdate);
     if (groupToPlaceInFirstPosition === -1) {
         return
@@ -147,6 +171,8 @@ function updateGroupsWithLastMessageSent(store: Store, value: FullMessageModel, 
     let item = {...groupsArray[groupToPlaceInFirstPosition]};
     item.lastMessage = value.message;
     item.lastMessageDate = value.time;
+    item.lastMessageSeen = value.isMessageSeen;
+    item.lastMessageSender = value.sender;
     groupsArray.splice(groupToPlaceInFirstPosition, 1);
     groupsArray.unshift(item);
     store.dispatch({type: SET_WS_GROUPS, payload: groupsArray})
@@ -158,11 +184,8 @@ function markMessageAsSeen(store: Store, groupUrl: string) {
     if (groupToUpdateIndex === -1) {
         return;
     }
-    if (!groups[groupToUpdateIndex].isLastMessageSeen) {
-        return;
-    }
     let groupsArray = [...groups];
-    groupsArray[groupToUpdateIndex].isLastMessageSeen = false;
+    groupsArray[groupToUpdateIndex].lastMessageSeen = true;
     store.dispatch({type: SET_WS_GROUPS, payload: groupsArray})
 }
 

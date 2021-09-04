@@ -9,9 +9,6 @@ import java.util.Objects;
 @IdClass(GroupRoleKey.class)
 public class GroupUser implements Serializable {
 
-//    @EmbeddedId
-//    GroupRoleKey id;
-
     @Id
     private int groupId;
 
@@ -29,14 +26,6 @@ public class GroupUser implements Serializable {
     UserEntity userMapping;
 
     private int role;
-
-//    public GroupRoleKey getId() {
-//        return id;
-//    }
-//
-//    public void setId(GroupRoleKey id) {
-//        this.id = id;
-//    }
 
     public int getGroupId() {
         return groupId;

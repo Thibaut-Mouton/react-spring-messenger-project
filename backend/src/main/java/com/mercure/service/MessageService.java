@@ -7,13 +7,11 @@ import com.mercure.entity.GroupEntity;
 import com.mercure.entity.MessageEntity;
 import com.mercure.repository.MessageRepository;
 import com.mercure.utils.MessageTypeEnum;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -57,12 +55,20 @@ public class MessageService {
         return messageRepository.save(messageEntity);
     }
 
-    public List<MessageEntity> findByGroupId(int id) {
-        return messageRepository.findAllByGroupId(id);
+    public List<MessageEntity> findByGroupId(int id, int offset) {
+        List<MessageEntity> list = messageRepository.findByGroupIdAndOffset(id, offset);
+        if (list.size() == 0) {
+            return new ArrayList<>();
+        }
+        return list;
     }
 
     public MessageEntity findLastMessage(int groupId) {
         return messageRepository.findLastMessageByGroupId(groupId);
+    }
+
+    public int findLastMessageIdByGroupId(int groupId) {
+        return messageRepository.findLastMessageIdByGroupId(groupId);
     }
 
     /**
@@ -89,7 +95,7 @@ public class MessageService {
             FileEntity fileEntity = fileService.findByFkMessageId(id);
             fileUrl = fileEntity.getUrl();
         }
-        return new MessageDTO(id, type, message, userId, group_id, null, sender, date, initials, colors.get(userId), fileUrl);
+        return new MessageDTO(id, type, message, userId, group_id, null, sender, date, initials, colors.get(userId), fileUrl, userId == id);
     }
 
     public static String createUserInitials(String str) {
@@ -110,28 +116,29 @@ public class MessageService {
     }
 
     public NotificationDTO createNotificationDTO(MessageEntity msg) {
+        String groupUrl = groupService.getGroupUrlById(msg.getGroup_id());
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setGroupId(msg.getGroup_id());
+        notificationDTO.setGroupUrl(groupUrl);
         if (msg.getType().equals(MessageTypeEnum.TEXT.toString())) {
-            notificationDTO.setMessageTypeEnum(MessageTypeEnum.TEXT);
+            notificationDTO.setType(MessageTypeEnum.TEXT);
             notificationDTO.setMessage(msg.getMessage());
         }
         if (msg.getType().equals(MessageTypeEnum.FILE.toString())) {
             FileEntity fileEntity = fileService.findByFkMessageId(msg.getId());
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("url", fileEntity.getUrl());
-            jsonObject.put("date", fileEntity.getCreatedAt());
-            jsonObject.put("name", fileEntity.getFilename());
-            notificationDTO.setMessageTypeEnum(MessageTypeEnum.FILE);
-            notificationDTO.setMessage(jsonObject.toString());
+            notificationDTO.setType(MessageTypeEnum.FILE);
+            notificationDTO.setMessage(msg.getMessage());
+            notificationDTO.setFileUrl(fileEntity.getUrl());
+            notificationDTO.setFileName(fileEntity.getFilename());
         }
         notificationDTO.setFromUserId(msg.getUser_id());
         notificationDTO.setLastMessageDate(msg.getCreatedAt().toString());
         notificationDTO.setSenderName(userService.findFirstNameById(msg.getUser_id()));
+        notificationDTO.setMessageSeen(false);
         return notificationDTO;
     }
 
-    public MessageDTO createNotificationMessageDTO(MessageEntity msg) {
+    public MessageDTO createNotificationMessageDTO(MessageEntity msg, int userId) {
         String groupUrl = groupService.getGroupUrlById(msg.getGroup_id());
         String firstName = userService.findFirstNameById(msg.getUser_id());
         String initials = userService.findUsernameById(msg.getUser_id());
@@ -146,6 +153,7 @@ public class MessageService {
         messageDTO.setTime(msg.getCreatedAt().toString());
         messageDTO.setInitials(createUserInitials(initials));
         messageDTO.setColor(colors.get(msg.getUser_id()));
+        messageDTO.setMessageSeen(msg.getUser_id() == userId);
         return messageDTO;
     }
 }
