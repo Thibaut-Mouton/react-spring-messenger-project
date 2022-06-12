@@ -1,5 +1,6 @@
 package com.mercure.utils;
 
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -7,11 +8,8 @@ import java.util.Locale;
 import java.util.Random;
 
 @Service
+@NoArgsConstructor
 public class FileNameGenerator {
-
-    public FileNameGenerator() {
-
-    }
 
     /**
      * Generate a random string.

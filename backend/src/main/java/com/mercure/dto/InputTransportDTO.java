@@ -1,7 +1,15 @@
 package com.mercure.dto;
 
 import com.mercure.utils.TransportActionEnum;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class InputTransportDTO {
 
     private int userId;
@@ -15,28 +23,4 @@ public class InputTransportDTO {
     private String message;
 
     private int messageId;
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public TransportActionEnum getAction() {
-        return action;
-    }
-
-    public String getWsToken() {
-        return wsToken;
-    }
-
-    public String getGroupUrl() {
-        return groupUrl;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public int getMessageId() {
-        return messageId;
-    }
 }

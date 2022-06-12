@@ -1,5 +1,10 @@
 package com.mercure.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
@@ -7,6 +12,10 @@ import java.util.Objects;
 @Entity
 @Table(name = "group_user")
 @IdClass(GroupRoleKey.class)
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class GroupUser implements Serializable {
 
     @Id
@@ -26,46 +35,6 @@ public class GroupUser implements Serializable {
     UserEntity userMapping;
 
     private int role;
-
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public GroupEntity getGroupMapping() {
-        return groupMapping;
-    }
-
-    public void setGroupMapping(GroupEntity groupMapping) {
-        this.groupMapping = groupMapping;
-    }
-
-    public UserEntity getUserMapping() {
-        return userMapping;
-    }
-
-    public void setUserMapping(UserEntity userMapping) {
-        this.userMapping = userMapping;
-    }
-
-    public int getRole() {
-        return role;
-    }
-
-    public void setRole(int role) {
-        this.role = role;
-    }
 
     @Override
     public int hashCode() {

@@ -2,28 +2,26 @@ package com.mercure.mapper;
 
 import com.mercure.dto.AuthUserDTO;
 import com.mercure.dto.GroupDTO;
-import com.mercure.dto.LightUserDTO;
 import com.mercure.dto.UserDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.UserEntity;
-import com.mercure.service.UserSeenMessageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.mercure.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserMapper {
-
-    private Logger log = LoggerFactory.getLogger(UserMapper.class);
 
     @Autowired
     private GroupMapper groupMapper;
 
     @Autowired
-    private UserSeenMessageService seenMessageService;
+    private UserService userService;
 
     /**
      * Map a UserEntity to a UserDTO
@@ -61,8 +59,11 @@ public class UserMapper {
 
 
     public AuthUserDTO toLightUserDTO(UserEntity userEntity) {
-        Optional<GroupEntity> groupUrl = userEntity.getGroupSet().stream().findFirst();
-        String val = groupUrl.isPresent() ? groupUrl.get().getUrl() : "";
-        return new AuthUserDTO(userEntity.getId(), userEntity.getFirstName(), val, userEntity.getWsToken());
+        Set<GroupEntity> groups = userEntity.getGroupSet();
+        List<GroupDTO> allUserGroups = userEntity.getGroupSet().stream()
+                .map((groupEntity) -> groupMapper.toGroupDTO(groupEntity, userEntity.getId())).toList();
+        Optional<GroupEntity> groupUrl = groups.stream().findFirst();
+        String lastGroupUrl = groupUrl.isPresent() ? groupUrl.get().getUrl() : "";
+        return new AuthUserDTO(userEntity.getId(), userEntity.getFirstName(), lastGroupUrl, userEntity.getWsToken(), allUserGroups);
     }
 }

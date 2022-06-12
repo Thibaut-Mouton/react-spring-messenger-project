@@ -1,5 +1,7 @@
 package com.mercure.controller;
 
+import com.google.gson.Gson;
+import com.mercure.dto.AuthenticationUserDTO;
 import com.mercure.dto.GroupMemberDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.GroupRoleKey;
@@ -11,9 +13,6 @@ import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.UserService;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @RestController
-@CrossOrigin
 @RequestMapping(value = "/api")
 public class ApiController {
 
-    private Logger log = LoggerFactory.getLogger(ApiController.class);
+    private final Logger log = LoggerFactory.getLogger(ApiController.class);
 
     @Autowired
     private UserService userService;
@@ -165,25 +163,22 @@ public class ApiController {
      *
      * @param data string req
      * @return a {@link ResponseEntity}
-     * @throws ParseException if req is mal formed
      */
     @PostMapping(value = "/user/register")
-    public ResponseEntity<?> createUser(@RequestBody String data) throws ParseException {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject json = (JSONObject) jsonParser.parse(data);
+    public ResponseEntity<?> createUser(@RequestBody String data) {
+        Gson gson = new Gson();
+        AuthenticationUserDTO userDTO = gson.fromJson(data, AuthenticationUserDTO.class);
 
         // Check if there are matched in DB
-        if ((userService.checkIfUserNameOrMailAlreadyUsed((String) json.get("firstname"), (String) json.get("email")))) {
+        if ((userService.checkIfUserNameOrMailAlreadyUsed(userDTO.getFirstName(), userDTO.getEmail()))) {
             return ResponseEntity.badRequest().body("Username or mail already used, please try again");
         }
         UserEntity user = new UserEntity();
-        String firstName = (String) json.get("firstname");
-        String lastName = (String) json.get("lastname");
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setMail((String) json.get("email"));
-        user.setPassword(userService.passwordEncoder((String) json.get("password")));
-        user.setShortUrl(userService.createShortUrl(firstName, lastName));
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setMail(userDTO.getEmail());
+        user.setPassword(userService.passwordEncoder(userDTO.getPassword()));
+        user.setShortUrl(userService.createShortUrl(userDTO.getFirstName(), userDTO.getLastName()));
         user.setWsToken(UUID.randomUUID().toString());
         user.setRole(1);
         user.setAccountNonExpired(true);

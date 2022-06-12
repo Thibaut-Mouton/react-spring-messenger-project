@@ -1,10 +1,7 @@
 package com.mercure.controller;
 
-import com.mercure.dto.AuthUserDTO;
-import com.mercure.dto.JwtDTO;
-import com.mercure.dto.LightUserDTO;
-import com.mercure.dto.UserDTO;
-import com.mercure.entity.GroupEntity;
+import com.google.gson.Gson;
+import com.mercure.dto.*;
 import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
@@ -13,9 +10,6 @@ import com.mercure.service.GroupService;
 import com.mercure.service.UserService;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(value = "/api")
-@CrossOrigin(allowCredentials = "true")
 public class AuthenticationController {
 
     @Autowired
@@ -97,13 +90,11 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/create")
-    public String createGroupChat(HttpServletRequest request, @RequestBody String payload) throws ParseException {
+    public String createGroupChat(HttpServletRequest request, @RequestBody String payload) {
         UserEntity user = getUserEntity(request);
-        int userId;
-        userId = user.getId();
-        JSONParser parser = new JSONParser();
-        JSONObject json = (JSONObject) parser.parse(payload);
-        GroupUser groupUser = groupService.createGroup(userId, (String) json.get("name"));
+        Gson gson = new Gson();
+        GroupDTO groupDTO = gson.fromJson(payload, GroupDTO.class);
+        GroupUser groupUser = groupService.createGroup(user.getId(), groupDTO.getName());
         return groupUser.getGroupMapping().getUrl();
     }
 

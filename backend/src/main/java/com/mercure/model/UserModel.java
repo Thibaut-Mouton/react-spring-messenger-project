@@ -1,10 +1,14 @@
 package com.mercure.model;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+@Setter
+@Getter
 public class UserModel implements UserDetails {
 
     private String username;
@@ -42,9 +46,5 @@ public class UserModel implements UserDetails {
     @Override
     public boolean isEnabled() {
         return false;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 }

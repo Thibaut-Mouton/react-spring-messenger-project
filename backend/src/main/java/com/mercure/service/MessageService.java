@@ -84,9 +84,9 @@ public class MessageService {
      */
     public MessageDTO createMessageDTO(int id, String type, int userId, String date, int group_id, String message) {
         colors.putIfAbsent(userId, getRandomColor());
-        String str = userService.findUsernameById(userId);
+        String username = userService.findUsernameById(userId);
         String fileUrl = "";
-        String[] arr = str.split(",");
+        String[] arr = username.split(",");
         String initials = arr[0].substring(0, 1).toUpperCase() + arr[1].substring(0, 1).toUpperCase();
         String sender = StringUtils.capitalize(arr[0]) +
                 " " +
@@ -98,9 +98,9 @@ public class MessageService {
         return new MessageDTO(id, type, message, userId, group_id, null, sender, date, initials, colors.get(userId), fileUrl, userId == id);
     }
 
-    public static String createUserInitials(String str) {
-        String[] arr = str.split(",");
-        return arr[0].substring(0, 1).toUpperCase() + arr[1].substring(0, 1).toUpperCase();
+    public static String createUserInitials(String firstAndLastName) {
+        String[] names = firstAndLastName.split(",");
+        return names[0].substring(0, 1).toUpperCase() + names[1].substring(0, 1).toUpperCase();
     }
 
     @Transactional

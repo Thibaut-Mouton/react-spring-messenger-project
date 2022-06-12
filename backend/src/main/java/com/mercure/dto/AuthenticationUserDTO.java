@@ -9,13 +9,13 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupMemberDTO {
-
-    private int userId;
+public class AuthenticationUserDTO {
 
     private String firstName;
 
     private String lastName;
 
-    private boolean isAdmin;
+    private String password;
+
+    private String email;
 }

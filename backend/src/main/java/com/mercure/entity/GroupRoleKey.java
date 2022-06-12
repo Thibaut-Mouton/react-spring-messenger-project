@@ -1,43 +1,27 @@
 package com.mercure.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class GroupRoleKey implements Serializable {
-
-    public GroupRoleKey() {
-    }
-
-    public GroupRoleKey(int groupId, int userId) {
-        this.groupId = groupId;
-        this.userId = userId;
-    }
 
     @Column(name = "group_id")
     private int groupId;
 
     @Column(name = "user_id")
     private int userId;
-
-
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
 
     @Override
     public int hashCode() {

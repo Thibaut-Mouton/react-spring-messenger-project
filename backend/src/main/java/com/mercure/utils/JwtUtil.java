@@ -34,19 +34,17 @@ public class JwtUtil implements Serializable {
         return claimsResolver.apply(claims);
     }
 
-    // for retrieveing any information from token we will need the secret key
+    // for retrieving any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(JWT_TOKEN)
                 .parseClaimsJws(token).getBody();
     }
 
-    // check if the token has expired
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
-    // generate token for user
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         String username = userDetails.getUsername();

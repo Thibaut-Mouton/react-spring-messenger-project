@@ -17,8 +17,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     private UserService userService;
 
-    Logger log = LoggerFactory.getLogger(CustomUserDetailsService.class);
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = userService.findByNameOrEmail(username, username);

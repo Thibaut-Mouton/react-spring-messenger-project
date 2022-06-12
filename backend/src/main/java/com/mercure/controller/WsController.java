@@ -1,35 +1,36 @@
 package com.mercure.controller;
 
+import com.google.gson.Gson;
 import com.mercure.dto.*;
 import com.mercure.entity.MessageEntity;
 import com.mercure.entity.MessageUserEntity;
 import com.mercure.service.*;
-import com.mercure.utils.*;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.mercure.utils.ComparatorListGroupDTO;
+import com.mercure.utils.JwtUtil;
+import com.mercure.utils.MessageTypeEnum;
+import com.mercure.utils.TransportActionEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.handler.annotation.*;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @CrossOrigin
 public class WsController {
 
-    private Logger log = LoggerFactory.getLogger(WsController.class);
+    private final Logger log = LoggerFactory.getLogger(WsController.class);
 
     @Autowired
     private UserService userService;
@@ -55,7 +56,7 @@ public class WsController {
     @GetMapping
     public String testRoute(HttpServletRequest request) {
         String requestTokenHeader = request.getHeader("authorization");
-        if (StringUtils.isEmpty(requestTokenHeader)) {
+        if (StringUtils.hasLength(requestTokenHeader)) {
             return null;
         }
         return jwtUtil.getUserNameFromJwtToken(requestTokenHeader.substring(7));
@@ -63,7 +64,6 @@ public class WsController {
 
     @MessageMapping("/message")
     public void mainChannel(InputTransportDTO dto, @Header("simpSessionId") String sessionId) {
-        Map<Integer, String> sessions = userService.getWsSessions();
         TransportActionEnum action = dto.getAction();
         switch (action) {
             case INIT_USER_DATA:
@@ -117,7 +117,7 @@ public class WsController {
      */
     public List<GroupDTO> initUserProfile(String token) {
         String username = userService.findUsernameWithWsToken(token);
-        if (StringUtils.isEmpty(username)) {
+        if (StringUtils.hasLength(username)) {
             log.warn("Username not found");
             return null;
         }
@@ -146,7 +146,7 @@ public class WsController {
 
         // Save seen message
         seenMessageService.saveMessageNotSeen(msg, groupId);
-
+        log.debug("Message saved");
         OutputTransportDTO dto = new OutputTransportDTO();
         dto.setAction(TransportActionEnum.NOTIFICATION_MESSAGE);
         toSend.forEach(toUserId -> {
@@ -158,28 +158,18 @@ public class WsController {
 
     @MessageMapping("/message/call/{userId}/group/{groupUrl}")
     @SendTo("/topic/call/reply/{groupUrl}")
-    public String wsCallMessageMapping(@DestinationVariable int userId, String req) throws ParseException {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(req);
+    public String wsCallMessageMapping(@DestinationVariable int userId, String req) {
         log.info("Receiving RTC data, sending back to user ...");
-        JSONObject json = new JSONObject();
-        try {
-            json.put("userIn", userId);
-            json.put("rtc", jsonObject);
-        } catch (Exception e) {
-            log.info(String.valueOf(json));
-            log.info("Error during JSON creation : {}", e.getMessage());
-        }
         return req;
     }
 
     @MessageMapping("/groups/create/single")
     @SendToUser("/queue/reply")
-    public void wsCreateConversation(String req) throws ParseException {
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(req);
-        Long id1 = (Long) jsonObject.get("id1");
-        Long id2 = (Long) jsonObject.get("id2");
+    public void wsCreateConversation(String payload) {
+        Gson gson = new Gson();
+        CreateGroupDTO createGroup = gson.fromJson(payload, CreateGroupDTO.class);
+        Long id1 = createGroup.getId1();
+        Long id2 = createGroup.getId2();
         groupService.createConversation(id1.intValue(), id2.intValue());
     }
 

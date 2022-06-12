@@ -40,7 +40,7 @@ public class GroupMapper {
             if (messageUserEntity != null) {
                 grpDTO.setLastMessage(msg.getMessage());
                 grpDTO.setLastMessageDate(msg.getCreatedAt().toString());
-                grpDTO.setLastMessageSeen(messageUserEntity.getSeen());
+                grpDTO.setLastMessageSeen(messageUserEntity.isSeen());
             }
         } else {
             grpDTO.setLastMessageSeen(true);

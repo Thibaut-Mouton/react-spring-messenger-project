@@ -1,5 +1,9 @@
 package com.mercure.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -7,10 +11,11 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "message")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class MessageEntity {
-
-    public MessageEntity() {
-    }
 
     public MessageEntity(int userId, int groupId, String type, String message) {
         this.user_id = userId;
@@ -37,52 +42,4 @@ public class MessageEntity {
     @Column(name = "created_at")
     @CreationTimestamp
     private Timestamp createdAt;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public int getGroup_id() {
-        return group_id;
-    }
-
-    public void setGroup_id(int group_id) {
-        this.group_id = group_id;
-    }
-
-    public int getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
 }

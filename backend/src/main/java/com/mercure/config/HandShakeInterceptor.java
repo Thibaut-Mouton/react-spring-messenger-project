@@ -14,7 +14,6 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.server.HandshakeInterceptor;
-
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
@@ -24,28 +23,26 @@ public class HandShakeInterceptor implements HandshakeInterceptor, WebSocketHand
     @Autowired
     private UserService userService;
 
-    private Logger log = LoggerFactory.getLogger(HandShakeInterceptor.class);
+    private final Logger log = LoggerFactory.getLogger(HandShakeInterceptor.class);
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         String jwtToken = request.getURI().getQuery().substring(6);
-        if (StringUtils.isEmpty(jwtToken)) {
+        if (StringUtils.hasLength(jwtToken)) {
             return false;
         }
         String name = userService.findUsernameWithWsToken(jwtToken);
         int userId = userService.findUserIdWithToken(jwtToken);
-        if (request instanceof ServletServerHttpRequest) {
-            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
+        if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpSession session = servletRequest.getServletRequest().getSession();
             attributes.put("sessionId", session.getId());
             userService.getWsSessions().put(userId, session.getId());
         }
-        return !StringUtils.isEmpty(name);
+        return !StringUtils.hasLength(name);
     }
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Exception exception) {
-//        log.info("handshake finished");
     }
 
     @Override

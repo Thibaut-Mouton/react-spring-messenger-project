@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, { useContext, useState } from 'react';
 
 const defaultStatus: boolean = false;
 
@@ -11,11 +11,11 @@ const LoaderContext = React.createContext<LoaderContextType>(
     {} as LoaderContextType
 );
 
-export const LoaderProvider: React.FC = ({children}) => {
+export const LoaderProvider: React.FunctionComponent<any> = ({ children }) => {
     const [loading, setLoading] = useState<boolean>(defaultStatus);
     return (
-        <LoaderContext.Provider value={{loading, setLoading}}>
-            {children}
+        <LoaderContext.Provider value={ { loading, setLoading } }>
+            { children }
         </LoaderContext.Provider>
     );
 };

@@ -16,7 +16,7 @@ public class WsConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/messenger", "/call").addInterceptors(handShakeInterceptor).setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/messenger", "/call").addInterceptors(handShakeInterceptor).setAllowedOrigins("http://localhost:3000").withSockJS();
     }
 
     @Override

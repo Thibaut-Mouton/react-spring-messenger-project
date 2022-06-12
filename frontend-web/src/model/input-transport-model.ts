@@ -1,13 +1,12 @@
-import {TransportActionEnum} from "../utils/transport-action-enum";
+import { TransportActionEnum } from '../utils/transport-action-enum';
 
 export class OutputTransportDTO {
+  action: TransportActionEnum
 
-    action: TransportActionEnum;
+  object: object
 
-    object: object;
-
-    constructor(action: TransportActionEnum, object: object) {
-        this.action = action;
-        this.object = object;
-    }
+  constructor (action: TransportActionEnum, object: object) {
+      this.action = action;
+      this.object = object;
+  }
 }

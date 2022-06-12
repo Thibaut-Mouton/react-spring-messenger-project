@@ -1,5 +1,5 @@
-import React, {useContext, useState} from 'react';
-import {FeedbackModel} from "../model/feedback-model";
+import React, { useContext, useState } from 'react';
+import { FeedbackModel } from '../model/feedback-model';
 
 type AlertContextType = {
     alerts: FeedbackModel[]
@@ -8,12 +8,12 @@ type AlertContextType = {
 
 export const AlertContext = React.createContext<AlertContextType>({} as AlertContextType);
 
-export const AlertContextProvider: React.FunctionComponent = ({children}) => {
+export const AlertContextProvider: React.FunctionComponent<any> = ({ children }) => {
     const [alerts, setAlerts] = useState<FeedbackModel[]>([]);
 
     return (
-        <AlertContext.Provider value={{alerts, setAlerts}}>
-            {children}
+        <AlertContext.Provider value={ { alerts, setAlerts } }>
+            { children }
         </AlertContext.Provider>
     );
 };

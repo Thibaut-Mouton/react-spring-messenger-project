@@ -9,5 +9,4 @@ public class WsNativeApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WsNativeApplication.class, args);
 	}
-
 }

@@ -1,32 +1,42 @@
-import React, {useContext, useEffect, useState} from 'react'
-import UserModel from "../model/user-model";
-import AuthService from "../service/auth-service";
-import {AxiosResponse} from "axios";
+import { AxiosResponse } from 'axios'
+import React, { useContext, useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
+import UserModel from '../model/user-model'
+import { setUserId, setUserWsToken, setWsUserGroups } from '../reducers'
+import AuthService from '../service/auth-service'
 
 type AuthContextType = {
-    user: UserModel | undefined
-    setUser: (user: UserModel | undefined) => void
+  user: UserModel | undefined
+  setUser: (user: UserModel | undefined) => void
 }
 
-export const AuthContext = React.createContext<AuthContextType>({} as AuthContextType);
+export const AuthContext = React.createContext<AuthContextType>({} as AuthContextType)
 
-export const AuthContextProvider: React.FunctionComponent = ({children}) => {
-    const [user, setUser] = useState<UserModel | undefined>(undefined);
+export const AuthContextProvider: React.FunctionComponent<any> = ({ children }) => {
+  const [user, setUser] = useState<UserModel | undefined>(undefined)
+  const dispatch = useDispatch()
 
-    useEffect(() => {
-        async function authInit() {
-            const res: AxiosResponse<UserModel> = await new AuthService().testRoute();
-            setUser(res.data);
-        }
+  useEffect(() => {
+    async function authInit () {
+      const res: AxiosResponse<UserModel> = await new AuthService().testRoute()
+      const user = res.data
+      setUser(user)
+      dispatch(setUserWsToken({ wsToken: user.wsToken }))
+      dispatch(setUserId({ userId: user.id }))
+      dispatch(setWsUserGroups({ groupsArray: user.groups }))
+    }
 
-        authInit();
-    }, [])
+    authInit()
+  }, [])
 
-    return (
-        <AuthContext.Provider value={{user, setUser}}>
-            {children}
-        </AuthContext.Provider>
-    );
-};
+  return (
+    <AuthContext.Provider value={{
+      user,
+      setUser
+    }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
 
-export const useAuthContext = () => useContext(AuthContext);
+export const useAuthContext = () => useContext(AuthContext)

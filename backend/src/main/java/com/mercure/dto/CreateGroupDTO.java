@@ -7,15 +7,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class GroupMemberDTO {
+@AllArgsConstructor
+public class CreateGroupDTO {
 
-    private int userId;
+    private Long id1;
 
-    private String firstName;
-
-    private String lastName;
-
-    private boolean isAdmin;
+    private Long id2;
 }

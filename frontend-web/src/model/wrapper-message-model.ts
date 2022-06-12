@@ -1,14 +1,12 @@
-import {FullMessageModel} from "./full-message-model";
+import { FullMessageModel } from './full-message-model';
 
 export class WrapperMessageModel {
+  lastMessage: boolean
 
-    lastMessage: boolean;
+  messages: FullMessageModel[]
 
-    messages: FullMessageModel[]
-
-
-    constructor(lastMessage: boolean, messages: FullMessageModel[]) {
-        this.lastMessage = lastMessage;
-        this.messages = messages;
-    }
+  constructor (lastMessage: boolean, messages: FullMessageModel[]) {
+      this.lastMessage = lastMessage;
+      this.messages = messages;
+  }
 }

@@ -1,35 +1,31 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import {App} from './App';
+import { Provider } from 'react-redux';
+import { App } from './App';
+import { AlertContextProvider } from './context/alert-context';
+import { AuthContextProvider } from './context/auth-context';
+import { LoaderProvider } from './context/loader-context';
+import { ThemeProvider } from './context/theme-context';
+import { WebsocketContextProvider } from './context/ws-context';
+import { store } from './reducers';
 import * as serviceWorker from './serviceWorker';
-import {applyMiddleware, createStore} from "redux";
-import {Provider} from "react-redux";
-import rootReducer from "./reducers";
-import thunk from "redux-thunk";
-import WsClientMiddleWare from "./middleware/ws-middleware";
-import {AuthContextProvider} from "./context/auth-context";
-import {ThemeProvider} from "./context/theme-context";
-import {AlertContextProvider} from "./context/alert-context";
-import {LoaderProvider} from "./context/loader-context";
-
-
-// @ts-ignore
-const store = createStore(rootReducer, applyMiddleware(thunk, WsClientMiddleWare))
 
 ReactDOM.render(
     <React.StrictMode>
-        <AuthContextProvider>
-            <ThemeProvider>
-                <AlertContextProvider>
-                    <Provider store={store}>
-                        <LoaderProvider>
-                            <App/>
-                        </LoaderProvider>
-                    </Provider>
-                </AlertContextProvider>
-            </ThemeProvider>
-        </AuthContextProvider>
+        <Provider store={ store }>
+            <AuthContextProvider>
+                <LoaderProvider>
+                    <WebsocketContextProvider>
+                        <ThemeProvider>
+                            <AlertContextProvider>
+                                <App/>
+                            </AlertContextProvider>
+                        </ThemeProvider>
+                    </WebsocketContextProvider>
+                </LoaderProvider>
+            </AuthContextProvider>
+        </Provider>
     </React.StrictMode>,
     document.getElementById('root')
 );

@@ -3,6 +3,10 @@ package com.mercure.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mercure.utils.GroupTypeEnum;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,10 +15,11 @@ import java.util.Set;
 
 @Entity
 @Table(name = "chat_group")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class GroupEntity implements Serializable {
-
-    public GroupEntity() {
-    }
 
     public GroupEntity(String name) {
         this.name = name;
@@ -50,52 +55,4 @@ public class GroupEntity implements Serializable {
     @OneToMany(mappedBy = "groupMapping", fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<GroupUser> groupUsers = new HashSet<>();
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public GroupTypeEnum getGroupTypeEnum() {
-        return groupTypeEnum;
-    }
-
-    public void setGroupTypeEnum(GroupTypeEnum groupTypeEnum) {
-        this.groupTypeEnum = groupTypeEnum;
-    }
-
-    public Set<UserEntity> getUserEntities() {
-        return userEntities;
-    }
-
-    public void setUserEntities(Set<UserEntity> userEntities) {
-        this.userEntities = userEntities;
-    }
-
-    public Set<GroupUser> getGroupUsers() {
-        return groupUsers;
-    }
-
-    public void setGroupUsers(Set<GroupUser> groupUsers) {
-        this.groupUsers = groupUsers;
-    }
 }

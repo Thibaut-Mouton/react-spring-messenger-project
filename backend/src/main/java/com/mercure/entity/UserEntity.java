@@ -1,5 +1,9 @@
 package com.mercure.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -9,10 +13,11 @@ import java.util.*;
 
 @Entity
 @Table(name = "user")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserEntity implements UserDetails, Serializable {
-
-    public UserEntity() {
-    }
 
     public UserEntity(int id, String firstName, String password) {
         this.id = id;
@@ -39,7 +44,7 @@ public class UserEntity implements UserDetails, Serializable {
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "userEntities", cascade = CascadeType.ALL)
     private Set<GroupEntity> groupSet = new HashSet<>();
 
-    @OneToMany(mappedBy = "groupMapping",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "groupMapping", fetch = FetchType.EAGER)
     private Set<GroupUser> groupUsers = new HashSet<>();
 
     @Column(name = "expiration_date")
@@ -100,113 +105,5 @@ public class UserEntity implements UserDetails, Serializable {
     @Override
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getWsToken() {
-        return wsToken;
-    }
-
-    public void setWsToken(String wsToken) {
-        this.wsToken = wsToken;
-    }
-
-    public String getJwt() {
-        return jwt;
-    }
-
-    public void setJwt(String jwt) {
-        this.jwt = jwt;
-    }
-
-    public Set<GroupEntity> getGroupSet() {
-        return groupSet;
-    }
-
-    public void setGroupSet(Set<GroupEntity> groupSet) {
-        this.groupSet = groupSet;
-    }
-
-    public Set<GroupUser> getGroupUsers() {
-        return groupUsers;
-    }
-
-    public void setGroupUsers(Set<GroupUser> groupUsers) {
-        this.groupUsers = groupUsers;
-    }
-
-    public Date getExpiration_date() {
-        return expiration_date;
-    }
-
-    public void setExpiration_date(Date expiration_date) {
-        this.expiration_date = expiration_date;
-    }
-
-    public String getShortUrl() {
-        return shortUrl;
-    }
-
-    public void setShortUrl(String shortUrl) {
-        this.shortUrl = shortUrl;
-    }
-
-    public String getMail() {
-        return mail;
-    }
-
-    public void setMail(String mail) {
-        this.mail = mail;
-    }
-
-    public void setAccountNonExpired(boolean accountNonExpired) {
-        this.accountNonExpired = accountNonExpired;
-    }
-
-    public void setAccountNonLocked(boolean accountNonLocked) {
-        this.accountNonLocked = accountNonLocked;
-    }
-
-    public void setCredentialsNonExpired(boolean credentialsNonExpired) {
-        this.credentialsNonExpired = credentialsNonExpired;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public int getRole() {
-        return role;
-    }
-
-    public void setRole(int role) {
-        this.role = role;
     }
 }

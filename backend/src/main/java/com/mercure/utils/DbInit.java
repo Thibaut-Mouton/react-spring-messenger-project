@@ -20,9 +20,9 @@ public class DbInit implements CommandLineRunner {
 
     static Logger log = LoggerFactory.getLogger(DbInit.class);
 
-    private UserService userService;
+    private final UserService userService;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public DbInit(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
