@@ -4,6 +4,10 @@
 ![Spring Boot logo](assets/springboot.png "Sprint boot logo")
 </div>
 
+<div align="center">
+![build](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/maven/badge.svg)
+</div>
+
 # Messenger project : real time chat with React and Spring Boot
 
 Real time chat application group oriented. Talk with your friends, create and add users to conversation, send messages or images, set groups administrators and start video calls ! (coming soon)
