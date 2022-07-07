@@ -1,4 +1,4 @@
-name: Compile checker
+name: maven
 
 on:
   push:
