@@ -4,9 +4,7 @@
 ![Spring Boot logo](assets/springboot.png "Sprint boot logo")
 </div>
 
-<div align="center">
 ![build](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/maven/badge.svg)
-</div>
 
 # Messenger project : real time chat with React and Spring Boot
 
