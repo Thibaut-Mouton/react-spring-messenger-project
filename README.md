@@ -1,7 +1,7 @@
-<div align="center">
-   ![React logo](assets/react.png "React logo")
-   ![Spring Boot logo](assets/springboot.png "Sprint boot logo")
-</div>
+<p align="center">
+   <img src="/assets/react.png" alt="React logo"/>
+   <img src="/assets/springboot.png" alt="Spring boot logo"/>
+</p>
 
 # Project Requirements
 
@@ -20,7 +20,7 @@ This will start 3 containers : MySQL, backend and frontend together.  Liquibase 
 * Luke
 * Steve
 ```
-Be sure no other app is running on port 3000, 9090 or 3306
+Be sure that no other app is running on port 3000, 9090 or 3306
 ```
 
 # Project development set up
