@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "start": "tsc && react-scripts start",
+    "start:test": "tsc && set PORT=8080 && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "lint": "eslint -c .eslintrc.js --ext .js,.jsx,.ts,.tsx .",
+    "lint": "eslint -c .eslintrc.json --ext .ts,.tsx .",
     "lint:fix": "npm run lint -- --fix",
     "eject": "react-scripts eject"
   },
@@ -16,12 +17,12 @@
     "@mui/icons-material": "5.6.2",
     "@mui/material": "5.7.0",
     "@reduxjs/toolkit": "1.8.1",
-    "@stomp/stompjs": "6.0.0",
+    "@stomp/stompjs": "6.1.2",
     "@testing-library/jest-dom": "5.14.1",
     "@testing-library/react": "12.0.0",
     "@testing-library/user-event": "13.2.1",
     "@types/react-router-dom": "^5.3.3",
-    "axios": "0.21.1",
+    "axios": "0.27.2",
     "history": "5.0.0",
     "moment": "2.29.1",
     "react": "17.0.2",
@@ -32,11 +33,17 @@
     "react-scripts": "4.0.3",
     "react-toastify": "7.0.4",
     "sockjs-client": "1.5.0",
-    "typescript": "4.3.5"
+    "typescript": "4.7.4"
   },
-  "proxy": "http://localhost:9090",
   "eslintConfig": {
     "extends": "react-app"
+  },
+  "devDependencies": {
+    "@types/react-dom": "17.0.9",
+    "@types/react-redux": "7.1.24",
+    "@typescript-eslint/eslint-plugin": "^5.30.6",
+    "@typescript-eslint/parser": "^5.30.6",
+    "eslint-plugin-react": "^7.30.1"
   },
   "browserslist": {
     "production": [
@@ -49,9 +56,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@types/react-dom": "17.0.9",
-    "@types/react-redux": "7.1.24"
   }
 }

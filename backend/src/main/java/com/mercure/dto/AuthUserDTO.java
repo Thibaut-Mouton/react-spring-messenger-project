@@ -1,5 +1,6 @@
 package com.mercure.dto;
 
+import com.mercure.dto.user.GroupDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

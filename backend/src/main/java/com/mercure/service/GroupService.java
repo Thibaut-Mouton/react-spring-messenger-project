@@ -10,11 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
 
-    private static Logger log = LoggerFactory.getLogger(GroupService.class);
+    private static final Logger log = LoggerFactory.getLogger(GroupService.class);
 
     @Autowired
     private GroupRepository groupRepository;
@@ -27,6 +28,12 @@ public class GroupService {
 
     public int findGroupByUrl(String url) {
         return groupRepository.findGroupByUrl(url);
+    }
+
+    public List<Integer> getAllUsersIdByGroupUrl(String groupUrl) {
+        int groupId = groupRepository.findGroupByUrl(groupUrl);
+        List<GroupUser> users = groupUserJoinService.findAllByGroupId(groupId);
+        return users.stream().map(GroupUser::getUserId).collect(Collectors.toList());
     }
 
     public String getGroupName(String url) {
@@ -57,7 +64,7 @@ public class GroupService {
         return new GroupMemberDTO(user.getId(), user.getFirstName(), user.getLastName(), false);
     }
 
-    public GroupUser createGroup(int userId, String name) {
+    public GroupEntity createGroup(int userId, String name) {
         GroupUser groupUser = new GroupUser();
         GroupEntity group = new GroupEntity(name);
         group.setName(name);
@@ -68,13 +75,13 @@ public class GroupService {
         GroupRoleKey groupRoleKey = new GroupRoleKey();
         groupRoleKey.setUserId(userId);
         groupRoleKey.setGroupId(savedGroup.getId());
-//        groupUser.setId(groupRoleKey);
         groupUser.setGroupId(savedGroup.getId());
         groupUser.setUserId(userId);
         groupUser.setRole(1);
         groupUser.setUserMapping(user);
         groupUser.setGroupMapping(group);
-        return groupUserJoinService.save(groupUser);
+        groupUserJoinService.save(groupUser);
+        return savedGroup;
     }
 
     public Optional<GroupEntity> findById(int groupId) {
@@ -92,7 +99,6 @@ public class GroupService {
         UserEntity user2 = userService.findById(id2);
 
         GroupUser groupUser1 = new GroupUser();
-//        groupUser1.setId(new GroupRoleKey(savedGroup.getId(), id1));
         groupUser1.setGroupId(savedGroup.getId());
         groupUser1.setUserId(id1);
 
@@ -101,14 +107,11 @@ public class GroupService {
         groupUser1.setGroupMapping(groupEntity);
 
         GroupUser groupUser2 = new GroupUser();
-//        groupUser2.setId(new GroupRoleKey(savedGroup.getId(), id2));
         groupUser2.setUserId(savedGroup.getId());
         groupUser2.setGroupId(id2);
         groupUser2.setRole(0);
         groupUser2.setUserMapping(user2);
         groupUser2.setGroupMapping(groupEntity);
-        groupUserJoinService.save(groupUser1);
-        groupUserJoinService.save(groupUser2);
-
+        groupUserJoinService.saveAll(Arrays.asList(groupUser1, groupUser2));
     }
 }

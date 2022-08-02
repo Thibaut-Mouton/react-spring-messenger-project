@@ -1,77 +1,108 @@
-import { PayloadAction, configureStore, createSlice } from '@reduxjs/toolkit'
-import { Client } from '@stomp/stompjs'
-import { initialState } from './initial-store-state'
-import { logger } from '../middleware/ws-middleware'
-import { FullMessageModel } from '../model/full-message-model'
-import { GroupModel } from '../model/group-model'
-import { ReduxModel } from '../model/redux-model'
-import { SET_WS_GROUPS } from '../utils/redux-constants'
+import { configureStore, createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { Client } from "@stomp/stompjs"
+import { initialState } from "./initial-store-state"
+import { logger } from "../middleware/ws-middleware"
+import { FullMessageModel } from "../interface-contract/full-message-model"
+import { GroupModel } from "../interface-contract/group-model"
+import { IGroupWrapper } from "../interface-contract/user/group-wrapper-model"
+import { FeedbackModel, IPartialFeedBack } from "../interface-contract/feedback-model"
+import { UUIDv4 } from "../utils/uuid-generator"
 
 const mainReducer = createSlice({
-  name: 'main',
+  name: "main",
   initialState,
   reducers: {
+    setAlerts: (state, { payload }: PayloadAction<{ alert: IPartialFeedBack }>) => {
+	 const alertToSet = { ...payload.alert } as FeedbackModel
+	 alertToSet.id = UUIDv4()
+	 state.alerts = [...state.alerts, alertToSet]
+    },
+    setAllAlerts: (state, { payload }: PayloadAction<{ allAlerts: IPartialFeedBack[] }>) => {
+	 state.alerts = payload.allAlerts
+    },
     setUserWsToken: (state, { payload }: PayloadAction<{ wsToken: string }>) => {
-      state.userWsToken = payload.wsToken
+	 state.userWsToken = payload.wsToken
     },
     setUserId: (state, { payload }: PayloadAction<{ userId: number }>) => {
-      state.userId = payload.userId
+	 state.userId = payload.userId
     },
-    setWsUserGroups: (state, { payload }: PayloadAction<{ groupsArray: GroupModel[] }>) => {
-      state.wsUserGroups = payload.groupsArray
+    setCallIncoming: (state, { payload }: PayloadAction<{ callStarted: boolean }>) => {
+	 state.callStarted = payload.callStarted
+    },
+    setCallUrl: (state, { payload }: PayloadAction<{ callUrl: string }>) => {
+	 state.callUrl = payload.callUrl
+    },
+    setWsUserGroups: (state, { payload }: PayloadAction<{ groups: IGroupWrapper[] }>) => {
+	 state.groups = payload.groups
     },
     wsHealthCheckConnected: (state, { payload }: PayloadAction<{ isWsConnected: boolean }>) => {
-      state.isWsConnected = payload.isWsConnected
+	 state.isWsConnected = payload.isWsConnected
+    },
+    clearChatHistory: (state) => {
+	 state.chatHistory = []
     },
     setGroupMessages: (state, { payload }: PayloadAction<{ messages: FullMessageModel[] }>) => {
-      state.chatHistory = payload.messages
+	 const messagesTemp = state.chatHistory
+	 state.chatHistory = payload.messages.concat(messagesTemp)
     },
     setAllMessagesFetched: (state, { payload }: PayloadAction<{ allMessagesFetched: boolean }>) => {
-      state.allMessagesFetched = payload.allMessagesFetched
+	 state.allMessagesFetched = payload.allMessagesFetched
     },
     setCurrentActiveGroup: (state, { payload }: PayloadAction<{ currentActiveGroup: string }>) => {
-      state.currentActiveGroup = payload.currentActiveGroup
+	 state.currentActiveGroup = payload.currentActiveGroup
     },
     addChatHistory: (state, { payload }: PayloadAction<{ newMessage: FullMessageModel }>) => {
-      state.chatHistory = [...state.chatHistory, payload.newMessage]
+	 state.chatHistory = [...state.chatHistory, payload.newMessage]
     },
-    unsubscribeAll: (state) => {
-    },
-    sendWsMessage: (state, {
-      payload
-    }: PayloadAction<{ message: string }>) => {
-    },
-    fetchGroupMessages: (state, {
-      payload
-    }: PayloadAction<{ messageId: number }>) => {
-    },
-    setGroupName: (state, {
-      type,
-      payload
-    }: PayloadAction<{ groupName: string }>) => {
-      state.currentGroupName = payload.groupName
-    },
-    middlewareAction: (state, {
-      type,
-      payload
-    }: PayloadAction<{ data: ReduxModel, type: string }>) => {
+    setCurrentGroup: (state, {
+	 payload
+    }: PayloadAction<{ currentGroup: IGroupWrapper }>) => {
+	 state.currentGroup = payload.currentGroup
     },
     setWsObject: (state, {
-      payload
+	 payload
     }: PayloadAction<{ wsObj: Client | null }>) => {
-      state.wsObject = payload.wsObj
+	 state.wsObject = payload.wsObj
+    },
+    createGroup: (state, { payload }: PayloadAction<{ group: GroupModel }>) => {
+	 const groups = [...state.groups]
+	 groups.unshift({
+	   group: payload.group,
+	   groupCall: { anyCallActive: false }
+	 })
+	 state.chatHistory = []
+	 state.groups = groups
+    },
+    setGroupWithCurrentCall: (state, { payload }: PayloadAction<{ groupUrl: string, roomUrl?: string }>) => {
+	 const groups = [...state.groups]
+	 groups.map((group) => {
+	   if (group.group.url === payload.groupUrl) {
+		group.groupCall.anyCallActive = !!payload.roomUrl
+		group.groupCall.activeCallUrl = payload.roomUrl
+	   }
+	   return group
+	 })
+    },
+    removeUserFromGroup: (state, { payload }: PayloadAction<{ groupUrl: string }>) => {
+	 const groups = [...state.groups]
+	 state.groups = groups.reduce((acc: IGroupWrapper[], group) => {
+	   if (group.group.url === payload.groupUrl) {
+		return acc
+	   }
+	   acc.push(group)
+	   return acc
+	 }, new Array<IGroupWrapper>())
     },
     markMessageAsSeen: (state, {
-      payload
+	 payload
     }: PayloadAction<{ groupUrl: string }>) => {
-      const groups: GroupModel[] = state.wsUserGroups
-      const groupToUpdateIndex = groups.findIndex(elt => elt.url === payload.groupUrl)
-      if (groupToUpdateIndex === -1) {
-        return
-      }
-      const groupsArray = [...groups]
-      groupsArray[groupToUpdateIndex].lastMessageSeen = true
-      state.wsUserGroups = groupsArray
+	 const groups = state.groups
+	 state.groups = groups.map((groupWrapper) => {
+	   if (groupWrapper.group.url === payload.groupUrl) {
+		groupWrapper.group.lastMessageSeen = true
+	   }
+	   return groupWrapper
+	 })
     },
   }
 })
@@ -81,13 +112,18 @@ export const {
   setWsUserGroups,
   wsHealthCheckConnected,
   setGroupMessages,
+  clearChatHistory,
   setCurrentActiveGroup,
+  createGroup,
   setAllMessagesFetched,
-  unsubscribeAll,
   addChatHistory,
-  fetchGroupMessages,
-  setGroupName,
-  sendWsMessage,
+  setAlerts,
+  setAllAlerts,
+  setCurrentGroup,
+  setCallIncoming,
+  setCallUrl,
+  removeUserFromGroup,
+  setGroupWithCurrentCall,
   setUserWsToken,
   setUserId,
   markMessageAsSeen

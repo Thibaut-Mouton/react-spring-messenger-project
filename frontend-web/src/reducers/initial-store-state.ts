@@ -1,29 +1,32 @@
-import { UserReducerType, WsReducerInitType } from './types';
+import { WsReducerInitType } from "./types"
+import { IGroupWrapper } from "../interface-contract/user/group-wrapper-model"
 
 const initialRtcState = {
-    webRtcOffer: null,
-    webRtcAnswer: null,
-    webRtcCandidate: null
-};
-
-const initialUserState: UserReducerType = {
-    userWsToken: undefined,
-    userId: undefined
-};
+  callIncoming: false,
+  webRtcOffer: null,
+  webRtcAnswer: null,
+  webRtcCandidate: null
+}
 
 const initialWsState: WsReducerInitType = {
-    currentGroupName: '',
-    isWsConnected: false,
-    wsObject: null,
-    wsUserGroups: [],
-    currentActiveGroup: '',
-    allMessagesFetched: false,
-    usersInConversationList: [],
-    chatHistory: []
-};
+  currentGroup: {} as IGroupWrapper,
+  isWsConnected: false,
+  wsObject: null,
+  groups: [],
+  currentActiveGroup: "",
+  allMessagesFetched: false,
+  usersInConversationList: [],
+  chatHistory: [],
+  callStarted: false,
+  callUrl: "",
+
+  alerts: [],
+
+  userWsToken: undefined,
+  userId: undefined
+}
 
 export const initialState = {
-    ...initialUserState,
-    ...initialRtcState,
-    ...initialWsState
-};
+  ...initialRtcState,
+  ...initialWsState,
+}

@@ -1,6 +1,7 @@
 package com.mercure.repository;
 
 import com.mercure.entity.GroupEntity;
+import liquibase.pro.packaged.Q;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,9 +1,5 @@
-body {
-    overflow-y: scroll;
-}
-
 #root {
-    height: 100vh;
+    height: 100%;
 }
 
 ::-webkit-scrollbar {
@@ -72,6 +68,10 @@ body {
 /************ OVERRIDE ******************************************************************************/
 .lnk {
     text-decoration: none;
+}
+
+.mnu {
+    display: flex;
 }
 
 .clrcstm {

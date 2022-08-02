@@ -1,25 +1,26 @@
-import { Client } from '@stomp/stompjs';
-import { FullMessageModel } from '../../model/full-message-model';
-import { GroupModel } from '../../model/group-model';
+import { Client } from "@stomp/stompjs"
+import { FullMessageModel } from "../../interface-contract/full-message-model"
+import { IGroupWrapper } from "../../interface-contract/user/group-wrapper-model"
+import { FeedbackModel } from "../../interface-contract/feedback-model"
 
 export interface StoreState {
   globalReducer: WsReducerInitType
 }
 
-export interface UserReducerType {
-  userId?: number
-  userWsToken?: string
-}
-
 export interface WsReducerInitType {
   userId?: number
   userWsToken?: string
-  currentGroupName: string,
+  currentGroup: IGroupWrapper,
   isWsConnected: boolean,
   wsObject: Client | null,
-  wsUserGroups: GroupModel[],
+  groups: IGroupWrapper[],
   currentActiveGroup: string,
   allMessagesFetched: boolean,
   usersInConversationList: [],
-  chatHistory: FullMessageModel[]
+  chatHistory: FullMessageModel[],
+
+  alerts: FeedbackModel[]
+
+  callStarted: boolean
+  callUrl: string
 }

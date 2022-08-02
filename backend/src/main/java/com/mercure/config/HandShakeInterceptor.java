@@ -28,7 +28,7 @@ public class HandShakeInterceptor implements HandshakeInterceptor, WebSocketHand
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) {
         String jwtToken = request.getURI().getQuery().substring(6);
-        if (StringUtils.hasLength(jwtToken)) {
+        if (!StringUtils.hasLength(jwtToken)) {
             return false;
         }
         String name = userService.findUsernameWithWsToken(jwtToken);
@@ -38,7 +38,7 @@ public class HandShakeInterceptor implements HandshakeInterceptor, WebSocketHand
             attributes.put("sessionId", session.getId());
             userService.getWsSessions().put(userId, session.getId());
         }
-        return !StringUtils.hasLength(name);
+        return StringUtils.hasLength(name);
     }
 
     @Override

@@ -1,3 +1,3 @@
 export enum GroupActionEnum {
-  OPEN = 'OPEN', CLOSE = 'CLOSE', PARAM = 'PARAM'
+  OPEN = "OPEN", CLOSE = "CLOSE", PARAM = "PARAM"
 }

@@ -1,0 +1,12 @@
+FROM node:16.14.2
+
+MAINTAINER Thibaut MOUTON <thibautmouton22@gmail.com>
+
+RUN mkdir -p "/product/front"
+
+COPY frontend-web /product/front
+
+WORKDIR /product/front
+RUN npm i
+
+CMD ["npm", "start"]

@@ -1,8 +1,6 @@
 package com.mercure.utils;
 
-import com.mercure.dto.GroupDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.mercure.dto.user.GroupDTO;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,21 +9,21 @@ import java.util.Comparator;
 public class ComparatorListGroupDTO implements Comparator<GroupDTO> {
 
     @Override
-    public int compare(GroupDTO o1, GroupDTO o2) {
-        if (o1.getLastMessageDate() == null) {
+    public int compare(GroupDTO group1, GroupDTO group2) {
+        if (group1.getLastMessageDate() == null) {
             return -1;
         }
-        if (o2.getLastMessageDate() == null) {
+        if (group2.getLastMessageDate() == null) {
             return 1;
         }
-        if (o2.getLastMessageDate() == null && o1.getLastMessageDate() == null) {
-            return o1.getName().compareTo(o2.getName());
+        if (group2.getLastMessageDate() == null && group1.getLastMessageDate() == null) {
+            return group1.getName().compareTo(group2.getName());
         }
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-            if (sdf.parse(o1.getLastMessageDate()).before(sdf.parse(o2.getLastMessageDate()))) {
+            if (sdf.parse(group1.getLastMessageDate()).before(sdf.parse(group2.getLastMessageDate()))) {
                 return 1;
-            } else if (sdf.parse(o1.getLastMessageDate()).after(sdf.parse(o2.getLastMessageDate()))) {
+            } else if (sdf.parse(group1.getLastMessageDate()).after(sdf.parse(group2.getLastMessageDate()))) {
                 return -1;
             } else {
                 return 0;

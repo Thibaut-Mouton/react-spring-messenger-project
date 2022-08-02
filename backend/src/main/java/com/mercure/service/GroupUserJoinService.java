@@ -1,8 +1,11 @@
 package com.mercure.service;
 
+import com.mercure.controller.WsFileController;
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
 import com.mercure.repository.GroupUserJoinRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +15,24 @@ import java.util.Optional;
 @Service
 public class GroupUserJoinService {
 
+    private static final Logger log = LoggerFactory.getLogger(WsFileController.class);
+
     @Autowired
     private GroupUserJoinRepository groupUserJoinRepository;
 
+    @Autowired
+    private MessageService messageService;
+
     public GroupUser save(GroupUser groupUser) {
         return groupUserJoinRepository.save(groupUser);
+    }
+
+    public void saveAll(List<GroupUser> groups) {
+        try {
+            groupUserJoinRepository.saveAll(groups);
+        } catch (Exception e) {
+            log.error("Cannot save user for conversation : {}", e.getMessage());
+        }
     }
 
     public Optional<GroupUser> findById(GroupRoleKey id) {
@@ -58,7 +74,17 @@ public class GroupUserJoinService {
 
     public void removeUserFromConversation(int userIdToDelete, int groupId) {
         GroupRoleKey groupRoleKey = new GroupRoleKey(groupId, userIdToDelete);
-        Optional<GroupUser> optionalGroupUserToDelete = groupUserJoinRepository.findById(groupRoleKey);
-        optionalGroupUserToDelete.ifPresent(groupUser -> groupUserJoinRepository.delete(groupUser));
+        try {
+            Optional<GroupUser> optionalGroupUserToDelete = groupUserJoinRepository.findById(groupRoleKey);
+            optionalGroupUserToDelete.ifPresent(groupUser -> groupUserJoinRepository.delete(groupUser));
+            List<Integer> usersId = groupUserJoinRepository.getUsersIdInGroup(groupId);
+            if (usersId.isEmpty()) {
+                log.info("All users have left the group [groupId => {}]. Deleting messages...", groupId);
+                messageService.deleteAllMessagesByGroupId(groupId);
+                log.info("All messages have been successfully deleted");
+            }
+        } catch (Exception exception) {
+            log.error("Error occurred during user removal : {}", exception.getMessage());
+        }
     }
 }

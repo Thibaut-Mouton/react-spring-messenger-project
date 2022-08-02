@@ -1,3 +1,3 @@
 export enum TypeMessageEnum {
-    TEXT = 'TEXT'
+    TEXT = "TEXT"
 }

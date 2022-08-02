@@ -63,6 +63,10 @@ public class MessageService {
         return list;
     }
 
+    public void deleteAllMessagesByGroupId(int groupId) {
+        messageRepository.deleteMessagesDataByGroupId(groupId);
+    }
+
     public MessageEntity findLastMessage(int groupId) {
         return messageRepository.findLastMessageByGroupId(groupId);
     }
@@ -144,7 +148,11 @@ public class MessageService {
         String initials = userService.findUsernameById(msg.getUser_id());
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setId(msg.getId());
-        messageDTO.setType(MessageTypeEnum.TEXT.toString());
+        if (msg.getType().equals(MessageTypeEnum.FILE.toString())) {
+            String url = fileService.findFileUrlByMessageId(msg.getId());
+            messageDTO.setFileUrl(url);
+        }
+        messageDTO.setType(msg.getType());
         messageDTO.setMessage(msg.getMessage());
         messageDTO.setUserId(msg.getUser_id());
         messageDTO.setGroupUrl(groupUrl);

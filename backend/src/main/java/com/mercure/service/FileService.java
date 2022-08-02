@@ -18,4 +18,8 @@ public class FileService {
     public FileEntity findByFkMessageId(int id) {
         return fileRepository.findByMessageId(id);
     }
+
+    public String findFileUrlByMessageId(int id) {
+        return  fileRepository.findFileUrlByMessageId(id);
+    }
 }

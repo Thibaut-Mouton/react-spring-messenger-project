@@ -1,3 +1,4 @@
 export enum TypeGroupEnum {
-    GROUP = 'GROUP', SINGLE = 'SINGLE'
+  GROUP = "GROUP",
+  SINGLE = "SINGLE"
 }

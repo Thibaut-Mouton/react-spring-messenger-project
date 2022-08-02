@@ -9,4 +9,5 @@
     <include file="/db/changelog/createMessageWsTable.xml"/>
     <include file="/db/changelog/createFileBlobTable.xml"/>
     <include file="/db/changelog/createJoinTableMessageUserSeen.xml"/>
+    <include file="/db/changelog/addTimestampOnGroupTable.xml"/>
 </databaseChangeLog>

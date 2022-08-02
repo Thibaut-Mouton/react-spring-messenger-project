@@ -1,11 +1,14 @@
 package com.mercure.mapper;
 
 import com.mercure.dto.AuthUserDTO;
-import com.mercure.dto.GroupDTO;
-import com.mercure.dto.UserDTO;
+import com.mercure.dto.user.GroupDTO;
+import com.mercure.dto.user.GroupWrapperDTO;
+import com.mercure.dto.user.InitUserDTO;
+import com.mercure.dto.user.UserDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.UserEntity;
-import com.mercure.service.UserService;
+import com.mercure.utils.ComparatorListGroupDTO;
+import com.mercure.utils.ComparatorListWrapperGroupDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +24,7 @@ public class UserMapper {
     private GroupMapper groupMapper;
 
     @Autowired
-    private UserService userService;
+    private GroupCallMapper groupCallMapper;
 
     /**
      * Map a UserEntity to a UserDTO
@@ -30,40 +33,43 @@ public class UserMapper {
      * @param userEntity the {@link UserEntity} to map
      * @return a {@link UserDTO}
      */
-    public UserDTO toUserDTO(UserEntity userEntity) {
-        // Init
+    public InitUserDTO toUserDTO(UserEntity userEntity) {
         UserDTO userDTO = new UserDTO();
-        List<GroupDTO> groupEntitySet = new ArrayList<>();
+        InitUserDTO initUserDTO = new InitUserDTO();
+        List<GroupWrapperDTO> groupWrapperDTOS = new ArrayList<>();
 
-        // Main user infos
         userDTO.setId(userEntity.getId());
         userDTO.setFirstName(userEntity.getFirstName());
         userDTO.setLastName(userEntity.getLastName());
-        userDTO.setMail(userEntity.getMail());
         userDTO.setWsToken(userEntity.getWsToken());
-        // Global role
-        userDTO.setRole(userEntity.getRole());
-        // Spring security mapping
-        userDTO.setAccountNonExpired(userEntity.isAccountNonExpired());
-        userDTO.setAccountNonLocked(userEntity.isAccountNonLocked());
-        userDTO.setCredentialsNonExpired(userEntity.isCredentialsNonExpired());
-        userDTO.setEnabled(userEntity.isEnabled());
-        userDTO.setExpiration_date(userEntity.getExpiration_date());
         userDTO.setJwt(userEntity.getJwt());
-        userDTO.setAuthorities(userEntity.getAuthorities());
-        userEntity.getGroupSet().forEach(groupEntity ->
-                groupEntitySet.add(groupMapper.toGroupDTO(groupEntity, userEntity.getId())));
-        userDTO.setGroupList(groupEntitySet);
-        return userDTO;
+
+        userEntity.getGroupSet().forEach(groupEntity -> {
+                    GroupWrapperDTO groupWrapperDTO = new GroupWrapperDTO();
+                    groupWrapperDTO.setGroup(groupMapper.toGroupDTO(groupEntity, userEntity.getId()));
+                    groupWrapperDTO.setGroupCall(groupCallMapper.toGroupCall(groupEntity));
+                    groupWrapperDTOS.add(groupWrapperDTO);
+                }
+        );
+        groupWrapperDTOS.sort(new ComparatorListWrapperGroupDTO());
+
+        Optional<GroupWrapperDTO> groupUrl = groupWrapperDTOS.stream().findFirst();
+        String firstGroupUrl = groupUrl.isPresent() ? groupUrl.get().getGroup().getUrl() : "";
+
+        userDTO.setFirstGroupUrl(firstGroupUrl);
+        initUserDTO.setUser(userDTO);
+        initUserDTO.setGroupsWrapper(groupWrapperDTOS);
+        return initUserDTO;
     }
 
 
     public AuthUserDTO toLightUserDTO(UserEntity userEntity) {
         Set<GroupEntity> groups = userEntity.getGroupSet();
-        List<GroupDTO> allUserGroups = userEntity.getGroupSet().stream()
-                .map((groupEntity) -> groupMapper.toGroupDTO(groupEntity, userEntity.getId())).toList();
+        List<GroupDTO> allUserGroups = new ArrayList<>(userEntity.getGroupSet().stream()
+                .map((groupEntity) -> groupMapper.toGroupDTO(groupEntity, userEntity.getId())).toList());
         Optional<GroupEntity> groupUrl = groups.stream().findFirst();
         String lastGroupUrl = groupUrl.isPresent() ? groupUrl.get().getUrl() : "";
+        allUserGroups.sort(new ComparatorListGroupDTO());
         return new AuthUserDTO(userEntity.getId(), userEntity.getFirstName(), lastGroupUrl, userEntity.getWsToken(), allUserGroups);
     }
 }

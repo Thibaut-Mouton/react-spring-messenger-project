@@ -5,9 +5,8 @@ import com.mercure.dto.*;
 import com.mercure.entity.MessageEntity;
 import com.mercure.entity.MessageUserEntity;
 import com.mercure.service.*;
-import com.mercure.utils.ComparatorListGroupDTO;
-import com.mercure.utils.JwtUtil;
 import com.mercure.utils.MessageTypeEnum;
+import com.mercure.utils.RtcActionEnum;
 import com.mercure.utils.TransportActionEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,22 +20,24 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
 public class WsController {
 
+    @Autowired
+    private RoomCacheService roomCacheService;
+
     private final Logger log = LoggerFactory.getLogger(WsController.class);
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final Map<String, ArrayList<Integer>> usersIndexedByRoomId = new HashMap<>();
 
     @Autowired
     private GroupService groupService;
@@ -53,26 +54,18 @@ public class WsController {
     @Autowired
     private UserSeenMessageService seenMessageService;
 
-    @GetMapping
-    public String testRoute(HttpServletRequest request) {
-        String requestTokenHeader = request.getHeader("authorization");
-        if (StringUtils.hasLength(requestTokenHeader)) {
-            return null;
+    @GetMapping(value = "/room/ensure-room-exists/{groupUrl}")
+    public Boolean ensureCallRoomExists(@PathVariable String groupUrl) {
+        if (StringUtils.hasLength(groupUrl)) {
+            return roomCacheService.getRoomByKey(groupUrl) != null;
         }
-        return jwtUtil.getUserNameFromJwtToken(requestTokenHeader.substring(7));
+        return false;
     }
 
     @MessageMapping("/message")
     public void mainChannel(InputTransportDTO dto, @Header("simpSessionId") String sessionId) {
         TransportActionEnum action = dto.getAction();
         switch (action) {
-            case INIT_USER_DATA:
-                List<GroupDTO> groups = this.initUserProfile(dto.getWsToken());
-                OutputTransportDTO response = new OutputTransportDTO();
-                response.setObject(groups);
-                response.setAction(TransportActionEnum.INIT_USER_DATA);
-                this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), response);
-                break;
             case SEND_GROUP_MESSAGE:
                 this.getAndSaveMessage(dto.getUserId(), dto.getGroupUrl(), dto.getMessage());
                 break;
@@ -94,7 +87,7 @@ public class WsController {
                 }
                 break;
             case MARK_MESSAGE_AS_SEEN:
-                if (!dto.getGroupUrl().equals("")) {
+                if (!"".equals(dto.getGroupUrl())) {
                     int messageId = messageService.findLastMessageIdByGroupId(groupService.findGroupByUrl(dto.getGroupUrl()));
                     MessageUserEntity messageUserEntity = seenMessageService.findByMessageId(messageId, dto.getUserId());
                     if (messageUserEntity == null) break;
@@ -102,31 +95,109 @@ public class WsController {
                     seenMessageService.saveMessageUserEntity(messageUserEntity);
                 }
                 break;
+            case LEAVE_GROUP:
+                if (!dto.getGroupUrl().equals("")) {
+                    log.info("User id {} left group {}", dto.getUserId(), dto.getGroupUrl());
+                    int groupId = groupService.findGroupByUrl(dto.getGroupUrl());
+                    groupUserJoinService.removeUserFromConversation(dto.getUserId(), groupId);
+
+                    String groupName = groupService.getGroupName(dto.getGroupUrl());
+                    LeaveGroupDTO leaveGroupDTO = new LeaveGroupDTO();
+                    leaveGroupDTO.setGroupUrl(dto.getGroupUrl());
+                    leaveGroupDTO.setGroupName(groupName);
+                    OutputTransportDTO leaveResponse = new OutputTransportDTO();
+                    leaveResponse.setAction(TransportActionEnum.LEAVE_GROUP);
+                    leaveResponse.setObject(leaveGroupDTO);
+                    this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), leaveResponse);
+                } else {
+                    log.warn("User cannot left group because groupUrl is empty");
+                }
+                break;
+            case CHECK_EXISTING_CALL:
+                OutputTransportDTO outputTransportDTO = new OutputTransportDTO();
+                for (String key : usersIndexedByRoomId.keySet()) {
+                    if (key.contains(dto.getGroupUrl())) {
+                        outputTransportDTO.setAction(TransportActionEnum.CALL_IN_PROGRESS);
+                        this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), outputTransportDTO);
+                        break;
+                    }
+                }
+                outputTransportDTO.setAction(TransportActionEnum.NO_CALL_IN_PROGRESS);
+                this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), outputTransportDTO);
+                break;
             default:
                 break;
         }
     }
 
+    @MessageMapping("/rtc/{roomUrl}")
+    public void webRtcChannel(@DestinationVariable String roomUrl, RtcTransportDTO dto) {
+        RtcActionEnum action = dto.getAction();
+        switch (action) {
+            case INIT_ROOM -> {
+                List<Integer> usersId = this.groupService.getAllUsersIdByGroupUrl(dto.getGroupUrl());
+                ArrayList<Integer> userIDs = new ArrayList<>();
+                userIDs.add(dto.getUserId());
 
-    /**
-     * Used this to retrieve user information (without password)
-     * and all groups attached to the user
-     *
-     * @param token the String request from client
-     * @return {@link UserDTO}
-     */
-    public List<GroupDTO> initUserProfile(String token) {
-        String username = userService.findUsernameWithWsToken(token);
-        if (StringUtils.hasLength(username)) {
-            log.warn("Username not found");
-            return null;
+                roomCacheService.putNewRoom(dto.getGroupUrl(), roomUrl, userIDs);
+
+                OutputTransportDTO outputTransportDTO = new OutputTransportDTO();
+                outputTransportDTO.setAction(TransportActionEnum.CALL_INCOMING);
+                outputTransportDTO.setObject(roomUrl);
+                usersId.stream()
+                        .filter((user) -> !user.equals(dto.getUserId()))
+                        .forEach((userId) -> this.messagingTemplate.convertAndSend("/topic/user/" + userId, outputTransportDTO));
+            }
+            case SEND_ANSWER -> {
+                String key = roomUrl + "_" + dto.getGroupUrl();
+                ArrayList<Integer> hostList = usersIndexedByRoomId.get(key);
+                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
+                rtcTransportDTO.setUserId(dto.getUserId());
+                rtcTransportDTO.setAction(RtcActionEnum.SEND_ANSWER);
+                rtcTransportDTO.setAnswer(dto.getAnswer());
+                hostList.stream()
+                        .filter((user) -> !user.equals(dto.getUserId()))
+                        .forEach((userId) -> this.messagingTemplate.convertAndSend("/topic/rtc/" + userId, rtcTransportDTO));
+            }
+            case JOIN_ROOM -> {
+                String key = roomUrl + "_" + dto.getGroupUrl();
+                ArrayList<Integer> hostList = usersIndexedByRoomId.get(key);
+                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
+                rtcTransportDTO.setUserId(dto.getUserId());
+                rtcTransportDTO.setAction(RtcActionEnum.SEND_OFFER);
+                rtcTransportDTO.setOffer(dto.getOffer());
+                hostList.add(dto.getUserId());
+                usersIndexedByRoomId.put(roomUrl, hostList);
+                hostList.stream()
+                        .filter((user) -> !user.equals(dto.getUserId()))
+                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
+            }
+            case ICE_CANDIDATE -> {
+                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
+                rtcTransportDTO.setUserId(dto.getUserId());
+                rtcTransportDTO.setAction(RtcActionEnum.ICE_CANDIDATE);
+                ArrayList<Integer> hostList = usersIndexedByRoomId.get(roomUrl);
+                hostList.stream()
+                        .filter((user) -> !user.equals(dto.getUserId()))
+                        // TODO null ici ?
+                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
+            }
+            case LEAVE_ROOM -> {
+                String key = roomUrl + "_" + dto.getGroupUrl();
+                List<Integer> userIds = groupService.getAllUsersIdByGroupUrl(dto.getGroupUrl());
+                HashMap<String, ArrayList<Integer>> hostListsIndexedByRoomUrl = roomCacheService.getRoomByKey(key);
+                if (hostListsIndexedByRoomUrl.size() == 0) {
+                    log.info("All users left the call, removing room from list");
+                    OutputTransportDTO outputTransportDTO = new OutputTransportDTO();
+                    outputTransportDTO.setAction(TransportActionEnum.END_CALL);
+                    outputTransportDTO.setObject(dto.getGroupUrl());
+                    usersIndexedByRoomId.remove(key);
+                    userIds.forEach(userId -> this.messagingTemplate.convertAndSend("/topic/user/" + userId, outputTransportDTO));
+                }
+            }
+            default -> log.warn("Unknown action : {}", dto.getAction());
         }
-        UserDTO user = userService.getUserInformation(username);
-        List<GroupDTO> toReturn = user.getGroupList();
-        toReturn.sort(new ComparatorListGroupDTO());
-        return toReturn;
     }
-
 
     /**
      * Receive message from user and dispatch to all users subscribed to conversation

@@ -1,0 +1,7 @@
+**/node_modules
+uploads
+frontend-web/build
+backend/target
+backend/mvnw
+backend/mvnw.cmd
+backend/.idea

@@ -2,8 +2,11 @@ package com.mercure.controller;
 
 import com.google.gson.Gson;
 import com.mercure.dto.*;
-import com.mercure.entity.GroupUser;
+import com.mercure.dto.user.GroupDTO;
+import com.mercure.dto.user.InitUserDTO;
+import com.mercure.entity.GroupEntity;
 import com.mercure.entity.UserEntity;
+import com.mercure.mapper.GroupMapper;
 import com.mercure.mapper.UserMapper;
 import com.mercure.service.CustomUserDetailsService;
 import com.mercure.service.GroupService;
@@ -46,6 +49,9 @@ public class AuthenticationController {
     @Autowired
     private GroupService groupService;
 
+    @Autowired
+    private GroupMapper groupMapper;
+
     @PostMapping(value = "/auth")
     public AuthUserDTO createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) throws Exception {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
@@ -75,8 +81,8 @@ public class AuthenticationController {
     }
 
     @GetMapping(value = "/fetch")
-    public AuthUserDTO fetchInformation(HttpServletRequest request) {
-        return userMapper.toLightUserDTO(getUserEntity(request));
+    public InitUserDTO fetchInformation(HttpServletRequest request) {
+        return userMapper.toUserDTO(getUserEntity(request));
     }
 
     private void authenticate(String username, String password) throws Exception {
@@ -90,12 +96,12 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/create")
-    public String createGroupChat(HttpServletRequest request, @RequestBody String payload) {
+    public GroupDTO createGroupChat(HttpServletRequest request, @RequestBody String payload) {
         UserEntity user = getUserEntity(request);
         Gson gson = new Gson();
         GroupDTO groupDTO = gson.fromJson(payload, GroupDTO.class);
-        GroupUser groupUser = groupService.createGroup(user.getId(), groupDTO.getName());
-        return groupUser.getGroupMapping().getUrl();
+        GroupEntity groupEntity = groupService.createGroup(user.getId(), groupDTO.getName());
+        return groupMapper.toGroupDTO(groupEntity, user.getId());
     }
 
     private UserEntity getUserEntity(HttpServletRequest request) {

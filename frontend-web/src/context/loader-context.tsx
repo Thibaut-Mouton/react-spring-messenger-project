@@ -1,6 +1,6 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from "react"
 
-const defaultStatus: boolean = false;
+const defaultStatus = false
 
 type LoaderContextType = {
     loading: boolean;
@@ -9,15 +9,15 @@ type LoaderContextType = {
 
 const LoaderContext = React.createContext<LoaderContextType>(
     {} as LoaderContextType
-);
+)
 
 export const LoaderProvider: React.FunctionComponent<any> = ({ children }) => {
-    const [loading, setLoading] = useState<boolean>(defaultStatus);
-    return (
-        <LoaderContext.Provider value={ { loading, setLoading } }>
-            { children }
-        </LoaderContext.Provider>
-    );
-};
+	const [loading, setLoading] = useState<boolean>(defaultStatus)
+	return (
+		<LoaderContext.Provider value={ { loading, setLoading } }>
+			{ children }
+		</LoaderContext.Provider>
+	)
+}
 
-export const useLoaderContext = () => useContext(LoaderContext);
+export const useLoaderContext = (): LoaderContextType => useContext(LoaderContext)

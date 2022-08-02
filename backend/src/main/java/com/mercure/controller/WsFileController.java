@@ -1,6 +1,6 @@
 package com.mercure.controller;
 
-import com.mercure.dto.NotificationDTO;
+import com.mercure.dto.MessageDTO;
 import com.mercure.dto.OutputTransportDTO;
 import com.mercure.entity.MessageEntity;
 import com.mercure.service.GroupService;
@@ -57,12 +57,12 @@ public class WsFileController {
     public ResponseEntity<?> uploadFile(@RequestParam(name = "file") MultipartFile file, @RequestParam(name = "userId") int userId, @RequestParam(name = "groupUrl") String groupUrl) {
         int groupId = groupService.findGroupByUrl(groupUrl);
         try {
-            MessageEntity messageEntity = messageService.createAndSaveMessage(userId, groupId, MessageTypeEnum.FILE.toString(), "has send a file");
+            MessageEntity messageEntity = messageService.createAndSaveMessage(userId, groupId, MessageTypeEnum.FILE.toString(), "have send a file");
             storageService.store(file, messageEntity.getId());
             OutputTransportDTO res = new OutputTransportDTO();
-            NotificationDTO notificationDTO = messageService.createNotificationDTO(messageEntity);
+            MessageDTO messageDTO = messageService.createNotificationMessageDTO(messageEntity, userId);
             res.setAction(TransportActionEnum.NOTIFICATION_MESSAGE);
-            res.setObject(notificationDTO);
+            res.setObject(messageDTO);
             seenMessageService.saveMessageNotSeen(messageEntity, groupId);
             List<Integer> toSend = messageService.createNotificationList(userId, groupUrl);
             toSend.forEach(toUserId -> messagingTemplate.convertAndSend("/topic/user/" + toUserId, res));

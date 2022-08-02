@@ -1,7 +1,8 @@
 package com.mercure.service;
 
 import com.mercure.dto.GroupMemberDTO;
-import com.mercure.dto.UserDTO;
+import com.mercure.dto.user.InitUserDTO;
+import com.mercure.dto.user.UserDTO;
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
@@ -121,18 +122,5 @@ public class UserService {
 
     public boolean checkIfUserNameOrMailAlreadyUsed(String firstName, String mail) {
         return userRepository.countAllByFirstNameOrMail(firstName, mail) > 0;
-    }
-
-
-    /**
-     * At WebSocket init, fetch user data and map it to a {@link UserDTO}
-     *
-     * @param username string value for username
-     * @return a {@link UserDTO}
-     */
-    @Transactional
-    public UserDTO getUserInformation(String username) {
-        UserEntity userEntity = findByNameOrEmail(username, username);
-        return userMapper.toUserDTO(userEntity);
     }
 }

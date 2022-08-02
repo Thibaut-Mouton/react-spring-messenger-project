@@ -7,9 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,6 +45,10 @@ public class GroupEntity implements Serializable {
     @Column(name = "type")
     @Enumerated(value = EnumType.STRING)
     private GroupTypeEnum groupTypeEnum;
+
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private Timestamp createdAt;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
