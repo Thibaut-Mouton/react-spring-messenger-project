@@ -3,6 +3,10 @@
    <img src="/assets/springboot.png" alt="Spring boot logo"/>
 </p>
 
+# FastLiteMessage ![build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/maven/badge.svg?branch=master)
+
+Real time chat application group oriented built with React and Spring Boot. Talk with your friends, create and add users to conversation, send messages or images, set groups administrators and start video calls !
+
 # Project Requirements
 
 * [JDK](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)  17
@@ -42,7 +46,7 @@ Be sure that no other app is running on port 3000, 9090 or 3306
 * Please note there is no specific security over websockets.
 * Docker setup is not production ready
 
-## Features
+# Project overview
 
 ![Project overview](assets/messenger.jpg?raw=true "Project overview")
 
