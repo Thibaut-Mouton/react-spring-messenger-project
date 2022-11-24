@@ -22,6 +22,7 @@ import { ImagePreviewComponent } from "../partials/image-preview"
 import { CustomTextField } from "../partials/custom-material-textfield"
 import { ActiveVideoCall } from "../partials/video/active-video-call"
 import { HttpService } from "../../service/http-service"
+import { generateIconColorMode } from "../utils/enable-dark-mode"
 
 export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string }> = ({ groupUrl }) => {
   const { theme } = useThemeContext()
@@ -295,14 +296,14 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 					 : <div style={{
 					   fontFamily: "Segoe UI,SegoeUI,\"Helvetica Neue\",Helvetica,Arial,sans-serif",
 					   backgroundColor: `${messageModel.color}`,
-					   letterSpacing: "1px",
+					   fontWeight: "bold",
 					   minWidth: "40px",
 					   width: "40px",
 					   height: "40px",
 					   textAlign: "center",
 					   fontSize: "20px",
-					   borderRadius: " 50%",
-					   border: "1px solid gray",
+					   borderRadius: "8px",
+					   border: `1px solid ${generateIconColorMode(theme)}`,
 					   lineHeight: "37px"
 					 }}>
 					   <div style={{ color: "#FFFFFF" }}>{messageModel.initials}</div>

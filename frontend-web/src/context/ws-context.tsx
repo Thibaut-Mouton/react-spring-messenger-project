@@ -1,7 +1,6 @@
 import { Client, IMessage } from "@stomp/stompjs"
 import React, { useContext, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Dispatch } from "redux"
 import { useAuthContext } from "./auth-context"
 import { useLoaderContext } from "./loader-context"
 import { playNotificationSound } from "../components/utils/play-sound-notification"
@@ -16,14 +15,12 @@ import {
   setCallIncoming,
   setCallUrl,
   setGroupMessages, setGroupWithCurrentCall,
-  setWsUserGroups,
+  updateGroupsWithLastMessageSent,
   wsHealthCheckConnected
 } from "../reducers"
 import { StoreState } from "../reducers/types"
 import { TransportActionEnum } from "../utils/transport-action-enum"
-import { TypeMessageEnum } from "../utils/type-message-enum"
 import { ILeaveGroupModel } from "../interface-contract/leave-group-model"
-import { IGroupWrapper } from "../interface-contract/user/group-wrapper-model"
 import { IUser } from "../interface-contract/user/user-model"
 
 type WebSocketContextType = {
@@ -38,57 +35,21 @@ export const WebsocketContextProvider: React.FunctionComponent<any> = ({ childre
   const { user } = useAuthContext()
   const { setLoading } = useLoaderContext()
   const dispatch = useDispatch()
-  const {
-    groups,
-    userWsToken
-  } = useSelector(
+  const { userWsToken } = useSelector(
     (state: StoreState) => state.globalReducer
   )
 
   useEffect(() => {
     if (user && user.wsToken !== null) {
 	 setLoading(true)
-	 initWs(user, groups).then(() => (setLoading(false)))
+	 initWs(user).then(() => (setLoading(false)))
     }
     return () => {
 	 dispatch(wsHealthCheckConnected({ isWsConnected: false }))
     }
   }, [userWsToken])
 
-  /**
-   * Update groups sidebar with new messages
-   *
-   * @param dispatch
-   * @param groupWrappers
-   * @param message
-   * @param userId
-   */
-  function updateGroupsWithLastMessageSent (dispatch: Dispatch, groupWrappers: IGroupWrapper[], message: FullMessageModel, userId: number) {
-    const groupIdToUpdate = message.groupId
-    const isMessageSendByCurrentUser = message.userId === userId
-
-    const groups = groupWrappers.map((groupWrapper) => {
-	 const group = { ...groupWrapper.group }
-	 if (groupWrapper.group.id === groupIdToUpdate) {
-	   if (message.type === TypeMessageEnum.TEXT) {
-		group.lastMessageSender = message.sender
-		group.lastMessage = message.message
-	   } else {
-		group.lastMessage = `${isMessageSendByCurrentUser ? "You" : message.sender} ${message.message}`
-		group.lastMessageSender = undefined
-	   }
-	   group.lastMessageDate = message.time
-	   group.lastMessageSeen = isMessageSendByCurrentUser ? true : message.isMessageSeen
-	 }
-	 return {
-	   group,
-	   groupCall: groupWrapper.groupCall
-	 }
-    })
-    dispatch(setWsUserGroups({ groups }))
-  }
-
-  async function initWs (user: IUser, groups: IGroupWrapper[]) {
+  async function initWs (user: IUser) {
     const wsObj = await initWebSocket(user.wsToken)
     setWsClient(wsObj)
     wsObj.onConnect = () => {
@@ -131,7 +92,11 @@ export const WebsocketContextProvider: React.FunctionComponent<any> = ({ childre
 		break
 	   case TransportActionEnum.NOTIFICATION_MESSAGE: {
 		const message = data.object as FullMessageModel
-		updateGroupsWithLastMessageSent(dispatch, groups, message, user.id)
+		dispatch(updateGroupsWithLastMessageSent({
+		  userId: user.id,
+		  message
+		}))
+		// updateGroupsWithLastMessageSent(dispatch, groups, message, user.id)
 		dispatch(addChatHistory({ newMessage: message }))
 		if (message.userId !== user.id) {
 		  playNotificationSound()

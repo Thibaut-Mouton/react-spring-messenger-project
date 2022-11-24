@@ -21,7 +21,7 @@ const initialWsState: WsReducerInitType = {
   callUrl: "",
 
   alerts: [],
-
+  authLoading: true,
   userWsToken: undefined,
   userId: undefined
 }

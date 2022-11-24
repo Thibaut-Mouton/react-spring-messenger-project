@@ -15,11 +15,15 @@ import { clearChatHistory, setCurrentActiveGroup, setCurrentGroup } from "../../
 import { StoreState } from "../../reducers/types"
 import { useLoaderContext } from "../../context/loader-context"
 
-interface ClockType {
+interface IClockType {
   date: string
 }
 
-const Clock: React.FunctionComponent<ClockType> = ({ date }) => {
+interface IWebSocketGroupComponent {
+  groupUrl: string
+}
+
+const Clock: React.FunctionComponent<IClockType> = ({ date }) => {
   const [currentCount, setCount] = useState(dateParser(date))
 
   useEffect(() => {
@@ -39,7 +43,7 @@ const Clock: React.FunctionComponent<ClockType> = ({ date }) => {
   )
 }
 
-export const WebsocketGroupsComponent: React.FunctionComponent<{ groupUrl: string }> = ({ groupUrl }) => {
+export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupComponent> = ({ groupUrl }) => {
   const history = useHistory()
   const dispatch = useDispatch()
   const {

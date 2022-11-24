@@ -21,6 +21,8 @@ export interface WsReducerInitType {
 
   alerts: FeedbackModel[]
 
+  authLoading: boolean
+
   callStarted: boolean
   callUrl: string
 }

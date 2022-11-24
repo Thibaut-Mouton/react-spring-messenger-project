@@ -18,6 +18,7 @@ export const HeaderComponent: React.FunctionComponent = () => {
     setUser
   } = useAuthContext()
   const {
+    authLoading,
     currentActiveGroup,
   } = useSelector(
     (state: StoreState) => state.globalReducer
@@ -92,9 +93,9 @@ export const HeaderComponent: React.FunctionComponent = () => {
 					  </RouterLink>
 				  </Typography>
 				  <nav className={"lnk clrcstm mnu"}>
-				{generateLoading()}
+				{authLoading && generateLoading()}
 				{
-				  user &&
+				  !authLoading && user &&
 						<RouterLink className={"lnk clrcstm"} to={`/t/messages/${currentActiveGroup}`}>
 							<Button className={"clrcstm"} variant="outlined"
 									style={{ margin: "8px 12px" }}>
@@ -103,7 +104,7 @@ export const HeaderComponent: React.FunctionComponent = () => {
 						</RouterLink>
 				}
 				{
-				  !user &&
+				  !authLoading && !user &&
 						<RouterLink className={"lnk clrcstm"} to={"/login"}>
 							<Button className={"clrcstm"} variant="outlined" style={{ margin: "8px 12px" }}>
 								Login
@@ -111,7 +112,7 @@ export const HeaderComponent: React.FunctionComponent = () => {
 						</RouterLink>
 				}
 				{
-				  !user &&
+				  !authLoading && !user &&
 						<RouterLink className={"lnk clrcstm"} to={"/register"}>
 							<Button className={"clrcstm"} variant="outlined" style={{ margin: "8px 12px" }}>
 								Register
@@ -119,7 +120,7 @@ export const HeaderComponent: React.FunctionComponent = () => {
 						</RouterLink>
 				}
 				{
-				  user &&
+				  !authLoading && user &&
 						<RouterLink className={"lnk clrcstm"} to={"/create"}>
 							<Button className={"clrcstm"} variant="outlined"
 									style={{ margin: "8px 12px" }}>
@@ -128,14 +129,14 @@ export const HeaderComponent: React.FunctionComponent = () => {
 						</RouterLink>
 				}
 				{
-				  user &&
+				  !authLoading && user &&
 						<Button className={"clrcstm"} variant="outlined" disabled
 								style={{ margin: "8px 12px" }}>
 					 {user?.firstName}
 						</Button>
 				}
 				{
-				  user &&
+				  !authLoading && user &&
 						<RouterLink className={"lnk clrcstm"} to={"#"}>
 							<Button className={"clrcstm"} variant="outlined"
 									onClick={(event) => logoutUser(event)}

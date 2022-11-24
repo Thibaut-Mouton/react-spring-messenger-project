@@ -7,6 +7,7 @@ import { GroupModel } from "../interface-contract/group-model"
 import { IGroupWrapper } from "../interface-contract/user/group-wrapper-model"
 import { FeedbackModel, IPartialFeedBack } from "../interface-contract/feedback-model"
 import { UUIDv4 } from "../utils/uuid-generator"
+import { TypeMessageEnum } from "../utils/type-message-enum"
 
 const mainReducer = createSlice({
   name: "main",
@@ -104,6 +105,41 @@ const mainReducer = createSlice({
 	   return groupWrapper
 	 })
     },
+    setAuthLoading: (state, { payload }: PayloadAction<{ isLoading: boolean }>) => {
+	 state.authLoading = payload.isLoading
+    },
+    updateGroupsWithLastMessageSent: (state, { payload }: PayloadAction<{ message: FullMessageModel, userId: number }>) => {
+	 const groupWrappers = [...state.groups]
+	 const groupIdToUpdate = payload.message.groupId
+	 const {
+	   message,
+	   userId
+	 } = payload
+	 const isMessageSendByCurrentUser = message.userId === userId
+	 const groupsTemp = groupWrappers.map((groupWrapper) => {
+	   const group = { ...groupWrapper.group }
+	   if (groupWrapper.group.id === groupIdToUpdate) {
+		if (message.type === TypeMessageEnum.TEXT) {
+		  group.lastMessageSender = message.sender
+		  group.lastMessage = message.message
+		} else {
+		  group.lastMessage = `${isMessageSendByCurrentUser ? "You" : message.sender} ${message.message}`
+		  group.lastMessageSender = undefined
+		}
+		group.lastMessageDate = message.time
+		group.lastMessageSeen = isMessageSendByCurrentUser ? true : message.isMessageSeen
+	   }
+	   return {
+		group,
+		groupCall: groupWrapper.groupCall
+	   }
+	 })
+	 const groupIndexToMove = groupsTemp.findIndex((elt) => elt.group.url === message.groupUrl)
+	 if (groupIndexToMove !== -1) {
+	   groupsTemp.unshift(groupsTemp.splice(groupIndexToMove, 1)[0])
+	 }
+	 state.groups = groupsTemp
+    }
   }
 })
 
@@ -111,6 +147,7 @@ export const globalReducer = mainReducer.reducer
 export const {
   setWsUserGroups,
   wsHealthCheckConnected,
+  updateGroupsWithLastMessageSent,
   setGroupMessages,
   clearChatHistory,
   setCurrentActiveGroup,
@@ -126,7 +163,8 @@ export const {
   setGroupWithCurrentCall,
   setUserWsToken,
   setUserId,
-  markMessageAsSeen
+  markMessageAsSeen,
+  setAuthLoading
 } = mainReducer.actions
 
 const reducer = {
