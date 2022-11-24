@@ -5,6 +5,10 @@
 
 # FastLiteMessage ![build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/maven/badge.svg?branch=master)
 
+Real time chat application group oriented built with React and Spring Boot. Talk with your friends, create and add users to conversation, send messages or images, set groups administrators and start video calls ! (coming soon)
+
+# FastLiteMessage ![build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/maven/badge.svg?branch=master)
+
 Real time chat application group oriented built with React and Spring Boot. Talk with your friends, create and add users to conversation, send messages or images, set groups administrators and start video calls !
 
 # Project Requirements
@@ -45,6 +49,12 @@ Be sure that no other app is running on port 3000, 9090 or 3306
 # Disclaimer
 * Please note there is no specific security over websockets.
 * Docker setup is not production ready
+
+##### Start server
+- Go inside backend folder then type  ```mvn spring-boot:run``` to launch backend.
+- Or you can type ```mvn clean package``` to generate a JAR file and then start server with ```java -jar path/to/jar/file``` (Normally in inside backend/target/)
+##### Start frontend
+- Go inside frontend-web folder and then type ```npm react-scripts start```
 
 # Project overview
 
