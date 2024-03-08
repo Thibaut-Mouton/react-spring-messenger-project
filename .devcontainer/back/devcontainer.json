@@ -1,0 +1,7 @@
+{
+  "name": "Back spring configuration",
+  "dockerComposeFile": ["../../docker-compose.yml"],
+  "service": "back",
+  "shutdownAction": "none",
+  workspaceFolder: "/workspace/backend"
+}
