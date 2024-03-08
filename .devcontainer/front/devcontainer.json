@@ -3,5 +3,6 @@
   "dockerComposeFile": ["../../docker-compose.yml"],
   "service": "web",
   "shutdownAction": "none",
-  workspaceFolder: "/workspace/frontend-web"
+  "initializeCommand": "ls",
+  "workspaceFolder": "/workspace/frontend-web"
 }
