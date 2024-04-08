@@ -6,11 +6,11 @@ MAINTAINER Thibaut MOUTON <thibautmouton22@gmail.com>
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
 RUN apt-get update && apt-get install -y curl  \
-    && apt-get -y autoclean  \
-    && apt-get install procps  \
-    && apt-get install git \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get install -y --no-install-recommends openjdk-11-jre
+    && apt-get -y autoclean \
+    && apt-get -y install procps \
+    && apt-get -y install git \
+    && apt-get -y install openjdk-17-jdk \
+    && rm -rf /var/lib/apt/lists/*
 
 # nvm environment variables
 ENV NVM_DIR /root/.nvm
