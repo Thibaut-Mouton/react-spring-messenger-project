@@ -1,9 +1,16 @@
 FROM debian:latest
 
+MAINTAINER Thibaut MOUTON <thibautmouton22@gmail.com>
+
 # replace shell with bash so we can source files
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-RUN apt-get update && apt-get install -y curl && apt-get -y autoclean && apt-get -y install procps && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl  \
+    && apt-get -y autoclean  \
+    && apt-get install procps  \
+    && apt-get install git \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get install -y --no-install-recommends openjdk-11-jre
 
 # nvm environment variables
 ENV NVM_DIR /root/.nvm
@@ -24,5 +31,6 @@ ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 # confirm installation
 RUN node -v
 RUN npm -v
+RUN java --version
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
