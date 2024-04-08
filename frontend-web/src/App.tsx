@@ -1,18 +1,12 @@
 import React from "react"
 import "./App.css"
 import { LinearProgress } from "@mui/material"
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom"
-import { CreateGroupComponent } from "./components/create-group/create-group-component"
+import {BrowserRouter as Router} from "react-router-dom"
 import { HeaderComponent } from "./components/partials/header-component"
-import { LoginComponent } from "./components/login/login-component"
-import { WebSocketMainComponent } from "./components/websocket/websocket-main-component"
 import { useLoaderContext } from "./context/loader-context"
-import { HomeComponent } from "./components/home"
 import { AlertComponent } from "./components/partials/alert-component"
-import { VideoComponent } from "./components/websocket/video-component"
-import { RegisterFormComponent } from "./components/register/register-user"
 
-export const App = (): JSX.Element => {
+export const App = () => {
   const { loading } = useLoaderContext()
 
   return (
@@ -26,7 +20,6 @@ export const App = (): JSX.Element => {
 		}}/>
 	 }
 	 <HeaderComponent/>
-	 <Switch>
 	   <Route exact path="/">
 		<HomeComponent/>
 	   </Route>
@@ -48,7 +41,6 @@ export const App = (): JSX.Element => {
 	   <Route exact path="/call/:uuid">
 		<VideoComponent/>
 	   </Route>
-	 </Switch>
 	 <AlertComponent/>
     </Router>
   )

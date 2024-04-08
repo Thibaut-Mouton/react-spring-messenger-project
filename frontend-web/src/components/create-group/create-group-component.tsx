@@ -1,6 +1,5 @@
 import { Button, Container, CssBaseline, Grid, Typography } from "@mui/material"
 import React, { useEffect, useState } from "react"
-import { useHistory } from "react-router-dom"
 import { useThemeContext } from "../../context/theme-context"
 import { useDispatch } from "react-redux"
 import { createGroup, setAlerts } from "../../reducers"
