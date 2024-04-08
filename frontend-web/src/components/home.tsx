@@ -1,12 +1,12 @@
 import { Box, Grid } from "@mui/material"
-import React, { useEffect } from "react"
+import React, {useEffect} from "react"
 import { Link as RouterLink } from "react-router-dom"
 import { generateColorMode } from "./utils/enable-dark-mode"
 import { useAuthContext } from "../context/auth-context"
 import { useLoaderContext } from "../context/loader-context"
 import { useThemeContext } from "../context/theme-context"
 
-export const HomeComponent = (): JSX.Element => {
+export const HomeComponent = (): React.JSX.Element => {
   const { theme } = useThemeContext()
   const { user } = useAuthContext()
   const { setLoading } = useLoaderContext()

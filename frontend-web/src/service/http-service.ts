@@ -4,7 +4,6 @@ import { IUserWrapper } from "../interface-contract/user/user-wrapper"
 import { JwtModel } from "../interface-contract/jwt-model"
 import { IUser } from "../interface-contract/user/user-model"
 import { GroupUserModel } from "../interface-contract/group-user-model"
-import { setAlerts, store } from "../reducers"
 
 export class HttpService {
 
