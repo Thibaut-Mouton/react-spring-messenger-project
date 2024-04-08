@@ -3,7 +3,7 @@ FROM debian:latest
 # replace shell with bash so we can source files
 RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 
-RUN apt-get update && apt-get install -y curl && apt-get -y autoclean && apt-get install procps && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y curl && apt-get -y autoclean && apt-get -y install procps && rm -rf /var/lib/apt/lists/*
 
 # nvm environment variables
 ENV NVM_DIR /root/.nvm
