@@ -1,8 +1,0 @@
-{
-  "name": "Front configuration",
-  "dockerComposeFile": ["../../docker-compose.yml"],
-  "service": "web",
-  "shutdownAction": "none",
-  "initializeCommand": "ls",
-  "workspaceFolder": "/workspace/frontend-web"
-}
