@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material"
+import {Box, Card, CardContent, Grid, Typography} from "@mui/material"
 import React, {useEffect} from "react"
 import { Link as RouterLink } from "react-router-dom"
 import { generateColorMode } from "./utils/enable-dark-mode"
@@ -13,7 +13,7 @@ export const HomeComponent = (): React.JSX.Element => {
 
   useEffect(() => {
     document.title = "Home | FLM"
-    setLoading(false)
+    // setLoading(false)
   }, [setLoading])
 
   return (
@@ -27,6 +27,13 @@ export const HomeComponent = (): React.JSX.Element => {
 	   <Grid container spacing={2}>
 		<Grid item xs={12}>
 		  <h3>Welcome {user ? "back " + user.firstName : "visitor"} !</h3>
+			<Card variant="outlined">
+				<CardContent>
+					<Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+						Word of the Day
+					</Typography>
+				</CardContent>
+			</Card>
 		  {
 		    user
 			 ? <p>You have 0 unread messages</p>

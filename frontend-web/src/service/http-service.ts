@@ -19,13 +19,13 @@ export class HttpService {
 	 return response
     }, (error) => {
 	 if (error.message === "Network Error") {
-	   store.dispatch(setAlerts({
-		alert: {
-		  text: "Unable to reach server. Please try again later.",
-		  alert: "error",
-		  isOpen: true
-		}
-	   }))
+	   // store.dispatch(setAlerts({
+		// alert: {
+		//   text: "Unable to reach server. Please try again later.",
+		//   alert: "error",
+		//   isOpen: true
+		// }
+	   // }))
 	 }
 	 return Promise.reject(error)
     })

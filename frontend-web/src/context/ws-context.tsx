@@ -27,7 +27,7 @@ export const WebsocketContextProvider: React.FunctionComponent<any> = ({ childre
   useEffect(() => {
     if (user && user.wsToken !== null) {
 	 setLoading(true)
-	 initWs(user).then(() => (setLoading(false)))
+	 initWs(user)
     }
     return () => {
 	 // wsHealthCheckConnected({ isWsConnected: false }))
@@ -39,7 +39,7 @@ export const WebsocketContextProvider: React.FunctionComponent<any> = ({ childre
     setWsClient(wsObj)
     wsObj.onConnect = () => {
 	 // dispatch(wsHealthCheckConnected({ isWsConnected: true }))
-	 setLoading(false)
+	 // setLoading(false)
 	 wsObj.subscribe(`/topic/user/${user.id}`, (res: IMessage) => {
 	   const data = JSON.parse(res.body) as OutputTransportDTO
 	   switch (data.action) {

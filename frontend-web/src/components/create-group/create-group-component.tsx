@@ -1,16 +1,12 @@
 import { Button, Container, CssBaseline, Grid, Typography } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import { useThemeContext } from "../../context/theme-context"
-import { useDispatch } from "react-redux"
-import { createGroup, setAlerts } from "../../reducers"
 import { CustomTextField } from "../partials/custom-material-textfield"
 import { HttpService } from "../../service/http-service"
 
 export const CreateGroupComponent = () => {
-  const history = useHistory()
   const [groupName, setGroupName] = useState("")
   const { theme } = useThemeContext()
-  const dispatch = useDispatch()
   const httpService = new HttpService()
 
   useEffect(() => {
@@ -26,17 +22,17 @@ export const CreateGroupComponent = () => {
     event.preventDefault()
     if (groupName !== "") {
 	const res =  await httpService.createGroup(groupName)
-	 dispatch(setAlerts({
-	   alert: {
-		isOpen: true,
-		alert: "success",
-		text: `Group "${groupName}" has been created successfully`
-	   }
-	 }))
-	 dispatch(createGroup({ group: res.data }))
-	 history.push({
-	   pathname: "/t/messages/" + res.data.url
-	 })
+	 // dispatch(setAlerts({
+	 //   alert: {
+		// isOpen: true,
+		// alert: "success",
+		// text: `Group "${groupName}" has been created successfully`
+	 //   }
+	 // }))
+	 // dispatch(createGroup({ group: res.data }))
+	 // history.push({
+	 //   pathname: "/t/messages/" + res.data.url
+	 // })
 	 // setAlerts([...alerts, new FeedbackModel(UUIDv4(), `Cannot create group "${groupName}" : ${err.toString()}`, "error", true)])
     }
   }

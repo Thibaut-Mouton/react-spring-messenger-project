@@ -1,22 +1,18 @@
 import LockIcon from "@mui/icons-material/Lock"
 import { Button, Grid, Typography } from "@mui/material"
 import React, { useEffect, useState } from "react"
-import { Link, useHistory } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { useLoaderContext } from "../../context/loader-context"
 import { useThemeContext } from "../../context/theme-context"
 import { generateIconColorMode, generateLinkColorMode } from "../utils/enable-dark-mode"
 import { FooterComponent } from "../partials/footer-component"
 import { CustomTextField } from "../partials/custom-material-textfield"
 import { HttpService } from "../../service/http-service"
-import { useDispatch } from "react-redux"
-import { setAlerts } from "../../reducers"
-import { AxiosError } from "axios"
 
 export const LoginComponent: React.FunctionComponent = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const history = useHistory()
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
   const { theme } = useThemeContext()
   const { setLoading } = useLoaderContext()
   const httpService = new HttpService()
@@ -55,26 +51,26 @@ export const LoginComponent: React.FunctionComponent = () => {
 	   username,
 	   password
 	 })
-	 dispatch(setAlerts({
-	   alert: {
-		text: "You are connected",
-		alert: "info",
-		isOpen: true
-	   }
-	 }))
-	 history.push("/")
+	 // dispatch(setAlerts({
+	 //   alert: {
+		// text: "You are connected",
+		// alert: "info",
+		// isOpen: true
+	 //   }
+	 // }))
+	 // history.push("/")
     } catch (err: any) {
-	 dispatch(setAlerts({
-	   alert: {
-		text: err.message,
-		alert: "error",
-		isOpen: true
-	   }
-	 }))
+	 // dispatch(setAlerts({
+	 //   alert: {
+		// text: err.message,
+		// alert: "error",
+		// isOpen: true
+	 //   }
+	 // }))
 	 setUsername("")
 	 setPassword("")
     } finally {
-	 setLoading(false)
+	 // setLoading(false)
     }
   }
 
