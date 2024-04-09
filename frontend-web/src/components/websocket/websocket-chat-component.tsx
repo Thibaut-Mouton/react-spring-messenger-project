@@ -3,7 +3,6 @@ import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import ImageIcon from "@mui/icons-material/Image"
 import { Box, Button, CircularProgress, IconButton, Tooltip } from "@mui/material"
 import React, { useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
 import { GroupActionEnum } from "./group-action-enum"
 import { useAuthContext } from "../../context/auth-context"
 import { useLoaderContext } from "../../context/loader-context"
@@ -13,8 +12,6 @@ import { FullMessageModel } from "../../interface-contract/full-message-model"
 import { getPayloadSize } from "../../utils/string-size-calculator"
 import { TransportActionEnum } from "../../utils/transport-action-enum"
 import { TypeMessageEnum } from "../../utils/type-message-enum"
-import { markMessageAsSeen } from "../../reducers"
-import { StoreState } from "../../reducers/types"
 import { NoDataComponent } from "../partials/no-data-component"
 import { TransportModel } from "../../interface-contract/transport-model"
 import { CallWindowComponent } from "./call-window-component"
@@ -30,7 +27,6 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
   const { ws } = useWebSocketContext()
   const { setLoading } = useLoaderContext()
   const [isPreviewImageOpen, setPreviewImageOpen] = React.useState(false)
-  const dispatch = useDispatch()
   const [messageId, setLastMessageId] = React.useState(0)
   const [loadingOldMessages, setLoadingOldMessages] = React.useState<boolean>(false)
 
@@ -41,17 +37,15 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
   const [message, setMessage] = React.useState("")
   const httpService = new HttpService()
   let messageEnd: HTMLDivElement | null
-
+    
+  const chatHistory: any[] = []
   const {
     isWsConnected,
-    chatHistory,
     allMessagesFetched,
     currentActiveGroup,
     currentGroup,
     userId
-  } = useSelector(
-    (state: StoreState) => state.globalReducer
-  )
+  } = {} as any
 
   useEffect(() => {
     if (isWsConnected && groupUrl && ws) {
@@ -60,7 +54,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 	   destination: "/app/message",
 	   body: JSON.stringify(transport)
 	 })
-	 setLoading(false)
+	 // setLoading(false)
     }
   }, [isWsConnected])
 
@@ -191,9 +185,9 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
   }
 
   function markMessageSeen () {
-    dispatch(markMessageAsSeen({
-	 groupUrl
-    }))
+    // dispatch(markMessageAsSeen({
+	//  groupUrl
+    // }))
   }
 
   function handleScroll (event: any) {

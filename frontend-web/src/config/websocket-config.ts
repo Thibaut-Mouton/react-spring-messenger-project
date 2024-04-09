@@ -1,5 +1,4 @@
 import { Client } from "@stomp/stompjs"
-import { UUIDv4 } from "../utils/uuid-generator"
 
 const WS_URL = process.env.NODE_ENV === "development" ? "localhost:9090/" : "localhost:9090/"
 
@@ -12,7 +11,7 @@ export function initWebSocket (userToken: string): Client {
 		// debug: (str: string) => {
 		//     console.log(str);
 		// },
-		connectHeaders: { clientSessionId: UUIDv4() },
+		connectHeaders: { clientSessionId: crypto.randomUUID() },
 		reconnectDelay: 5000,
 		heartbeatIncoming: 4000,
 		heartbeatOutgoing: 4000

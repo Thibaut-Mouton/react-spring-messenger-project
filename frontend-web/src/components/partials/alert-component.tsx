@@ -1,12 +1,8 @@
 import { Alert, Collapse } from "@mui/material"
 import React from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { StoreState } from "../../reducers/types"
-import { setAllAlerts } from "../../reducers"
 
 export const AlertComponent: React.FunctionComponent = () => {
-  const { alerts } = useSelector((state: StoreState) => state.globalReducer)
-  const dispatch = useDispatch()
+  const alerts: any[] = []
 
   function closeAlert (id?: string) {
     if (!id) {
@@ -17,7 +13,7 @@ export const AlertComponent: React.FunctionComponent = () => {
     const eltToDelete = { ...allAlerts[indexToDelete] }
     eltToDelete.isOpen = false
     allAlerts[indexToDelete] = eltToDelete
-    dispatch(setAllAlerts({ allAlerts }))
+    // dispatch(setAllAlerts({ allAlerts }))
   }
 
   return (

@@ -2,7 +2,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import CloseIcon from "@mui/icons-material/Close"
 import { Alert, Button, Collapse, Grid, IconButton, Typography } from "@mui/material"
 import React from "react"
-import { Link, useHistory } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { useLoaderContext } from "../../context/loader-context"
 import { useThemeContext } from "../../context/theme-context"
 import { HttpService } from "../../service/http-service"
@@ -10,12 +10,9 @@ import "./register-form.css"
 import { CustomTextField } from "../partials/custom-material-textfield"
 import { generateColorMode, generateIconColorMode, generateLinkColorMode } from "../utils/enable-dark-mode"
 import { FooterComponent } from "../partials/footer-component"
-import { useDispatch } from "react-redux"
-import { setAlerts } from "../../reducers"
 
 export const RegisterFormComponent = (): JSX.Element => {
   const { theme } = useThemeContext()
-  const history = useHistory()
   const { setLoading } = useLoaderContext()
   const [username, setUsername] = React.useState<string>("")
   const [lastName, setLastName] = React.useState<string>("")
@@ -28,7 +25,6 @@ export const RegisterFormComponent = (): JSX.Element => {
   const [displayEmailNotValid, setDisplayEmailNotValid] = React.useState<boolean>(false)
   const [errorArray, setErrorArray] = React.useState<string[]>([])
   const refWrapper = React.useRef()
-  const dispatch = useDispatch()
   const httpService = new HttpService()
 
   function checkFormValidation (): string[] {
@@ -63,29 +59,29 @@ export const RegisterFormComponent = (): JSX.Element => {
     if (result.length === 0) {
 	 try {
 	   await httpService.createUser(username, lastName, email, password)
-	   setLoading(false)
-	   dispatch(setAlerts({
-		alert: {
-		  text: "Account created successfully",
-		  alert: "success",
-		  isOpen: true
-		}
-	   }))
-	   history.push("/")
+	   // setLoading(false)
+	   // dispatch(setAlerts({
+		// alert: {
+		//   text: "Account created successfully",
+		//   alert: "success",
+		//   isOpen: true
+		// }
+	   // }))
+	   // history.push("/")
 	 } catch (err: any) {
 	   if (err.response !== undefined) {
 		errorArray.push(err.response.data)
 	   }
-	   dispatch(setAlerts({
-		alert: {
-		  text: "Error during registration, please see above errors",
-		  alert: "error",
-		  isOpen: true
-		}
-	   }))
+	   // dispatch(setAlerts({
+		// alert: {
+		//   text: "Error during registration, please see above errors",
+		//   alert: "error",
+		//   isOpen: true
+		// }
+	   // }))
 	 } finally {
 	   setDisplayFormValidationError(true)
-	   setLoading(false)
+	   // setLoading(false)
 	 }
     }
   }
