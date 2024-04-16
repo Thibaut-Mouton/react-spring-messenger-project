@@ -2,6 +2,7 @@ package com.mercure.service;
 
 import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
+import com.mercure.dto.WrapperMessageDTO;
 import com.mercure.entity.FileEntity;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.MessageEntity;
@@ -21,10 +22,13 @@ public class MessageService {
     private MessageRepository messageRepository;
 
     @Autowired
-    private UserService userService;
+    private MessageService messageService;
 
     @Autowired
     private GroupService groupService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private FileService fileService;
@@ -56,9 +60,11 @@ public class MessageService {
     }
 
     public List<MessageEntity> findByGroupId(int id, int offset) {
-        List<MessageEntity> list = messageRepository.findByGroupIdAndOffset(id, offset);
-        if (list.size() == 0) {
-            return new ArrayList<>();
+        List<MessageEntity> list;
+        if (offset == -1) {
+            list = messageRepository.findByGroupIdAndOffset(id, offset);
+        } else {
+            list = messageRepository.findLastMessagesByGroupId(id);
         }
         return list;
     }
@@ -163,5 +169,32 @@ public class MessageService {
         messageDTO.setColor(colors.get(msg.getUser_id()));
         messageDTO.setMessageSeen(msg.getUser_id() == userId);
         return messageDTO;
+    }
+
+    /**
+     * Return history of group discussion
+     *
+     * @param url The group url to map
+     * @return List of message
+     */
+    public WrapperMessageDTO getConversationMessage(String url, int messageId) {
+        WrapperMessageDTO wrapper = new WrapperMessageDTO();
+        if (url != null) {
+            List<MessageDTO> messageDTOS = new ArrayList<>();
+            GroupEntity group = groupService.getGroupByUrl(url);
+            List<MessageEntity> newMessages = messageService.findByGroupId(group.getId(), messageId);
+            if (newMessages != null) {
+                newMessages.forEach(msg ->
+                        messageDTOS.add(messageService
+                                .createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()))
+                );
+            }
+//            wrapper.setLastMessage(afterMessages != null && afterMessages.isEmpty());
+            wrapper.setLastMessage(true);
+            wrapper.setMessages(messageDTOS);
+            wrapper.setGroupName(group.getName());
+            return wrapper;
+        }
+        return null;
     }
 }

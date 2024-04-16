@@ -1,7 +1,8 @@
 package com.mercure.controller;
 
 import com.google.gson.Gson;
-import com.mercure.dto.*;
+import com.mercure.dto.AuthUserDTO;
+import com.mercure.dto.JwtDTO;
 import com.mercure.dto.user.GroupDTO;
 import com.mercure.dto.user.InitUserDTO;
 import com.mercure.entity.GroupEntity;
@@ -13,26 +14,26 @@ import com.mercure.service.GroupService;
 import com.mercure.service.UserService;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping(value = "/api")
+@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 public class AuthenticationController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
     private JwtUtil jwtTokenUtil;
@@ -66,6 +67,7 @@ public class AuthenticationController {
 //         7 days
         jwtAuthToken.setMaxAge(7 * 24 * 60 * 60);
         response.addCookie(jwtAuthToken);
+        log.debug("User authenticated successfully");
         return userMapper.toLightUserDTO(user);
     }
 
@@ -80,6 +82,11 @@ public class AuthenticationController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping(value = "/csrf")
+    public CsrfToken getCsrfToken(CsrfToken token) {
+        return token;
+    }
+
     @GetMapping(value = "/fetch")
     public InitUserDTO fetchInformation(HttpServletRequest request) {
         return userMapper.toUserDTO(getUserEntity(request));
@@ -87,7 +94,7 @@ public class AuthenticationController {
 
     private void authenticate(String username, String password) throws Exception {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            //authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {

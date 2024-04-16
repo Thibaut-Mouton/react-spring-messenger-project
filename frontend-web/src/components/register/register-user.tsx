@@ -3,17 +3,14 @@ import CloseIcon from "@mui/icons-material/Close"
 import { Alert, Button, Collapse, Grid, IconButton, Typography } from "@mui/material"
 import React from "react"
 import { Link } from "react-router-dom"
-import { useLoaderContext } from "../../context/loader-context"
 import { useThemeContext } from "../../context/theme-context"
 import { HttpService } from "../../service/http-service"
 import "./register-form.css"
 import { CustomTextField } from "../partials/custom-material-textfield"
 import { generateColorMode, generateIconColorMode, generateLinkColorMode } from "../utils/enable-dark-mode"
-import { FooterComponent } from "../partials/footer-component"
 
 export const RegisterFormComponent = (): JSX.Element => {
   const { theme } = useThemeContext()
-  const { setLoading } = useLoaderContext()
   const [username, setUsername] = React.useState<string>("")
   const [lastName, setLastName] = React.useState<string>("")
   const [email, setEmail] = React.useState<string>("")
@@ -53,7 +50,6 @@ export const RegisterFormComponent = (): JSX.Element => {
 
   async function registerUser (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     event.preventDefault()
-    setLoading(true)
     errorArray.length = 0
     const result = checkFormValidation()
     if (result.length === 0) {
@@ -145,7 +141,7 @@ export const RegisterFormComponent = (): JSX.Element => {
   return (
     <div className={generateColorMode(theme)}
 	    style={{
-		 height: "calc(100% - 64px)",
+		 height: "calc(100% - 46px)",
 		 width: "100%"
 	    }}>
 	 <div className={"main-register-form"}>
@@ -289,7 +285,6 @@ export const RegisterFormComponent = (): JSX.Element => {
 		</Grid>
 	   </form>
 	 </div>
-	 <FooterComponent/>
     </div>
   )
 }

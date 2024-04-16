@@ -18,7 +18,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin
 public class WsController {
 
     @Autowired
@@ -69,23 +67,22 @@ public class WsController {
             case SEND_GROUP_MESSAGE:
                 this.getAndSaveMessage(dto.getUserId(), dto.getGroupUrl(), dto.getMessage());
                 break;
-            case FETCH_GROUP_MESSAGES:
-                if (!dto.getGroupUrl().equals("")) {
-                    int groupId = groupService.findGroupByUrl(dto.getGroupUrl());
-                    if (dto.getGroupUrl().equals("") || groupUserJoinService.checkIfUserIsAuthorizedInGroup(dto.getUserId(), groupId)) {
-                        break;
-                    }
-                    WrapperMessageDTO messages = this.getConversationMessage(dto.getGroupUrl(), dto.getMessageId());
-                    OutputTransportDTO resMessages = new OutputTransportDTO();
-                    if (dto.getMessageId() == -1) {
-                        resMessages.setAction(TransportActionEnum.FETCH_GROUP_MESSAGES);
-                    } else {
-                        resMessages.setAction(TransportActionEnum.ADD_CHAT_HISTORY);
-                    }
-                    resMessages.setObject(messages);
-                    this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), resMessages);
-                }
-                break;
+//            case FETCH_GROUP_MESSAGES:
+//                if (!dto.getGroupUrl().equals("")) {
+//                    int groupId = groupService.findGroupByUrl(dto.getGroupUrl());
+//                    if (dto.getGroupUrl().equals("") || groupUserJoinService.checkIfUserIsAuthorizedInGroup(dto.getUserId(), groupId)) {
+//                        break;
+//                    }
+//                    OutputTransportDTO resMessages = new OutputTransportDTO();
+//                    if (dto.getMessageId() == -1) {
+//                        resMessages.setAction(TransportActionEnum.FETCH_GROUP_MESSAGES);
+//                    } else {
+//                        resMessages.setAction(TransportActionEnum.ADD_CHAT_HISTORY);
+//                    }
+//                    resMessages.setObject(messages);
+//                    this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), resMessages);
+//                }
+//                break;
             case MARK_MESSAGE_AS_SEEN:
                 if (!"".equals(dto.getGroupUrl())) {
                     int messageId = messageService.findLastMessageIdByGroupId(groupService.findGroupByUrl(dto.getGroupUrl()));
@@ -242,32 +239,5 @@ public class WsController {
         Long id1 = createGroup.getId1();
         Long id2 = createGroup.getId2();
         groupService.createConversation(id1.intValue(), id2.intValue());
-    }
-
-    /**
-     * Return history of group discussion
-     *
-     * @param url The group url to map
-     * @return List of message
-     */
-    public WrapperMessageDTO getConversationMessage(String url, int messageId) {
-        WrapperMessageDTO wrapper = new WrapperMessageDTO();
-        if (url != null) {
-            List<MessageDTO> messageDTOS = new ArrayList<>();
-            int groupId = groupService.findGroupByUrl(url);
-            List<MessageEntity> newMessages = messageService.findByGroupId(groupId, messageId);
-            int lastMessageId = newMessages != null && newMessages.size() != 0 ? newMessages.get(0).getId() : 0;
-            List<MessageEntity> afterMessages = messageService.findByGroupId(groupId, lastMessageId);
-            if (newMessages != null) {
-                wrapper.setLastMessage(afterMessages != null && afterMessages.size() == 0);
-                newMessages.forEach(msg ->
-                        messageDTOS.add(messageService
-                                .createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()))
-                );
-            }
-            wrapper.setMessages(messageDTOS);
-            return wrapper;
-        }
-        return null;
     }
 }

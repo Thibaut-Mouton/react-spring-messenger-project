@@ -1,4 +1,4 @@
-name: npm
+name: build-front
 
 on: push
 

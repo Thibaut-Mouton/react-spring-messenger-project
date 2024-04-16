@@ -13,6 +13,8 @@ import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.UserService;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @RestController
-@RequestMapping(value = "/api")
 public class ApiController {
 
     private final Logger log = LoggerFactory.getLogger(ApiController.class);

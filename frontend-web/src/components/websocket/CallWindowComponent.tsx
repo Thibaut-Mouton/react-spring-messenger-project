@@ -1,15 +1,17 @@
 import CallIcon from "@mui/icons-material/Call"
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material"
-import React from "react"
-import {useWebSocketContext} from "../../context/ws-context"
+import React, {useContext} from "react"
 import {RtcTransportDTO} from "../../interface-contract/rtc-transport-model"
 import {RtcActionEnum} from "../../utils/rtc-action-enum"
+import {WebSocketContext} from "../../context/WebsocketContext"
 
-export const CallWindowComponent: React.FunctionComponent<{ userId: number, groupUrl: string }> = ({
-                                                                                                       userId,
-                                                                                                       groupUrl
-                                                                                                   }) => {
-    const {ws} = useWebSocketContext()
+interface CallWindowComponentProps {
+    userId: number
+    groupUrl?: string
+}
+
+export function CallWindowComponent({userId, groupUrl}: CallWindowComponentProps) {
+    const {ws} = useContext(WebSocketContext)!
     const {
         callStarted,
         callUrl
@@ -19,9 +21,9 @@ export const CallWindowComponent: React.FunctionComponent<{ userId: number, grou
         event.preventDefault()
         const startedCallUrl = crypto.randomUUID()
         if (ws) {
-            const transport = new RtcTransportDTO(userId, groupUrl, RtcActionEnum.INIT_ROOM)
+            const transport = new RtcTransportDTO(userId, groupUrl || "", RtcActionEnum.INIT_ROOM)
             ws.publish({
-                destination: `/app/rtc/${startedCallUrl}`,
+                destination: `/rtc/${startedCallUrl}`,
                 body: JSON.stringify(transport)
             })
             const callPage = window.open(`http://localhost:3000/call/${startedCallUrl}`, "_blank") as any

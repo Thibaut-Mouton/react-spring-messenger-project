@@ -1,22 +1,22 @@
-import React, { useContext } from "react"
-
+import React, {createContext, useState} from "react"
 
 type LoaderContextType = {
     loading: boolean;
-    setLoading: (isLoading: boolean) => void
+    setLoading: (isAppLoading: boolean) => void
 };
 
-const LoaderContext = React.createContext<LoaderContextType>(
+const LoaderContext = createContext<LoaderContextType>(
     {} as LoaderContextType
 )
 
-// export const LoaderProvider: React.FunctionComponent<unknown> = ({ children }) => {
-// 	const [loading, setLoading] = useState<boolean>(defaultStatus)
-// 	return (
-// 		<LoaderContext.Provider value={ { loading, setLoading } }>
-// 			{ children }
-// 		</LoaderContext.Provider>
-// 	)
-// }
+const LoaderProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
+    const [loading, setLoading] = useState<boolean>(false)
+    return (
+        <LoaderContext.Provider value={{loading, setLoading}}>
+            {children}
+        </LoaderContext.Provider>
+    )
+}
 
-export const useLoaderContext = (): LoaderContextType => useContext(LoaderContext)
+
+export {LoaderContext, LoaderProvider}
