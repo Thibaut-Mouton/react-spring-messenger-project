@@ -2,13 +2,13 @@ import {Button, Container, CssBaseline, Grid, Typography} from "@mui/material"
 import React, {useContext, useEffect, useState} from "react"
 import {useThemeContext} from "../../context/theme-context"
 import {CustomTextField} from "../partials/custom-material-textfield"
-import {HttpService} from "../../service/http-service"
+import {HttpGroupService} from "../../service/http-group-service"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
 
 export const CreateGroupComponent = () => {
     const [groupName, setGroupName] = useState("")
     const {theme} = useThemeContext()
-    const httpService = new HttpService()
+    const httpService = new HttpGroupService()
     const {dispatch} = useContext(AlertContext)!
 
     useEffect(() => {
@@ -65,7 +65,7 @@ export const CreateGroupComponent = () => {
     return (
         <div className={theme}
              style={{
-                 height: "calc(100% - 46px)",
+                 height: "calc(100% - 64px)",
                  textAlign: "center",
                  paddingTop: "40px"
              }}>

@@ -26,9 +26,10 @@ import {
 import {TransportModel} from "../../interface-contract/transport-model"
 import {TransportActionEnum} from "../../utils/transport-action-enum"
 import {AllUsersDialog} from "../partials/all-users-dialog"
-import {HttpService} from "../../service/http-service"
+import {HttpGroupService} from "../../service/http-group-service"
 import {GroupUserModel} from "../../interface-contract/group-user-model"
 import {WebSocketContext} from "../../context/WebsocketContext"
+import {AuthUserContext} from "../../context/AuthContext"
 
 export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?: string }> = ({groupUrl}) => {
     const [paramsOpen, setParamsOpen] = useState(false)
@@ -40,10 +41,8 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
     const [openTooltipId, setToolTipId] = useState<number | null>(null)
     const {theme} = useThemeContext()
     const {ws} = useContext(WebSocketContext)!
-    const httpService = new HttpService()
-    const {user} = {} as any // TODO remove any
-
-    const groups = []
+    const httpService = new HttpGroupService()
+    const {user, groups} = useContext(AuthUserContext)!
 
     function handleTooltipAction(event: any, action: string) {
         event.preventDefault()

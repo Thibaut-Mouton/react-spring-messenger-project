@@ -1,29 +1,21 @@
-import {Box, CircularProgress, Tooltip} from "@mui/material"
-import React, {useContext, useEffect, useState} from "react"
-import {GroupActionEnum} from "./group-action-enum"
-import {useThemeContext} from "../../context/theme-context"
-import {FullMessageModel} from "../../interface-contract/full-message-model"
+import {Box, CircularProgress} from "@mui/material"
+import React, {useContext, useEffect} from "react"
 import {TransportActionEnum} from "../../utils/transport-action-enum"
-import {TypeMessageEnum} from "../../utils/type-message-enum"
 import {TransportModel} from "../../interface-contract/transport-model"
-import {ImagePreviewComponent} from "../partials/image-preview"
 import {ActiveVideoCall} from "../partials/video/active-video-call"
 import {GroupModel} from "../../interface-contract/group-model"
 import {NoDataComponent} from "../partials/NoDataComponent"
 import {HttpMessageService} from "../../service/http-message.service"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
-import {CreateMessageComponent} from "../message/CreateMessageComponent"
+import {CreateMessageComponent} from "../messages/CreateMessageComponent"
 import {WebSocketContext} from "../../context/WebsocketContext"
+import {DisplayMessagesComponent} from "../messages/DisplayMessagesComponent"
 
 export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string }> = ({groupUrl}) => {
-    const {theme} = useThemeContext()
     const {dispatch} = useContext(AlertContext)!
-    const {ws} = useContext(WebSocketContext)!
-    const [isPreviewImageOpen, setPreviewImageOpen] = React.useState(false)
+    const {ws, messages, setMessages} = useContext(WebSocketContext)!
     const [messageId, setLastMessageId] = React.useState(0)
     const [loadingOldMessages, setLoadingOldMessages] = React.useState<boolean>(false)
-    const [messages, setMessages] = useState<FullMessageModel[]>([])
-    const [imgSrc, setImgSrc] = React.useState("")
     let messageEnd: HTMLDivElement | null
 
     const {
@@ -67,46 +59,8 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
         }
     }, [messages])
 
-    function styleSelectedMessage() {
-        return theme === "dark" ? "hover-msg-dark" : "hover-msg-light"
-    }
-
-    function generateImageRender(message: FullMessageModel) {
-        if (message.fileUrl === undefined) {
-            return null
-        }
-        return (
-            <div>
-                <img src={message.fileUrl} height={"200px"} alt={message.name}
-                     onClick={() => handleImagePreview(GroupActionEnum.OPEN, message.fileUrl)}
-                     style={{
-                         border: "1px solid #c8c8c8",
-                         borderRadius: "7%"
-                     }}/>
-            </div>
-        )
-    }
-
     function scrollToEnd() {
         messageEnd?.scrollIntoView({behavior: "auto"})
-    }
-
-    function handlePopupState(isOpen: boolean) {
-        setPreviewImageOpen(isOpen)
-    }
-
-    function handleImagePreview(action: string, src: string) {
-        switch (action) {
-            case GroupActionEnum.OPEN:
-                setImgSrc(src)
-                handlePopupState(true)
-                break
-            case GroupActionEnum.CLOSE:
-                handlePopupState(false)
-                break
-            default:
-                throw new Error("handleImagePreview failed")
-        }
     }
 
     function handleScroll(event: any) {
@@ -144,7 +98,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                     }}>
                         <div style={{
                             backgroundColor: "white",
-                            borderRadius: "30px 30px 0 0",
+                            borderRadius: "15px 15px 0 0",
                             width: "100%",
                             borderBottom: "1px solid #d5d5d5"
                         }}>
@@ -193,59 +147,8 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                                     </div>
                                 </div>
                             }
-                            <ImagePreviewComponent imgSrc={imgSrc}
-                                                   displayImagePreview={isPreviewImageOpen}
-                                                   setDisplayImagePreview={handlePopupState}/>
-                            {messages.map((messageModel, index, array) => (
-                                <Tooltip
-                                    key={index}
-                                    enterDelay={1000}
-                                    leaveDelay={0}
-                                    title={new Date(messageModel.time).getHours() + ":" + new Date(messageModel.time).getMinutes()}
-                                    placement="left">
-                                    <div className={"msg " + styleSelectedMessage()} key={index}
-                                         style={{display: "flex"}}>
-                                        {index >= 1 && array[index - 1].userId === array[index].userId
-                                            ? <div style={{
-                                                minWidth: "40px",
-                                                width: "40px",
-                                                height: "40px"
-                                            }}/>
-                                            : <div style={{
-                                                fontFamily: "Segoe UI,SegoeUI,\"Helvetica Neue\",Helvetica,Arial,sans-serif",
-                                                backgroundColor: `${messageModel.color}`,
-                                                fontWeight: "bold",
-                                                minWidth: "40px",
-                                                width: "40px",
-                                                height: "40px",
-                                                textAlign: "center",
-                                                fontSize: "20px",
-                                                borderRadius: "8px",
-                                                lineHeight: "37px"
-                                            }}>
-                                                <div style={{color: "#FFFFFF"}}>{messageModel.initials}</div>
-                                            </div>
-                                        }
-                                        <div style={{margin: "4px"}}>
-                                            {index >= 1 && array[index - 1].userId === array[index].userId
-                                                ? <div/>
-                                                : <div>
-                                                    <b>{messageModel.sender} </b>
-                                                </div>
-                                            }
-                                            {
-                                                messageModel.type === TypeMessageEnum.TEXT
-                                                    ? <div style={{overflowWrap: "break-word"}}>
-                                                        {messageModel.message}
-                                                    </div>
-                                                    : <div>
-                                                        {generateImageRender(messageModel)}
-                                                    </div>
-                                            }
-                                        </div>
-                                    </div>
-                                </Tooltip>
-                            ))}
+
+                            <DisplayMessagesComponent messages={messages}/>
                             {/*<div style={{*/}
                             {/*    float: "left",*/}
                             {/*    clear: "both"*/}

@@ -17,6 +17,7 @@ public class JwtUtil implements Serializable {
 
     public static final long JWT_TOKEN_VALIDITY = 1000 * 3600 * 365;
 
+    // TODO generate key
     public static final String JWT_TOKEN = "d95d7dc9-0d56-4ef3-8d03-263c23b5bce5";
 
     // retrieve username from jwt token

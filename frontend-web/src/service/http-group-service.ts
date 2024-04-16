@@ -7,7 +7,7 @@ import {GroupUserModel} from "../interface-contract/group-user-model"
 import {HttpMainService} from "./http-main.service"
 import {Csrf} from "../interface-contract/csrf/csrf.type"
 
-export class HttpService extends HttpMainService {
+export class HttpGroupService extends HttpMainService {
 
     public constructor() {
         super()
@@ -42,7 +42,7 @@ export class HttpService extends HttpMainService {
     }
 
     public fetchAllUsersInConversation(groupUrl: string): Promise<AxiosResponse<GroupUserModel[]>> {
-        return this.instance.get("users/group/" + groupUrl, {})
+        return this.instance.get(`users/group/${groupUrl}`)
     }
 
     public fetchAllUsersWithoutAlreadyInGroup(groupUrl: string): Promise<AxiosResponse<GroupUserModel[]>> {

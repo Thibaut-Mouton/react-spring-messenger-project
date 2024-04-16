@@ -1,5 +1,5 @@
-![maven build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/maven/badge.svg?branch=master)
-![npm build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/npm/badge.svg?branch=master)
+![maven build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/build-back/badge.svg?branch=master)
+![npm build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/build-front/badge.svg?branch=master)
 
 <p align="center">
    <img src="/assets/react.png" alt="React logo"/>

@@ -2,9 +2,9 @@ import {Box, Card, CardContent, Grid, Typography} from "@mui/material"
 import React, {useContext, useEffect} from "react"
 import {generateColorMode} from "./utils/enable-dark-mode"
 import {useThemeContext} from "../context/theme-context"
-import {LoginComponent} from "./login/login-component"
 import {FooterComponent} from "./partials/footer-component"
 import {AuthUserContext} from "../context/AuthContext"
+import {LoginComponent} from "./login/LoginComponent"
 
 export const HomeComponent = (): React.JSX.Element => {
     const {theme} = useThemeContext()
@@ -18,7 +18,7 @@ export const HomeComponent = (): React.JSX.Element => {
         <div className={generateColorMode(theme)}
              style={{
                  width: "100%",
-                 height: "calc(100% - 46px)",
+                 height: "calc(100% - 64px)",
                  textAlign: "center"
              }}>
             <Box p={2}>
@@ -35,7 +35,10 @@ export const HomeComponent = (): React.JSX.Element => {
                                 <Typography variant="h5" gutterBottom>
                                     Simple, fast and secure
                                 </Typography>
-                                <div>FastLiteMessage allow to communicate with other people, create groups, make serverless video calls in an easy way. Log into your account or register to start using FastLiteMessage.</div>
+                                <div>FastLiteMessage allow to communicate with other people, create groups, make
+                                    serverless video calls in an easy way. Log into your account or register to start
+                                    using FastLiteMessage.
+                                </div>
                                 <FooterComponent/>
                             </CardContent>
                         </Card>

@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useEffect} from "react"
 import "./index.css"
 import * as serviceWorker from "./serviceWorker"
 import {createBrowserRouter, redirect, RouterProvider} from "react-router-dom"
@@ -10,16 +10,15 @@ import {VideoComponent} from "./components/websocket/video-component"
 import {LoaderProvider} from "./context/loader-context"
 import {AlertComponent} from "./components/partials/alert-component"
 import {LoaderComponent} from "./components/partials/loader/LoaderComponent"
-import {HttpService} from "./service/http-service"
+import {HttpGroupService} from "./service/http-group-service"
 import {AlertContextProvider} from "./context/AlertContext"
 import {AuthUserContextProvider} from "./context/AuthContext"
-import {HeaderComponent} from "./components/partials/HeaderComponent"
 
 const router = createBrowserRouter([
     {
         path: "/",
         loader: async () => {
-            return new HttpService().pingRoute().catch(() => redirect("/login"))
+            return new HttpGroupService().pingRoute().catch(() => redirect("/login"))
         },
     },
     {
@@ -44,18 +43,37 @@ const router = createBrowserRouter([
     }
 ])
 
-createRoot(document.getElementById("root")!)
-    .render(
+function RootComponent() {
+
+    useEffect(() => {
+        const getCsrfToken = async () => {
+            const http = new HttpGroupService()
+            try {
+                const {data} = await http.getCsrfToken()
+                localStorage.setItem("csrf", JSON.stringify(data))
+            } catch (error) {
+                console.log("ERROR", error)
+            }
+        }
+        getCsrfToken()
+    }, [])
+
+    return (
         <LoaderProvider>
             <AuthUserContextProvider>
                 <AlertContextProvider>
                     <LoaderComponent/>
-                    <HeaderComponent/>
                     <RouterProvider router={router}/>
                     <AlertComponent/>
                 </AlertContextProvider>
             </AuthUserContextProvider>
         </LoaderProvider>
+    )
+}
+
+createRoot(document.getElementById("root")!)
+    .render(
+        <RootComponent/>
     )
 
 // If you want your app to work offline and load faster, you can change
