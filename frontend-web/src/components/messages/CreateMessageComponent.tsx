@@ -4,7 +4,7 @@ import React, {useContext, useState} from "react"
 import {getPayloadSize} from "../../utils/string-size-calculator"
 import {TransportModel} from "../../interface-contract/transport-model"
 import {TransportActionEnum} from "../../utils/transport-action-enum"
-import {HttpService} from "../../service/http-service"
+import {HttpGroupService} from "../../service/http-group-service"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import {WebSocketContext} from "../../context/WebsocketContext"
 import {AuthUserContext} from "../../context/AuthContext"
@@ -74,7 +74,7 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
             setMessage("")
         }
         if (file !== null) {
-            const httpService = new HttpService()
+            const httpService = new HttpGroupService()
             const formData = new FormData()
             formData.append("file", file)
             formData.append("userId", String(user?.id || 0))

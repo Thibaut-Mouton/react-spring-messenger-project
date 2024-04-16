@@ -28,7 +28,7 @@ public class JwtWebConfig extends OncePerRequestFilter {
     private JwtUtil jwtUtil;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String jwtToken = null;
         String username;
         Cookie cookie = WebUtils.getCookie(request, StaticVariable.SECURE_COOKIE);
@@ -38,17 +38,10 @@ public class JwtWebConfig extends OncePerRequestFilter {
         }
         if (jwtToken != null) {
             username = jwtUtil.getUserNameFromJwtToken(jwtToken);
-            try {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if (jwtUtil.validateToken(jwtToken, userDetails)) {
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-                }
-            } catch (Exception ex) {
-                //this is very important, since it guarantees the user is not authenticated at all
-                filterChain.doFilter(request, response);
-                SecurityContextHolder.clearContext();
-                return;
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (jwtUtil.validateToken(jwtToken, userDetails)) {
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
         filterChain.doFilter(request, response);

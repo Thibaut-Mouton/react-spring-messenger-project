@@ -4,7 +4,7 @@ import { Alert, Button, Collapse, Grid, IconButton, Typography } from "@mui/mate
 import React from "react"
 import { Link } from "react-router-dom"
 import { useThemeContext } from "../../context/theme-context"
-import { HttpService } from "../../service/http-service"
+import { HttpGroupService } from "../../service/http-group-service"
 import "./register-form.css"
 import { CustomTextField } from "../partials/custom-material-textfield"
 import { generateColorMode, generateIconColorMode, generateLinkColorMode } from "../utils/enable-dark-mode"
@@ -22,7 +22,7 @@ export const RegisterFormComponent = (): JSX.Element => {
   const [displayEmailNotValid, setDisplayEmailNotValid] = React.useState<boolean>(false)
   const [errorArray, setErrorArray] = React.useState<string[]>([])
   const refWrapper = React.useRef()
-  const httpService = new HttpService()
+  const httpService = new HttpGroupService()
 
   function checkFormValidation (): string[] {
     const validationErrors: string[] = []
@@ -141,7 +141,7 @@ export const RegisterFormComponent = (): JSX.Element => {
   return (
     <div className={generateColorMode(theme)}
 	    style={{
-		 height: "calc(100% - 46px)",
+		 height: "calc(100% - 64px)",
 		 width: "100%"
 	    }}>
 	 <div className={"main-register-form"}>

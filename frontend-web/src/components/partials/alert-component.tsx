@@ -1,6 +1,6 @@
 import {Alert, AlertTitle, Collapse} from "@mui/material"
 import React, {useContext} from "react"
-import {AlertAction, AlertContext, AlertContextProvider} from "../../context/AlertContext"
+import {AlertAction, AlertContext} from "../../context/AlertContext"
 
 export const AlertComponent: React.FunctionComponent = () => {
     const {alerts, dispatch} = useContext(AlertContext)!

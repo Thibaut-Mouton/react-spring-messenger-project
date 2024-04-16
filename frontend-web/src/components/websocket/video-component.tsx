@@ -10,7 +10,7 @@ import {VideoControl} from "../partials/video/video-control"
 import {EmptyRoom} from "../partials/video/empty-room"
 import {HangUpControl} from "../partials/video/hang-up-control"
 import {CallEnded} from "../partials/video/call-ended"
-import {HttpService} from "../../service/http-service"
+import {HttpGroupService} from "../../service/http-group-service"
 
 const getUuid = (location: string): string => {
     const temp = location.split("/")
@@ -33,7 +33,7 @@ export const VideoComponent = (): React.JSX.Element => {
     const isUserInitiateSession = location.search.split("=")[1]
     const roomUrl = getUuid(location.pathname)
     const groupUrlFromParent = (window as any).groupUrl
-    const http = new HttpService()
+    const http = new HttpGroupService()
 
     peerConnection.addEventListener("connectionstatechange", () => {
         switch (peerConnection.connectionState) {

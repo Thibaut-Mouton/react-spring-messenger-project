@@ -12,6 +12,7 @@ import {dateParser} from "../../utils/date-formater"
 import {SkeletonLoader} from "../partials/skeleten-loader"
 import {AuthUserContext} from "../../context/AuthContext"
 import NoteAddOutlinedIcon from "@mui/icons-material/NoteAddOutlined"
+import {WebSocketContext} from "../../context/WebsocketContext"
 
 interface IClockType {
     date: string
@@ -46,7 +47,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
     const {theme} = useThemeContext()
     const navigate = useNavigate()
     const {groups} = useContext(AuthUserContext)!
-    const isWsConnected = true
+    const {isWsConnected} = useContext(WebSocketContext)!
 
     function changeGroupName(url: string) {
         const currentGroup = groups.find((group) => group.url === url)
@@ -92,9 +93,11 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
     return (
         <div className={"sidebar"} style={{backgroundColor: "#f6f8fc"}}>
             <Collapse in={!isWsConnected}>
-                <Alert severity="error">
-                    Application is currently unavailable
-                </Alert>
+                <Box m={1}>
+                    <Alert severity="error">
+                        Application is currently unavailable
+                    </Alert>
+                </Box>
             </Collapse>
 
             <div style={{

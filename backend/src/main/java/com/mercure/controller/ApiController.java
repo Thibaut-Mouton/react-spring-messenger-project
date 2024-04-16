@@ -25,6 +25,7 @@ import org.springframework.web.util.WebUtils;
 import java.util.*;
 
 @RestController
+@CrossOrigin
 public class ApiController {
 
     private final Logger log = LoggerFactory.getLogger(ApiController.class);

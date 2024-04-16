@@ -10,8 +10,10 @@ import {AuthUserContext} from "./AuthContext"
 
 type WebSocketContextType = {
     ws: Client | undefined
+    messages: FullMessageModel[]
     isWsConnected: boolean
     setWsClient: (ws: Client) => void
+    setMessages: (messages: FullMessageModel[]) => void
     setWsConnected: (isConnected: boolean) => void
 }
 
@@ -19,6 +21,7 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(undefin
 
 const WebsocketContextProvider: React.FC<{ children: ReactNode }> = ({children}) => {
     const [ws, setWsClient] = useState<Client | undefined>(undefined)
+    const [messages, setMessages] = useState<FullMessageModel[]>([])
     const [isWsConnected, setWsConnected] = useState<boolean>(false)
     const {user} = useContext(AuthUserContext)!
 
@@ -33,10 +36,10 @@ const WebsocketContextProvider: React.FC<{ children: ReactNode }> = ({children})
         setWsClient(wsObj)
         wsObj.onConnect = () => {
             console.log("WS connected")
-            // dispatch(wsHealthCheckConnected({ isWsConnected: true }))
-            // setLoading(false)
+            setWsConnected(true)
             wsObj.subscribe(`/topic/user/${user.id}`, (res: IMessage) => {
                 const data = JSON.parse(res.body) as OutputTransportDTO
+                console.log("RECEIVE SUBSCRIBIG", data)
                 switch (data.action) {
                     case TransportActionEnum.FETCH_GROUP_MESSAGES: {
                         // const result = data.object as WrapperMessageModel
@@ -46,38 +49,17 @@ const WebsocketContextProvider: React.FC<{ children: ReactNode }> = ({children})
                         // }))
                         break
                     }
-                    case TransportActionEnum.LEAVE_GROUP: {
-                        // const {
-                        //   groupUrl,
-                        //   groupName
-                        // } = data.object as ILeaveGroupModel
-                        // dispatch(removeUserFromGroup({ groupUrl }))
-                        // dispatch(setAlerts({
-                        //   alert: {
-                        //     alert: "success",
-                        //     isOpen: true,
-                        //     text: `you left the group ${groupName}`
-                        //   }
-                        // }))
-                        break
-                    }
-                    case TransportActionEnum.ADD_CHAT_HISTORY: {
-                        // const wrapper = data.object as WrapperMessageModel
-                        // dispatch(setAllMessagesFetched({ allMessagesFetched: wrapper.lastMessage }))
-                        // const messages = wrapper.messages
-                        // dispatch(setGroupMessages({ messages }))
-                    }
-                        break
+
                     case TransportActionEnum.SEND_GROUP_MESSAGE:
                         break
                     case TransportActionEnum.NOTIFICATION_MESSAGE: {
                         const message = data.object as FullMessageModel
                         // dispatch(updateGroupsWithLastMessageSent({
-                        //   userId: user.id,
-                        //   message
+                        //     userId: user.id,
+                        //     message
                         // }))
                         // updateGroupsWithLastMessageSent(dispatch, groups, message, user.id)
-                        // dispatch(addChatHistory({ newMessage: message }))
+                        setMessages(state => [...state, message])
                         if (message.userId !== user.id) {
                             playNotificationSound()
                         }
@@ -119,8 +101,10 @@ const WebsocketContextProvider: React.FC<{ children: ReactNode }> = ({children})
     return (
         <WebSocketContext.Provider value={{
             ws,
+            messages,
             isWsConnected,
             setWsClient,
+            setMessages,
             setWsConnected
         }}>
             {children}

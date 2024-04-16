@@ -5,18 +5,18 @@ import {Link, redirect} from "react-router-dom"
 import {useThemeContext} from "../../context/theme-context"
 import {generateIconColorMode, generateLinkColorMode} from "../utils/enable-dark-mode"
 import {CustomTextField} from "../partials/custom-material-textfield"
-import {HttpService} from "../../service/http-service"
+import {HttpGroupService} from "../../service/http-group-service"
 import {LoaderContext} from "../../context/loader-context"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
 
-export const LoginComponent: React.FunctionComponent = () => {
+export function LoginComponent(): React.JSX.Element {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
 
     const {dispatch} = useContext(AlertContext)!
     const {setLoading} = useContext(LoaderContext)
     const {theme} = useThemeContext()
-    const httpService = new HttpService()
+    const httpService = new HttpGroupService()
 
     useEffect(() => {
         document.title = "Login | FLM"
@@ -73,7 +73,7 @@ export const LoginComponent: React.FunctionComponent = () => {
     return (
         <div className={theme}
              style={{
-                 height: "calc(100% - 46px)",
+                 height: "calc(100% - 64px)",
                  width: "100%"
              }}>
             <div className={"main-register-form"}>

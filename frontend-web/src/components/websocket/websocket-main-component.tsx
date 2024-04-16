@@ -7,6 +7,7 @@ import {useThemeContext} from "../../context/theme-context"
 import {generateColorMode} from "../utils/enable-dark-mode"
 import {useParams} from "react-router-dom"
 import {WebsocketContextProvider} from "../../context/WebsocketContext"
+import {HeaderComponent} from "../partials/HeaderComponent"
 
 export const WebSocketMainComponent: React.FunctionComponent = (): React.JSX.Element => {
     const {theme} = useThemeContext()
@@ -17,17 +18,20 @@ export const WebSocketMainComponent: React.FunctionComponent = (): React.JSX.Ele
     }, [])
 
     return (
-        <div className={generateColorMode(theme)}
-             style={{
-                 height: "calc(100% - 46px)",
-                 display: "flex",
-                 justifyContent: "space-between"
-             }}>
-            <WebsocketContextProvider>
-                <WebsocketGroupsComponent groupUrl={groupId}/>
-                <WebSocketChatComponent groupUrl={groupId}/>
-                <WebSocketGroupActionComponent groupUrl={groupId}/>
-            </WebsocketContextProvider>
-        </div>
+        <>
+            <HeaderComponent/>
+            <div className={generateColorMode(theme)}
+                 style={{
+                     height: "calc(100% - 64px)",
+                     display: "flex",
+                     justifyContent: "space-between"
+                 }}>
+                <WebsocketContextProvider>
+                    <WebsocketGroupsComponent groupUrl={groupId}/>
+                    <WebSocketChatComponent groupUrl={groupId}/>
+                    <WebSocketGroupActionComponent groupUrl={groupId}/>
+                </WebsocketContextProvider>
+            </div>
+        </>
     )
 }
