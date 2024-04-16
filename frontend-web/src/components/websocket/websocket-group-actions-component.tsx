@@ -16,22 +16,21 @@ import PersonIcon from "@mui/icons-material/Person"
 import GroupAddIcon from "@mui/icons-material/GroupAdd"
 import GroupIcon from "@mui/icons-material/Group"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
-import React, {useEffect, useState} from "react"
+import React, {useContext, useState} from "react"
 import {GroupActionEnum} from "./group-action-enum"
-import {useAuthContext} from "../../context/auth-context"
 import {useThemeContext} from "../../context/theme-context"
 import {
     generateClassName,
     generateIconColorMode
 } from "../utils/enable-dark-mode"
-import {useWebSocketContext} from "../../context/ws-context"
 import {TransportModel} from "../../interface-contract/transport-model"
 import {TransportActionEnum} from "../../utils/transport-action-enum"
 import {AllUsersDialog} from "../partials/all-users-dialog"
 import {HttpService} from "../../service/http-service"
 import {GroupUserModel} from "../../interface-contract/group-user-model"
+import {WebSocketContext} from "../../context/WebsocketContext"
 
-export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: string }> = ({groupUrl}) => {
+export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?: string }> = ({groupUrl}) => {
     const [paramsOpen, setParamsOpen] = useState(false)
     const [popupOpen, setPopupOpen] = useState(false)
     const [usersInConversation, setUsersInConversation] = useState<GroupUserModel[]>([])
@@ -40,18 +39,11 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
     const [toolTipAction, setToolTipAction] = useState(false)
     const [openTooltipId, setToolTipId] = useState<number | null>(null)
     const {theme} = useThemeContext()
-    const {ws} = useWebSocketContext()
+    const {ws} = useContext(WebSocketContext)!
     const httpService = new HttpService()
-    const {user} = useAuthContext()
+    const {user} = {} as any // TODO remove any
 
     const groups = []
-    const currentActiveGroup = {} as any
-    useEffect(() => {
-        clearData()
-        return () => {
-            clearData()
-        }
-    }, [currentActiveGroup])
 
     function handleTooltipAction(event: any, action: string) {
         event.preventDefault()
@@ -62,16 +54,6 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
             setToolTipAction(false)
             setToolTipId(null)
         }
-    }
-
-    function clearData() {
-        setAllUsers([])
-        setToolTipAction(false)
-        setToolTipId(null)
-        setCurrentUserIsAdmin(false)
-        setUsersInConversation([])
-        handlePopupState(false)
-        setParamsOpen(false)
     }
 
     function handleDisplayUserAction(event: any, id: number) {
@@ -90,7 +72,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
         switch (action) {
             case GroupActionEnum.PARAM:
                 if (usersInConversation.length === 0) {
-                    const res = await httpService.fetchAllUsersInConversation(groupUrl)
+                    const res = await httpService.fetchAllUsersInConversation(groupUrl || "")
                     res.data.forEach((groupUserModel) => {
                         if (groupUserModel.userId === user?.id && groupUserModel.admin) {
                             setCurrentUserIsAdmin(true)
@@ -114,7 +96,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
             case GroupActionEnum.OPEN:
                 handlePopupState(true)
                 if (allUsers.length === 0) {
-                    const res = await httpService.fetchAllUsersWithoutAlreadyInGroup(groupUrl)
+                    const res = await httpService.fetchAllUsersWithoutAlreadyInGroup(groupUrl || "")
                     setAllUsers(res.data)
                 }
                 break
@@ -130,7 +112,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
         if (ws) {
             const transport = new TransportModel(userId, TransportActionEnum.LEAVE_GROUP, undefined, groupUrl)
             ws.publish({
-                destination: "/app/message",
+                destination: "/message",
                 body: JSON.stringify(transport)
             })
         }
@@ -138,7 +120,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 
     async function removeUserFromAdminListInConversation(userId: string | number) {
         try {
-            const res = await httpService.removeAdminUserInConversation(userId, groupUrl)
+            // const res = await httpService.removeAdminUserInConversation(userId, groupUrl)
             const users = [...usersInConversation]
             const user = users.find((elt) => elt.userId === userId)
             if (user) {
@@ -165,7 +147,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 
     async function grantUserAdminInConversation(userId: number | string) {
         try {
-            const res = await httpService.grantUserAdminInConversation(userId, groupUrl)
+            // const res = await httpService.grantUserAdminInConversation(userId, groupUrl)
             // dispatch(setAlerts({
             //   alert: {
             // text: res.data,
@@ -192,7 +174,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 
     async function addUserInConversation(userId: string | number) {
         try {
-            const res = await httpService.addUserToGroup(userId, groupUrl)
+            const res = await httpService.addUserToGroup(userId, groupUrl || "")
             const users = [...usersInConversation]
             users.push(res.data)
             setUsersInConversation(users)
@@ -218,7 +200,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 
     async function removeUserFromConversation(userId: string | number) {
         try {
-            const res = await httpService.removeUserFromConversation(userId, groupUrl)
+            // const res = await httpService.removeUserFromConversation(userId, groupUrl)
             // dispatch(setAlerts({
             //   alert: {
             // text: res.data,
@@ -242,7 +224,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
     }
 
     return (
-        <div>
+        <div style={{backgroundColor: "#f6f8fc"}}>
             <div className={"sidebar"}>
                 <List
                     component="nav">

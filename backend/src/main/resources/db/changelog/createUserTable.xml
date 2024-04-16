@@ -14,7 +14,7 @@
             </not>
         </preConditions>
         <createTable tableName="user">
-            <column name="id" type="int">
+            <column name="id" autoIncrement="true" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="firstname" type="varchar(50)">
@@ -43,12 +43,6 @@
             <column name="credentials_non_expired" type="boolean" defaultValueBoolean="false"/>
             <column name="enabled" type="boolean" defaultValueBoolean="false"/>
         </createTable>
-        <addAutoIncrement columnDataType="int"
-                          columnName="id"
-                          defaultOnNull="false"
-                          generationType="ALWAYS"
-                          incrementBy="1"
-                          tableName="user"/>
         <rollback>
             <dropTable tableName="user"/>
         </rollback>

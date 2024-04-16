@@ -2,6 +2,10 @@
   "name": "frontend-web",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Thibaut MOUTON",
+    "email": "thibautmouton22@gmail.com"
+  },
   "scripts": {
     "start": "react-scripts start",
     "start:test": "tsc && set PORT=8080 && react-scripts start",

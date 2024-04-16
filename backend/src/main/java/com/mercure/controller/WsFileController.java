@@ -24,8 +24,6 @@ import java.util.List;
  * API controller to handle file upload
  */
 @RestController
-@CrossOrigin
-@RequestMapping("/api")
 public class WsFileController {
 
     private static Logger log = LoggerFactory.getLogger(WsFileController.class);

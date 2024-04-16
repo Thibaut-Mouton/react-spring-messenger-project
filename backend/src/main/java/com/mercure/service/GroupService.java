@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,10 @@ public class GroupService {
 
     public int findGroupByUrl(String url) {
         return groupRepository.findGroupByUrl(url);
+    }
+
+    public GroupEntity getGroupByUrl(String url) {
+        return groupRepository.getGroupByUrl(url);
     }
 
     public List<Integer> getAllUsersIdByGroupUrl(String groupUrl) {
@@ -52,8 +57,8 @@ public class GroupService {
         }
         UserEntity user = userService.findById(userId);
         GroupUser groupUser = new GroupUser();
-        groupUser.setGroupMapping(groupEntity.orElse(null));
-        groupUser.setUserMapping(user);
+        groupUser.setGroupUsers(groupEntity.orElse(null));
+        groupUser.setUserEntities(user);
         groupUser.setGroupId(groupId);
         groupUser.setUserId(userId);
         groupUser.setRole(0);
@@ -78,8 +83,8 @@ public class GroupService {
         groupUser.setGroupId(savedGroup.getId());
         groupUser.setUserId(userId);
         groupUser.setRole(1);
-        groupUser.setUserMapping(user);
-        groupUser.setGroupMapping(group);
+        groupUser.setUserEntities(user);
+        groupUser.setGroupUsers(group);
         groupUserJoinService.save(groupUser);
         return savedGroup;
     }
@@ -103,15 +108,15 @@ public class GroupService {
         groupUser1.setUserId(id1);
 
         groupUser1.setRole(0);
-        groupUser1.setUserMapping(user1);
-        groupUser1.setGroupMapping(groupEntity);
+        groupUser1.setUserEntities(user1);
+        groupUser1.setGroupUsers(groupEntity);
 
         GroupUser groupUser2 = new GroupUser();
         groupUser2.setUserId(savedGroup.getId());
         groupUser2.setGroupId(id2);
         groupUser2.setRole(0);
-        groupUser2.setUserMapping(user2);
-        groupUser2.setGroupMapping(groupEntity);
+        groupUser2.setUserEntities(user2);
+        groupUser2.setGroupUsers(groupEntity);
         groupUserJoinService.saveAll(Arrays.asList(groupUser1, groupUser2));
     }
 }

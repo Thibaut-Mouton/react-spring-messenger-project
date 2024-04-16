@@ -2,22 +2,23 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt"
 import ErrorIcon from "@mui/icons-material/Error"
 import FolderIcon from "@mui/icons-material/Folder"
-import {Alert, Avatar, Collapse, List, ListItemButton, ListItemText} from "@mui/material"
-import React, {useEffect, useState} from "react"
-import {Link} from "react-router-dom"
+import {Alert, Avatar, Box, Button, Collapse, List, ListItemButton, ListItemText} from "@mui/material"
+import React, {useContext, useEffect, useState} from "react"
+import {Link, useNavigate} from "react-router-dom"
 import {useThemeContext} from "../../context/theme-context"
 import {generateColorMode, generateLinkColorMode} from "../utils/enable-dark-mode"
 import {TypeGroupEnum} from "../../utils/type-group-enum"
 import {dateParser} from "../../utils/date-formater"
 import {SkeletonLoader} from "../partials/skeleten-loader"
-import {useLoaderContext} from "../../context/loader-context"
+import {AuthUserContext} from "../../context/AuthContext"
+import NoteAddOutlinedIcon from "@mui/icons-material/NoteAddOutlined"
 
 interface IClockType {
     date: string
 }
 
 interface IWebSocketGroupComponent {
-    groupUrl: string
+    groupUrl?: string
 }
 
 const Clock: React.FunctionComponent<IClockType> = ({date}) => {
@@ -41,16 +42,14 @@ const Clock: React.FunctionComponent<IClockType> = ({date}) => {
 }
 
 export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupComponent> = ({groupUrl}) => {
-    const {
-        setLoading
-    } = useLoaderContext()
     const [loadingState, setLoadingState] = React.useState(true)
     const {theme} = useThemeContext()
-    const groups: any[] = []
-	const isWsConnected = false
+    const navigate = useNavigate()
+    const {groups} = useContext(AuthUserContext)!
+    const isWsConnected = true
 
     function changeGroupName(url: string) {
-        const currentGroup = groups.find((elt) => elt.group.url === url)
+        const currentGroup = groups.find((group) => group.url === url)
         if (currentGroup) {
             // dispatch(setCurrentGroup({currentGroup}))
         }
@@ -59,7 +58,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
     useEffect(() => {
         if (groups) {
             if (groups.length !== 0) {
-                changeGroupName(groupUrl)
+                changeGroupName(groupUrl || "")
                 // dispatch(setCurrentGroup({currentGroup: groups[0]}))
                 // dispatch(setCurrentActiveGroup({currentActiveGroup: groupUrl}))
             }
@@ -73,7 +72,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
             changeGroupName(url)
             // dispatch(clearChatHistory())
             // dispatch(setCurrentActiveGroup({currentActiveGroup: url}))
-            // history.push("/t/messages/" + url)
+            navigate(`/t/messages/${url}`)
         }
     }
 
@@ -91,13 +90,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
     }
 
     return (
-        <div
-            className={"sidebar"}
-            style={{
-                borderRight: "1px solid #C8C8C8",
-                overflowY: "scroll"
-            }}>
-
+        <div className={"sidebar"} style={{backgroundColor: "#f6f8fc"}}>
             <Collapse in={!isWsConnected}>
                 <Alert severity="error">
                     Application is currently unavailable
@@ -105,7 +98,6 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
             </Collapse>
 
             <div style={{
-                marginTop: "8px",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center"
@@ -118,6 +110,11 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
                     Discussions
 				</span>
             </div>
+            <Box margin={"10px 0"} display={"flex"} justifyContent={"center"}>
+                <Button variant="outlined" startIcon={<NoteAddOutlinedIcon/>} size={"large"}>
+                    New conversation
+                </Button>
+            </Box>
             {
                 !loadingState && groups && groups.length === 0 &&
                 <div
@@ -127,7 +124,6 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
                         flexDirection: "column",
                         alignItems: "center",
                         textAlign: "center",
-                        marginTop: "20px"
                     }}>
                     <ErrorIcon fontSize={"large"}/>
                     <h4>
@@ -140,29 +136,31 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
                     </div>
                 </div>
             }
-            <List>
-                {!loadingState && groups && groups.map((groupWrapper) => (
-                    <ListItemButton className={styleSelectedGroup(groupWrapper.group.url)} key={groupWrapper.group.id}
-                                    onClick={() => redirectToGroup(groupWrapper.group.id, groupWrapper.group.url)}>
-                        <Avatar>
-                            {
-                                groupWrapper.group.groupType === TypeGroupEnum.GROUP
-                                    ? <FolderIcon/>
-                                    : <AccountCircleIcon/>
-                            }
-                        </Avatar>
-                        <ListItemText
-                            style={{marginLeft: "5px"}}
-                            primary={
-                                <React.Fragment>
+            <Box m={1}>
+                <List>
+                    {!loadingState && groups && groups.map((group) => (
+                        <ListItemButton sx={{borderRadius: 2, my: 1}} className={styleSelectedGroup(group.url)}
+                                        key={group.id}
+                                        onClick={() => redirectToGroup(group.id, group.url)}>
+                            <Avatar>
+                                {
+                                    group.groupType === TypeGroupEnum.GROUP
+                                        ? <FolderIcon/>
+                                        : <AccountCircleIcon/>
+                                }
+                            </Avatar>
+                            <ListItemText
+                                style={{marginLeft: "5px"}}
+                                primary={
+                                    <React.Fragment>
 									<span
-                                        className={styleUnreadMessage(!groupWrapper.group.lastMessageSeen)}>{groupWrapper.group.name}
+                                        className={styleUnreadMessage(!group.lastMessageSeen)}>{group.name}
 									</span>
-                                </React.Fragment>}
-                            secondary={
-                                <React.Fragment>
+                                    </React.Fragment>}
+                                secondary={
+                                    <React.Fragment>
 									<span
-                                        className={styleUnreadMessage(!groupWrapper.group.lastMessageSeen) + " group-subtitle-color"}
+                                        className={styleUnreadMessage(!group.lastMessageSeen) + " group-subtitle-color"}
                                         style={{
                                             display: "flex",
                                             justifyContent: "space-between"
@@ -174,27 +172,29 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
                                                 whiteSpace: "nowrap",
                                                 textOverflow: "ellipsis"
                                             }}>
-											{groupWrapper.group.lastMessageSender ? groupWrapper.group.lastMessageSender + ": " : ""}
-                                            {groupWrapper.group.lastMessage
-                                                ? groupWrapper.group.lastMessage
+											{group.lastMessageSender ? group.lastMessageSender + ": " : ""}
+                                            {group.lastMessage
+                                                ? group.lastMessage
                                                 : <span
                                                     style={{fontStyle: "italic"}}>No message for the moment</span>}
-                                            {groupWrapper.group.lastMessage ?
+                                            {group.lastMessage ?
                                                 <span style={{fontWeight: "bold"}}> · </span> : ""}
                                             {
-                                                groupWrapper.group.lastMessage &&
-                                                <Clock date={groupWrapper.group.lastMessageDate}/>
+                                                group.lastMessage &&
+                                                <Clock date={group.lastMessageDate}/>
                                             }
 										</span>
 									</span>
-                                </React.Fragment>}
-                        />
-                    </ListItemButton>
-                ))}
-                {
-                    loadingState && <SkeletonLoader/>
-                }
-            </List>
+                                    </React.Fragment>}
+                            />
+                        </ListItemButton>
+                    ))}
+                    {
+                        loadingState && <SkeletonLoader/>
+                    }
+                </List>
+            </Box>
+
         </div>
     )
 }

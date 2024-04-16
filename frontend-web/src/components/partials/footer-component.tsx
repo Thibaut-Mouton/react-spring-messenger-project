@@ -13,7 +13,7 @@ export const FooterComponent = () => {
 					href={"https://github.com/Thibaut-Mouton/react-spring-messenger-project"} rel="noreferrer">
           FastLiteMessage - Open source software
 				</a>
-				{" - "}
+				{" | "}
 				{new Date().getFullYear()}
 			</Typography>
 		</Box>

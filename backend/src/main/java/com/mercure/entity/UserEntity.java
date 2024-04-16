@@ -1,5 +1,6 @@
 package com.mercure.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +8,6 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
 
@@ -43,9 +43,6 @@ public class UserEntity implements UserDetails, Serializable {
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "userEntities", cascade = CascadeType.ALL)
     private Set<GroupEntity> groupSet = new HashSet<>();
-
-    @OneToMany(mappedBy = "groupMapping", fetch = FetchType.EAGER)
-    private Set<GroupUser> groupUsers = new HashSet<>();
 
     @Column(name = "expiration_date")
     @Temporal(TemporalType.TIMESTAMP)

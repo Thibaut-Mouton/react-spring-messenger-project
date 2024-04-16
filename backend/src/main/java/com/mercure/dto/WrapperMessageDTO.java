@@ -15,5 +15,7 @@ public class WrapperMessageDTO {
 
     private boolean isLastMessage;
 
+    private String groupName;
+
     private List<MessageDTO> messages;
 }

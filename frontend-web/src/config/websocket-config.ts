@@ -1,19 +1,20 @@
-import { Client } from "@stomp/stompjs"
+import {Client} from "@stomp/stompjs"
+import {HttpService} from "../service/http-service"
 
-const WS_URL = process.env.NODE_ENV === "development" ? "localhost:9090/" : "localhost:9090/"
+const WS_URL = process.env.NODE_ENV === "development" ? "localhost:9090/api/" : "localhost:9090/api/"
 
 const WS_BROKER = process.env.NODE_ENV === "development" ? "ws" : "wss"
 
-export function initWebSocket (userToken: string): Client {
-	return new Client({
-		brokerURL: `${WS_BROKER}://${WS_URL}messenger/websocket?token=${userToken}`,
-		// Uncomment lines to activate WS debug
-		// debug: (str: string) => {
-		//     console.log(str);
-		// },
-		connectHeaders: { clientSessionId: crypto.randomUUID() },
-		reconnectDelay: 5000,
-		heartbeatIncoming: 4000,
-		heartbeatOutgoing: 4000
-	})
+export async function initWebSocket(userToken: string): Promise<Client> {
+    console.log("Initiating WS connection...")
+    const service = new HttpService()
+    const {data} = await service.getCsrfToken()
+    const {headerName, token} = data
+    return new Client({
+        brokerURL: `${WS_BROKER}://${WS_URL}messenger/websocket?token=${userToken}`,
+        connectHeaders: {clientSessionId: crypto.randomUUID(), [headerName]: token},
+        reconnectDelay: 5000,
+        heartbeatIncoming: 4000,
+        heartbeatOutgoing: 4000
+    })
 }

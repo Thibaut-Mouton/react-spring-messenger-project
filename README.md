@@ -1,17 +1,20 @@
+![maven build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/maven/badge.svg?branch=master)
+![npm build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/npm/badge.svg?branch=master)
+
 <p align="center">
    <img src="/assets/react.png" alt="React logo"/>
    <img src="/assets/springboot.png" alt="Spring boot logo"/>
 </p>
 
-# FastLiteMessage ![build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/maven/badge.svg?branch=master)
+# FastLiteMessage
 
 Real time chat application group oriented built with React and Spring Boot. Talk with your friends, create and add users to conversation, send messages or images, set groups administrators and start video calls ! (coming soon)
 
 # Project Requirements
 
 * [JDK](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)  17
-* [NodeJS](https://nodejs.org/en/download/) v16.14.2
-* [ReactJS](https://reactjs.org/) v17
+* [NodeJS](https://nodejs.org/en/download/) v20.12.1
+* [ReactJS](https://reactjs.org/) v18
 * [Material UI](https://mui.com/) v5.7.0
 * [MySQL Server](https://www.mysql.com/)
 
@@ -24,7 +27,7 @@ This will start 3 containers : MySQL, backend and frontend together.  Liquibase 
 * Luke
 * Steve
 ```
-Be sure that no other app is running on port 3000, 9090 or 3306
+Warning : Be sure that no other app is running on port 3000, 9090 or 3306
 ```
 
 # Project development set up
@@ -33,7 +36,7 @@ Be sure that no other app is running on port 3000, 9090 or 3306
 * You can disable Liquibase by setting ```spring.liquibase.enabled=false``` in ```application.properties```.
 * To try the project on localhost, check that nothing runs on ports 9090 (Spring Boot) and 3000 (React app)
 * You can edit ````spring.datasource```` in ```backend/src/main/resources/application.properties```  and ```username``` and ```password``` in ```backend/src/main/resources/liquibase.properties``` with your own MySQL login / password 
-* Create a database named "fastlitemessage" or you can also modify the name in the properties files mentioned just above.
+* Create a database named "fastlitemessage_dev" or you can also modify the name in the properties files mentioned just above.
 
 ## Start backend
 * Go inside backend folder then type  ```mvn spring-boot:run``` to launch backend.

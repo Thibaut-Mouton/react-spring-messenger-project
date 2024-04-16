@@ -14,7 +14,7 @@
             </not>
         </preConditions>
         <createTable tableName="file_storage">
-            <column name="id" type="int">
+            <column name="id" type="int" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="fk_message_id" type="int">
@@ -30,12 +30,6 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addAutoIncrement columnDataType="int"
-                          columnName="id"
-                          defaultOnNull="false"
-                          generationType="ALWAYS"
-                          incrementBy="1"
-                          tableName="file_storage"/>
         <addForeignKeyConstraint baseTableName="file_storage"
                                  baseColumnNames="fk_message_id"
                                  constraintName="fk_message_filename"

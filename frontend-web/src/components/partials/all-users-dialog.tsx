@@ -1,7 +1,6 @@
 import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import { Avatar, Dialog, DialogTitle, List, ListItemAvatar, ListItemButton, ListItemText } from "@mui/material"
 import React from "react"
-import { useAuthContext } from "../../context/auth-context"
 import { useThemeContext } from "../../context/theme-context"
 import { GroupUserModel } from "../../interface-contract/group-user-model"
 import { generateIconColorMode } from "../utils/enable-dark-mode"
@@ -22,7 +21,7 @@ export const AllUsersDialog: React.FunctionComponent<AllUsersDialogType> = ({
   action
 }) => {
   const { theme } = useThemeContext()
-  const { user } = useAuthContext()
+  const { user } = {} as any // TODO remove any
 
   return (
     <Dialog

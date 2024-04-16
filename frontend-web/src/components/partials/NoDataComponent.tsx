@@ -2,7 +2,7 @@ import React from "react"
 import CommentsDisabledIcon from "@mui/icons-material/CommentsDisabled"
 import { Box } from "@mui/material"
 
-export const NoDataComponent = (): JSX.Element => {
+export function NoDataComponent(): React.JSX.Element {
   return (
     <Box margin={0} height={"100%"} width={"100%"} display={"flex"} justifyContent={"center"} flexDirection={"column"}
 	    textAlign={"center"}>

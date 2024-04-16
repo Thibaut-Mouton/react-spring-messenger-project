@@ -1,11 +1,11 @@
 package com.mercure.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -27,12 +27,12 @@ public class GroupUser implements Serializable {
     @ManyToOne
     @MapsId("groupId")
     @JoinColumn(name = "group_id")
-    GroupEntity groupMapping;
+    GroupEntity groupUsers;
 
     @ManyToOne
     @MapsId("userId")
     @JoinColumn(name = "user_id")
-    UserEntity userMapping;
+    UserEntity userEntities;
 
     private int role;
 
