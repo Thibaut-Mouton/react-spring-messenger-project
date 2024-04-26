@@ -38,7 +38,7 @@
                 baseTableName="message"
                 constraintName="fk_message_user"
                 referencedColumnNames="id"
-                referencedTableName="user"/>
+                referencedTableName="users"/>
         <addForeignKeyConstraint
                 baseColumnNames="msg_group_id"
                 baseTableName="message"

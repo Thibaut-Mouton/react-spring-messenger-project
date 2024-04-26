@@ -1,27 +1,18 @@
-import {Box, CircularProgress} from "@mui/material"
-import React, {useContext, useEffect} from "react"
-import {TransportActionEnum} from "../../utils/transport-action-enum"
-import {TransportModel} from "../../interface-contract/transport-model"
+import {Box} from "@mui/material"
+import React, {useContext, useEffect, useState} from "react"
 import {ActiveVideoCall} from "../partials/video/active-video-call"
-import {GroupModel} from "../../interface-contract/group-model"
 import {NoDataComponent} from "../partials/NoDataComponent"
 import {HttpMessageService} from "../../service/http-message.service"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
 import {CreateMessageComponent} from "../messages/CreateMessageComponent"
 import {WebSocketContext} from "../../context/WebsocketContext"
 import {DisplayMessagesComponent} from "../messages/DisplayMessagesComponent"
+import {FullMessageModel} from "../../interface-contract/full-message-model"
 
 export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string }> = ({groupUrl}) => {
     const {dispatch} = useContext(AlertContext)!
-    const {ws, messages, setMessages} = useContext(WebSocketContext)!
-    const [messageId, setLastMessageId] = React.useState(0)
-    const [loadingOldMessages, setLoadingOldMessages] = React.useState<boolean>(false)
-    let messageEnd: HTMLDivElement | null
-
-    const {
-        allMessagesFetched,
-        userId
-    } = {currentGroup: {} as GroupModel} as any // TODO remove any
+    const {messages, setMessages, setAllMessagesFetched} = useContext(WebSocketContext)!
+    const [isActiveCall, setActiveCall] = useState<boolean>(false)
 
     const [groupName, setGroupName] = React.useState<string>("")
 
@@ -30,9 +21,11 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
             if (groupUrl) {
                 try {
                     const http = new HttpMessageService()
-                    const {data} = await http.getMessages(groupUrl)
+                    const {data} = await http.getMessages(groupUrl, -1)
                     setMessages(data.messages)
+                    setAllMessagesFetched(data.lastMessage)
                     setGroupName(data.groupName)
+                    setActiveCall(data.isActiveCall)
                 } catch (error) {
                     dispatch({
                         type: AlertAction.ADD_ALERT,
@@ -49,33 +42,8 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
         fetchMessages()
     }, [groupUrl])
 
-    useEffect(() => {
-        if (!loadingOldMessages) {
-            scrollToEnd()
-        }
-        setLoadingOldMessages(false)
-        if (messages && messages.length > 0) {
-            setLastMessageId(messages[0].id)
-        }
-    }, [messages])
-
-    function scrollToEnd() {
-        messageEnd?.scrollIntoView({behavior: "auto"})
-    }
-
-    function handleScroll(event: any) {
-        if (event.target.scrollTop === 0) {
-            if (!allMessagesFetched && ws) {
-                setLoadingOldMessages(true)
-                const transport = new TransportModel(userId || 0, TransportActionEnum.FETCH_GROUP_MESSAGES, undefined, groupUrl, undefined, messageId)
-                ws.publish({
-                    destination: "/message",
-                    body: JSON.stringify(transport)
-                })
-            }
-        } else {
-            setLoadingOldMessages(false)
-        }
+    function updateMessages(messagesToAdd: FullMessageModel[]) {
+        setMessages([...messagesToAdd, ...messages])
     }
 
     return (
@@ -84,7 +52,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                 !groupUrl ?
                     <div style={{
                         display: "flex",
-                        flex: "1",
+                        width: "100%",
                         flexDirection: "column",
                     }}>
                         <NoDataComponent/>
@@ -93,7 +61,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                     <div style={{
                         backgroundColor: "#f6f8fc",
                         display: "flex",
-                        flex: "1",
+                        width: "90%",
                         flexDirection: "column",
                     }}>
                         <div style={{
@@ -109,54 +77,20 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                                         fontWeight: "bold"
                                     }}>{groupName}</div>
                                 </Box>
-                                <ActiveVideoCall isAnyCallActive={true}/>
+                                <ActiveVideoCall isAnyCallActive={isActiveCall}/>
                             </Box>
                         </div>
                         <div
-                            onScroll={(event) => handleScroll(event)}
+                            // onScroll={(event) => handleScroll(event)}
                             style={{
                                 backgroundColor: "white",
                                 display: "flex",
                                 flexDirection: "column",
-                                justifyContent: "space-between",
                                 width: "100%",
-                                height: "100%",
+                                height: "92%",
                             }}>
 
-                            {
-                                !allMessagesFetched && loadingOldMessages &&
-                                <div style={{
-                                    width: "inherit",
-                                    boxSizing: "border-box",
-                                    height: "40px",
-                                    position: "relative",
-                                    display: "flex",
-                                    justifyContent: "center"
-                                }}>
-                                    <div style={{
-                                        display: "flex",
-                                        flexDirection: "column"
-                                    }}>
-                                        <div style={{
-                                            display: "flex",
-                                            justifyContent: "center"
-                                        }}>
-                                            <CircularProgress style={{margin: "5px"}} size={40}/>
-                                        </div>
-                                        <span style={{fontSize: "16px"}}>Loading older messages ....</span>
-                                    </div>
-                                </div>
-                            }
-
-                            <DisplayMessagesComponent messages={messages}/>
-                            {/*<div style={{*/}
-                            {/*    float: "left",*/}
-                            {/*    clear: "both"*/}
-                            {/*}}*/}
-                            {/*     ref={(el) => {*/}
-                            {/*         messageEnd = el*/}
-                            {/*     }}>*/}
-                            {/*</div>*/}
+                            <DisplayMessagesComponent updateMessages={updateMessages} groupUrl={groupUrl} messages={messages}/>
                             <CreateMessageComponent groupUrl={groupUrl}/>
                         </div>
                     </div>

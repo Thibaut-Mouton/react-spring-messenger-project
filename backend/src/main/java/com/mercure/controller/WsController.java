@@ -87,13 +87,14 @@ public class WsController {
                 if (!"".equals(dto.getGroupUrl())) {
                     int messageId = messageService.findLastMessageIdByGroupId(groupService.findGroupByUrl(dto.getGroupUrl()));
                     MessageUserEntity messageUserEntity = seenMessageService.findByMessageId(messageId, dto.getUserId());
-                    if (messageUserEntity == null) break;
-                    messageUserEntity.setSeen(true);
+                    if (messageUserEntity == null) {
+                        break;
+                    };
                     seenMessageService.saveMessageUserEntity(messageUserEntity);
                 }
                 break;
             case LEAVE_GROUP:
-                if (!dto.getGroupUrl().equals("")) {
+                if (!dto.getGroupUrl().isEmpty()) {
                     log.info("User id {} left group {}", dto.getUserId(), dto.getGroupUrl());
                     int groupId = groupService.findGroupByUrl(dto.getGroupUrl());
                     groupUserJoinService.removeUserFromConversation(dto.getUserId(), groupId);
@@ -183,7 +184,7 @@ public class WsController {
                 String key = roomUrl + "_" + dto.getGroupUrl();
                 List<Integer> userIds = groupService.getAllUsersIdByGroupUrl(dto.getGroupUrl());
                 HashMap<String, ArrayList<Integer>> hostListsIndexedByRoomUrl = roomCacheService.getRoomByKey(key);
-                if (hostListsIndexedByRoomUrl.size() == 0) {
+                if (hostListsIndexedByRoomUrl.isEmpty()) {
                     log.info("All users left the call, removing room from list");
                     OutputTransportDTO outputTransportDTO = new OutputTransportDTO();
                     outputTransportDTO.setAction(TransportActionEnum.END_CALL);

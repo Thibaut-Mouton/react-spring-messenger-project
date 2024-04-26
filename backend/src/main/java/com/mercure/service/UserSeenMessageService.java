@@ -26,7 +26,6 @@ public class UserSeenMessageService {
                     MessageUserEntity message = new MessageUserEntity();
                     message.setMessageId(msg.getId());
                     message.setUserId(user.getId());
-                    message.setSeen(msg.getUser_id() == user.getId());
                     seenMessageRepository.save(message);
                 }));
     }

@@ -32,7 +32,7 @@
         <addForeignKeyConstraint baseTableName="group_user"
                                  baseColumnNames="user_id"
                                  constraintName="fk_user_join"
-                                 referencedTableName="user"
+                                 referencedTableName="users"
                                  referencedColumnNames="id"/>
         <rollback>
             <dropTable tableName="group_user"/>

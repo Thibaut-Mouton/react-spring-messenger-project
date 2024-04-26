@@ -19,12 +19,11 @@ public class RoomCacheService {
     }
 
     public void putNewRoom(String groupUrl, String roomUrl, ArrayList<Integer> usersList) {
-        StringBuilder key = new StringBuilder();
-        key.append(groupUrl);
-        key.append("_");
-        key.append(roomUrl);
+        String key = groupUrl +
+                "_" +
+                roomUrl;
         Cache roomsCache = this.getCache();
-        roomsCache.put(key.toString(), usersList);
+        roomsCache.put(key, usersList);
     }
 
     public List<String> getAllKeys() {

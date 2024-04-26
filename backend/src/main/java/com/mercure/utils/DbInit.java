@@ -32,16 +32,16 @@ public class DbInit implements CommandLineRunner {
     @Override
     public void run(String... args) {
         try {
-
-            if (userService.findAll().size() == 0) {
+            if (userService.findAll().isEmpty()) {
                 List<String> sourceList = Arrays.asList("Thibaut", "Mark", "John", "Luke", "Steve");
                 sourceList.forEach(val -> {
                     UserEntity user = new UserEntity();
                     user.setFirstName(val);
-                    user.setLastName("Doe" + val.toLowerCase());
+                    user.setLastName("Williams");
                     user.setPassword(passwordEncoder.encode("root"));
                     user.setMail(val.toLowerCase() + "@fastlitemessage.com");
                     user.setEnabled(true);
+                    user.setColor(new ColorsUtils().getRandomColor());
                     user.setCredentialsNonExpired(true);
                     user.setAccountNonLocked(true);
                     user.setAccountNonExpired(true);

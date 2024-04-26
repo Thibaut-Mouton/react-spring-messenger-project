@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react"
-import { useCookies } from "react-cookie"
 
 type Theme = "light" | "dark";
 type ThemeContextType = { theme: Theme; toggleTheme: () => void };
@@ -9,8 +8,7 @@ export const ThemeContext = React.createContext<ThemeContextType>(
 )
 
 export const ThemeProvider: React.FunctionComponent<any> = ({ children }) => {
-  const [cookies] = useCookies(["pref-theme"])
-  const [theme, setTheme] = useState<Theme>(cookies["pref-theme"] ? cookies["pref-theme"] : "light")
+  const [theme, setTheme] = useState<Theme>("dark")
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light")
   }

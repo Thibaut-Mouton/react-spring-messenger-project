@@ -1,4 +1,4 @@
-import React, {useEffect} from "react"
+import React from "react"
 import "./index.css"
 import * as serviceWorker from "./serviceWorker"
 import {createBrowserRouter, redirect, RouterProvider} from "react-router-dom"
@@ -12,7 +12,8 @@ import {AlertComponent} from "./components/partials/alert-component"
 import {LoaderComponent} from "./components/partials/loader/LoaderComponent"
 import {HttpGroupService} from "./service/http-group-service"
 import {AlertContextProvider} from "./context/AlertContext"
-import {AuthUserContextProvider} from "./context/AuthContext"
+import {UserContextProvider} from "./context/UserContext"
+import {GroupContextProvider} from "./context/GroupContext"
 
 const router = createBrowserRouter([
     {
@@ -44,29 +45,17 @@ const router = createBrowserRouter([
 ])
 
 function RootComponent() {
-
-    useEffect(() => {
-        const getCsrfToken = async () => {
-            const http = new HttpGroupService()
-            try {
-                const {data} = await http.getCsrfToken()
-                localStorage.setItem("csrf", JSON.stringify(data))
-            } catch (error) {
-                console.log("ERROR", error)
-            }
-        }
-        getCsrfToken()
-    }, [])
-
     return (
         <LoaderProvider>
-            <AuthUserContextProvider>
-                <AlertContextProvider>
-                    <LoaderComponent/>
-                    <RouterProvider router={router}/>
-                    <AlertComponent/>
-                </AlertContextProvider>
-            </AuthUserContextProvider>
+            <UserContextProvider>
+                <GroupContextProvider>
+                    <AlertContextProvider>
+                        <LoaderComponent/>
+                        <RouterProvider router={router}/>
+                        <AlertComponent/>
+                    </AlertContextProvider>
+                </GroupContextProvider>
+            </UserContextProvider>
         </LoaderProvider>
     )
 }

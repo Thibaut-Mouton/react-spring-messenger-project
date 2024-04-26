@@ -2,7 +2,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle"
 import ArrowRightAltIcon from "@mui/icons-material/ArrowRightAlt"
 import ErrorIcon from "@mui/icons-material/Error"
 import FolderIcon from "@mui/icons-material/Folder"
-import {Alert, Avatar, Box, Button, Collapse, List, ListItemButton, ListItemText} from "@mui/material"
+import {Alert, Avatar, Box, Collapse, List, ListItemButton, ListItemText} from "@mui/material"
 import React, {useContext, useEffect, useState} from "react"
 import {Link, useNavigate} from "react-router-dom"
 import {useThemeContext} from "../../context/theme-context"
@@ -10,9 +10,9 @@ import {generateColorMode, generateLinkColorMode} from "../utils/enable-dark-mod
 import {TypeGroupEnum} from "../../utils/type-group-enum"
 import {dateParser} from "../../utils/date-formater"
 import {SkeletonLoader} from "../partials/skeleten-loader"
-import {AuthUserContext} from "../../context/AuthContext"
-import NoteAddOutlinedIcon from "@mui/icons-material/NoteAddOutlined"
 import {WebSocketContext} from "../../context/WebsocketContext"
+import {CreateConversationComponent} from "../create-conversation/CreateConversationComponent"
+import {GroupContext} from "../../context/GroupContext"
 
 interface IClockType {
     date: string
@@ -46,7 +46,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
     const [loadingState, setLoadingState] = React.useState(true)
     const {theme} = useThemeContext()
     const navigate = useNavigate()
-    const {groups} = useContext(AuthUserContext)!
+    const {groups} = useContext(GroupContext)!
     const {isWsConnected} = useContext(WebSocketContext)!
 
     function changeGroupName(url: string) {
@@ -87,7 +87,8 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
     }
 
     function styleUnreadMessage(isLastMessageSeen: boolean) {
-        return isLastMessageSeen ? theme ? "bold-unread-message-light" : "bold-unread-message-dark" : ""
+        // return isLastMessageSeen ? theme ? "bold-unread-message-light" : "bold-unread-message-dark" : ""
+        return isLastMessageSeen ? "" : "bold-unread-message-dark"
     }
 
     return (
@@ -114,9 +115,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
 				</span>
             </div>
             <Box margin={"10px 0"} display={"flex"} justifyContent={"center"}>
-                <Button variant="outlined" startIcon={<NoteAddOutlinedIcon/>} size={"large"}>
-                    New conversation
-                </Button>
+                <CreateConversationComponent/>
             </Box>
             {
                 !loadingState && groups && groups.length === 0 &&
@@ -157,13 +156,13 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
                                 primary={
                                     <React.Fragment>
 									<span
-                                        className={styleUnreadMessage(!group.lastMessageSeen)}>{group.name}
+                                        className={styleUnreadMessage(group.lastMessageSeen)}>{group.name}
 									</span>
                                     </React.Fragment>}
                                 secondary={
                                     <React.Fragment>
 									<span
-                                        className={styleUnreadMessage(!group.lastMessageSeen) + " group-subtitle-color"}
+                                        className={styleUnreadMessage(group.lastMessageSeen) + " group-subtitle-color"}
                                         style={{
                                             display: "flex",
                                             justifyContent: "space-between"

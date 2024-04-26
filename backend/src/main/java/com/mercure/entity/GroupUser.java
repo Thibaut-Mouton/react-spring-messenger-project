@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -16,7 +16,7 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupUser implements Serializable {
+public class GroupUser {
 
     @Id
     private int groupId;
@@ -35,6 +35,10 @@ public class GroupUser implements Serializable {
     UserEntity userEntities;
 
     private int role;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_message_seen_date")
+    private Timestamp lastMessageSeenDate;
 
     @Override
     public int hashCode() {

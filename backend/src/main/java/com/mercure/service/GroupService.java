@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.swing.*;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,9 @@ public class GroupService {
         groupUser.setUserEntities(user);
         groupUser.setGroupId(groupId);
         groupUser.setUserId(userId);
+        Date date = new Date();
+        Timestamp ts = new Timestamp(date.getTime());
+        groupUser.setLastMessageSeenDate(ts);
         groupUser.setRole(0);
         GroupUser saved = groupUserJoinService.save(groupUser);
         assert groupEntity.orElse(null) != null;
@@ -81,6 +85,9 @@ public class GroupService {
         groupRoleKey.setUserId(userId);
         groupRoleKey.setGroupId(savedGroup.getId());
         groupUser.setGroupId(savedGroup.getId());
+        Date date = new Date();
+        Timestamp ts = new Timestamp(date.getTime());
+        groupUser.setLastMessageSeenDate(ts);
         groupUser.setUserId(userId);
         groupUser.setRole(1);
         groupUser.setUserEntities(user);

@@ -2,14 +2,15 @@ import {
     Collapse,
     IconButton,
     List,
-    ListItem, ListItemButton,
+    ListItem,
+    ListItemButton,
     ListItemIcon,
     ListItemSecondaryAction,
     ListItemText,
     MenuItem,
     Tooltip
 } from "@mui/material"
-import {ExpandLess} from "@mui/icons-material"
+import {ExpandLess, FolderCopy} from "@mui/icons-material"
 import SecurityIcon from "@mui/icons-material/Security"
 import ExpandMore from "@mui/icons-material/ExpandMore"
 import PersonIcon from "@mui/icons-material/Person"
@@ -19,17 +20,16 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import React, {useContext, useState} from "react"
 import {GroupActionEnum} from "./group-action-enum"
 import {useThemeContext} from "../../context/theme-context"
-import {
-    generateClassName,
-    generateIconColorMode
-} from "../utils/enable-dark-mode"
+import {generateClassName, generateIconColorMode} from "../utils/enable-dark-mode"
 import {TransportModel} from "../../interface-contract/transport-model"
 import {TransportActionEnum} from "../../utils/transport-action-enum"
 import {AllUsersDialog} from "../partials/all-users-dialog"
 import {HttpGroupService} from "../../service/http-group-service"
 import {GroupUserModel} from "../../interface-contract/group-user-model"
 import {WebSocketContext} from "../../context/WebsocketContext"
-import {AuthUserContext} from "../../context/AuthContext"
+import {GroupContext} from "../../context/GroupContext"
+import {UserContext} from "../../context/UserContext"
+import {AlertAction, AlertContext} from "../../context/AlertContext"
 
 export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?: string }> = ({groupUrl}) => {
     const [paramsOpen, setParamsOpen] = useState(false)
@@ -40,9 +40,11 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
     const [toolTipAction, setToolTipAction] = useState(false)
     const [openTooltipId, setToolTipId] = useState<number | null>(null)
     const {theme} = useThemeContext()
+    const {dispatch} = useContext(AlertContext)!
     const {ws} = useContext(WebSocketContext)!
     const httpService = new HttpGroupService()
-    const {user, groups} = useContext(AuthUserContext)!
+    const {groups} = useContext(GroupContext)!
+    const {user} = useContext(UserContext)!
 
     function handleTooltipAction(event: any, action: string) {
         event.preventDefault()
@@ -177,21 +179,16 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
             const users = [...usersInConversation]
             users.push(res.data)
             setUsersInConversation(users)
-            // dispatch(setAlerts({
-            //   alert: {
-            // text: `${res.data.firstName} has been added to group`,
-            // alert: "success",
-            // isOpen: true
-            //   }
-            // }))
-        } catch (err: any) {
-            // dispatch(setAlerts({
-            //   alert: {
-            // text: `Cannot add user to group : ${err.toString()}`,
-            // alert: "error",
-            // isOpen: true
-            //   }
-            // }))
+        } catch (error: any) {
+            dispatch({
+                type: AlertAction.ADD_ALERT,
+                payload: {
+                    id: crypto.randomUUID(),
+                    text: `Cannot add user to group : ${error.toString()}`,
+                    alert: "error",
+                    isOpen: true
+                }
+            })
         } finally {
             setPopupOpen(false)
         }
@@ -222,22 +219,26 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
         }
     }
 
+    function isDisabled() {
+        return groups && groups.length === 0
+    }
+
     return (
         <div style={{backgroundColor: "#f6f8fc"}}>
             <div className={"sidebar"}>
                 <List
                     component="nav">
-                    <ListItemButton disabled={groups.length === 0}
+                    <ListItemButton disabled={isDisabled()}
                                     onClick={() => handleAddUserAction(GroupActionEnum.OPEN)}>
                         <ListItemIcon>
-                            <GroupAddIcon style={{color: generateIconColorMode(theme)}}/>
+                            <GroupAddIcon color={"primary"}/>
                         </ListItemIcon>
                         <ListItemText primary="Add user to group"/>
                     </ListItemButton>
-                    <ListItemButton disabled={groups.length === 0}
+                    <ListItemButton disabled={isDisabled()}
                                     onClick={(event) => handleClick(event, GroupActionEnum.PARAM)}>
                         <ListItemIcon>
-                            <GroupIcon style={{color: generateIconColorMode(theme)}}/>
+                            <GroupIcon color={"primary"}/>
                         </ListItemIcon>
                         <ListItemText primary="Members"/>
                         {paramsOpen ? <ExpandLess/> : <ExpandMore/>}
@@ -251,10 +252,8 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
                                     <ListItemIcon>
                                         {
                                             value.admin
-                                                ? <SecurityIcon
-                                                    style={{color: generateIconColorMode(theme)}}/>
-                                                : <PersonIcon
-                                                    style={{color: generateIconColorMode(theme)}}/>
+                                                ? <SecurityIcon color={"secondary"}/>
+                                                : <PersonIcon color={"secondary"}/>
                                         }
                                     </ListItemIcon>
                                     <ListItemText primary={value.firstName + " " + value.lastName}
@@ -329,6 +328,12 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
                             ))}
                         </List>
                     </Collapse>
+                    <ListItemButton disabled={isDisabled()}>
+                        <ListItemIcon>
+                            <FolderCopy color={"primary"}/>
+                        </ListItemIcon>
+                        <ListItemText primary="Multimedia content"/>
+                    </ListItemButton>
                 </List>
             </div>
             <AllUsersDialog usersList={allUsers} open={popupOpen} setOpen={handlePopupState}

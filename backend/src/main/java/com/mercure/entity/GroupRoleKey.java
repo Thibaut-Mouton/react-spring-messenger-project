@@ -15,7 +15,7 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupRoleKey implements Serializable {
+public class GroupRoleKey {
 
     @Column(name = "group_id")
     private int groupId;

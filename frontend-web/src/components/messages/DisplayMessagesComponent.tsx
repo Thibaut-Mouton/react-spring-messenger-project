@@ -1,17 +1,54 @@
-import {Tooltip} from "@mui/material"
+import {CircularProgress, Tooltip} from "@mui/material"
 import {TypeMessageEnum} from "../../utils/type-message-enum"
-import React from "react"
+import React, {useContext, useEffect, useState} from "react"
 import {FullMessageModel} from "../../interface-contract/full-message-model"
 import {GroupActionEnum} from "../websocket/group-action-enum"
 import {ImagePreviewComponent} from "../partials/image-preview"
+import {WebSocketContext} from "../../context/WebsocketContext"
+import {HttpMessageService} from "../../service/http-message.service"
 
 interface DisplayMessagesProps {
     messages: FullMessageModel[]
+    groupUrl: string
+    updateMessages: (messages: FullMessageModel[]) => void
 }
 
-export function DisplayMessagesComponent({messages}: DisplayMessagesProps) {
+export function DisplayMessagesComponent({messages, groupUrl, updateMessages}: DisplayMessagesProps) {
+    const {areAllMessagesFetched, setAllMessagesFetched} = useContext(WebSocketContext)!
     const [imgSrc, setImgSrc] = React.useState("")
     const [isPreviewImageOpen, setPreviewImageOpen] = React.useState(false)
+    const [messageId, setLastMessageId] = useState(0)
+    const [loadingOldMessages, setLoadingOldMessages] = useState<boolean>(false)
+    const httpService = new HttpMessageService()
+
+    let messageEnd: HTMLDivElement | null
+
+    async function handleScroll(event: any) {
+        if (event.target.scrollTop === 0) {
+            if (!areAllMessagesFetched) {
+                setLoadingOldMessages(true)
+                const {data} = await httpService.getMessages(groupUrl, messageId)
+                updateMessages(data.messages)
+                setAllMessagesFetched(data.lastMessage)
+            }
+        } else {
+            setLoadingOldMessages(false)
+        }
+    }
+
+    useEffect(() => {
+        if (!loadingOldMessages) {
+            scrollToEnd()
+        }
+        if (messages && messages.length > 0) {
+            setLoadingOldMessages(false)
+            setLastMessageId(messages[0].id)
+        }
+    }, [messages])
+
+    function scrollToEnd() {
+        messageEnd?.scrollIntoView({behavior: "auto"})
+    }
 
     function handlePopupState(isOpen: boolean) {
         setPreviewImageOpen(isOpen)
@@ -47,7 +84,29 @@ export function DisplayMessagesComponent({messages}: DisplayMessagesProps) {
         )
     }
 
-    return <div>
+    return <div style={{overflowY: "auto", flex: "1"}} onScroll={(event) => handleScroll(event)}>
+        {
+            !areAllMessagesFetched && loadingOldMessages && <div style={{
+                width: "inherit",
+                boxSizing: "border-box",
+                height: "40px",
+                position: "relative",
+                display: "flex",
+                justifyContent: "center"
+            }}>
+                <div style={{
+                    display: "flex",
+                    flexDirection: "column"
+                }}>
+                    <div style={{
+                        display: "flex",
+                        justifyContent: "center"
+                    }}>
+                        <CircularProgress style={{margin: "5px"}} size={40}/>
+                    </div>
+                </div>
+            </div>
+        }
         <ImagePreviewComponent imgSrc={imgSrc}
                                displayImagePreview={isPreviewImageOpen}
                                setDisplayImagePreview={handlePopupState}/>
@@ -81,7 +140,7 @@ export function DisplayMessagesComponent({messages}: DisplayMessagesProps) {
                             <div style={{color: "#FFFFFF"}}>{messageModel.initials}</div>
                         </div>
                     }
-                    <div style={{margin: "4px"}}>
+                    <div style={{marginLeft: "2px"}}>
                         {index >= 1 && array[index - 1].userId === array[index].userId
                             ? <div/>
                             : <div>
@@ -101,5 +160,13 @@ export function DisplayMessagesComponent({messages}: DisplayMessagesProps) {
                 </div>
             </Tooltip>
         ))}
+        <div style={{
+            float: "left",
+            clear: "both"
+        }}
+             ref={(el) => {
+                 messageEnd = el
+             }}>
+        </div>
     </div>
 }

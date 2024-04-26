@@ -1,5 +1,4 @@
-import {IconButton} from "@mui/material"
-import {CustomTextField} from "../partials/custom-material-textfield"
+import {Button, IconButton, styled, TextField} from "@mui/material"
 import React, {useContext, useState} from "react"
 import {getPayloadSize} from "../../utils/string-size-calculator"
 import {TransportModel} from "../../interface-contract/transport-model"
@@ -7,7 +6,10 @@ import {TransportActionEnum} from "../../utils/transport-action-enum"
 import {HttpGroupService} from "../../service/http-group-service"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import {WebSocketContext} from "../../context/WebsocketContext"
-import {AuthUserContext} from "../../context/AuthContext"
+import {CallWindowComponent} from "../websocket/CallWindowComponent"
+import {UserContext} from "../../context/UserContext"
+import {GroupContext, GroupContextAction} from "../../context/GroupContext"
+import {InsertPhoto} from "@mui/icons-material"
 
 interface CreateMessageComponentProps {
     groupUrl: string
@@ -15,7 +17,8 @@ interface CreateMessageComponentProps {
 
 export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps): React.JSX.Element {
     const {ws} = useContext(WebSocketContext)!
-    const {user} = useContext(AuthUserContext)!
+    const {user} = useContext(UserContext)!
+    const {changeGroupState} = useContext(GroupContext)!
     const [, setImageLoaded] = useState(false)
     const [message, setMessage] = useState("")
     const [file, setFile] = React.useState<File | null>(null)
@@ -23,15 +26,12 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
     const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string>("")
 
     function submitMessage(event: any) {
-        if (message !== "") {
-            if (event.key !== undefined && event.shiftKey && event.keyCode === 13) {
-                return
-            }
-            if (event.key !== undefined && event.keyCode === 13) {
-                event.preventDefault()
-                sendMessage()
-                setMessage("")
-            }
+        if (event.key !== undefined && event.shiftKey && event.keyCode === 13) {
+            return
+        }
+        if (event.key !== undefined && event.keyCode === 13) {
+            event.preventDefault()
+            sendMessage()
         }
     }
 
@@ -65,7 +65,6 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
         if (message !== "") {
             if (getPayloadSize(message) < 8192 && ws?.active) {
                 const transport = new TransportModel(user?.id || 0, TransportActionEnum.SEND_GROUP_MESSAGE, undefined, groupUrl, message)
-                console.log("SENDING MESSAGE", transport)
                 ws.publish({
                     destination: "/message",
                     body: JSON.stringify(transport)
@@ -88,11 +87,22 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
     }
 
     function markMessageSeen() {
-        // dispatch(markMessageAsSeen({
-        //  groupUrl
-        // }))
+        changeGroupState({
+            type: GroupContextAction.UPDATE_SEEN_MESSAGE, payload: {groupUrl, isMessageSeen: true}
+        })
     }
 
+    const VisuallyHiddenInput = styled("input")({
+        clip: "rect(0 0 0 0)",
+        clipPath: "inset(50%)",
+        height: 1,
+        overflow: "hidden",
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        whiteSpace: "nowrap",
+        width: 1,
+    })
 
     return (
         <>
@@ -128,24 +138,26 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
                 bottom: "0",
                 padding: "5px"
             }}>
-                <input
-                    accept="image/*"
-                    style={{display: "none"}}
-                    id="raised-button-file"
-                    multiple
-                    type="file"
-                    onChange={event => previewFile(event)}
-                />
-                <CustomTextField
-                    id={"inputChatMessenger"}
+                <Button
+                    component="label"
+                    role={undefined}
+                    variant="outlined"
+                    tabIndex={-1}
+                    startIcon={<InsertPhoto/>}
+                >
+                    <VisuallyHiddenInput type="file" onChange={previewFile}/>
+                </Button>
+                <CallWindowComponent/>
+                <TextField
+                    variant={"outlined"}
                     label={"Write a message"}
                     value={message}
+                    fullWidth
                     onClick={markMessageSeen}
-                    handleChange={(event: any) => handleChange(event)}
+                    onChange={(event: any) => handleChange(event)}
                     type={"text"}
-                    keyUp={submitMessage}
-                    isMultiline={true}
-                    isDarkModeEnable={"true"}
+                    onKeyDown={submitMessage}
+                    multiline={true}
                     name={"mainWriteMessage"}/>
                 {/*<Button*/}
                 {/*    onClick={sendMessage}*/}

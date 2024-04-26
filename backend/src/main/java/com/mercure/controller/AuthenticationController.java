@@ -21,16 +21,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
-
 @RestController
-@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
+@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000", methods = {RequestMethod.GET, RequestMethod.POST})
 public class AuthenticationController {
 
     private final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
@@ -53,22 +54,29 @@ public class AuthenticationController {
     @Autowired
     private GroupMapper groupMapper;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @PostMapping(value = "/auth")
-    public AuthUserDTO createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) throws Exception {
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-        UserEntity user = userService.findByNameOrEmail(authenticationRequest.getUsername(), authenticationRequest.getUsername());
-        String token = jwtTokenUtil.generateToken(userDetails);
-        Cookie jwtAuthToken = new Cookie(StaticVariable.SECURE_COOKIE, token);
-        jwtAuthToken.setHttpOnly(true);
-        jwtAuthToken.setSecure(false);
-        jwtAuthToken.setPath("/");
+    public AuthUserDTO createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+        if (authentication.isAuthenticated()) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+            UserEntity user = userService.findByNameOrEmail(authenticationRequest.getUsername(), authenticationRequest.getUsername());
+            String token = jwtTokenUtil.generateToken(userDetails);
+            Cookie jwtAuthToken = new Cookie(StaticVariable.SECURE_COOKIE, token);
+            jwtAuthToken.setHttpOnly(true);
+            jwtAuthToken.setSecure(false);
+            jwtAuthToken.setPath("/");
 //        cookie.setDomain("http://localhost");
-//         7 days
-        jwtAuthToken.setMaxAge(7 * 24 * 60 * 60);
-        response.addCookie(jwtAuthToken);
-        log.debug("User authenticated successfully");
-        return userMapper.toLightUserDTO(user);
+            // TODO add to env vars
+            jwtAuthToken.setMaxAge(2 * 60 * 60); // 2 hours
+            response.addCookie(jwtAuthToken);
+            log.debug("User authenticated successfully");
+            return userMapper.toLightUserDTO(user);
+        } else {
+            throw new UsernameNotFoundException("invalid user request");
+        }
     }
 
     @GetMapping(value = "/logout")
@@ -90,16 +98,6 @@ public class AuthenticationController {
     @GetMapping(value = "/fetch")
     public InitUserDTO fetchInformation(HttpServletRequest request) {
         return userMapper.toUserDTO(getUserEntity(request));
-    }
-
-    private void authenticate(String username, String password) throws Exception {
-        try {
-            //authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
-        } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
-        }
     }
 
     @PostMapping(value = "/create")
