@@ -10,10 +10,10 @@
     <changeSet id="createUserTable" author="TMN">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="user"/>
+                <tableExists tableName="users"/>
             </not>
         </preConditions>
-        <createTable tableName="user">
+        <createTable tableName="users">
             <column name="id" autoIncrement="true" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -23,6 +23,7 @@
             <column name="lastname" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
+            <column name="color" type="varchar(7)" defaultValue="#00ADD7"/>
             <column name="short_url" type="varchar(255)"/>
             <column name="email" type="varchar(255)"/>
 
@@ -44,7 +45,7 @@
             <column name="enabled" type="boolean" defaultValueBoolean="false"/>
         </createTable>
         <rollback>
-            <dropTable tableName="user"/>
+            <dropTable tableName="users"/>
         </rollback>
     </changeSet>
 

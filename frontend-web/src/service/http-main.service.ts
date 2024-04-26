@@ -1,5 +1,4 @@
 import axios, {AxiosInstance} from "axios"
-import {Csrf} from "../interface-contract/csrf/csrf.type"
 
 export abstract class HttpMainService {
 
@@ -11,14 +10,15 @@ export abstract class HttpMainService {
             withCredentials: true,
             baseURL
         })
+        this.instance.interceptors.request.use((config) => {
+            const csrfToken = document.cookie.replace(/(?:^|.*;\s*)XSRF-TOKEN\s*=\s*([^;]*).*$|^.*$/, "$1")
+            config.headers["X-CSRF-TOKEN"] = csrfToken
+            return config
+        })
         this.instance.interceptors.response.use((response) => {
-            const csrf = localStorage.getItem("csrf")
-            if (csrf) {
-                const {headerName, token} = JSON.parse(csrf) as Csrf
-                response.config.headers[headerName] = token
-            }
             return response
         }, (error) => {
+            console.log("ERROR", error)
             return Promise.reject(error)
         })
     }

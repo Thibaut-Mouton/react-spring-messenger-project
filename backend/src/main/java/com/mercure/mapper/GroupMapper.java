@@ -18,6 +18,9 @@ public class GroupMapper {
     private UserSeenMessageService seenMessageService;
 
     @Autowired
+    private GroupUserJoinService groupUserJoinService;
+
+    @Autowired
     private UserService userService;
 
     public GroupDTO toGroupDTO(GroupEntity grp, int userId) {
@@ -26,6 +29,7 @@ public class GroupMapper {
         grpDTO.setName(grp.getName());
         grpDTO.setUrl(grp.getUrl());
         grpDTO.setGroupType(grp.getGroupTypeEnum().toString());
+        GroupUser user = groupUserJoinService.findGroupUser(userId, grp.getId());
         MessageEntity msg = messageService.findLastMessage(grp.getId());
         if (msg != null) {
             String sender = userService.findFirstNameById(msg.getUser_id());
@@ -43,7 +47,7 @@ public class GroupMapper {
                     grpDTO.setLastMessage(msg.getMessage());
                 }
                 grpDTO.setLastMessage(msg.getMessage());
-                grpDTO.setLastMessageSeen(messageUserEntity.isSeen());
+                grpDTO.setLastMessageSeen(msg.getCreatedAt().after(user.getLastMessageSeenDate()));
                 grpDTO.setLastMessageDate(msg.getCreatedAt().toString());
             }
         } else {

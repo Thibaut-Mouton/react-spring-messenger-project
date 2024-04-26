@@ -1,4 +1,4 @@
-import axios, {AxiosResponse} from "axios"
+import {AxiosResponse} from "axios"
 import {GroupModel} from "../interface-contract/group-model"
 import {IUserWrapper} from "../interface-contract/user/user-wrapper"
 import {JwtModel} from "../interface-contract/jwt-model"
@@ -26,7 +26,7 @@ export class HttpGroupService extends HttpMainService {
     }
 
     public async ensureRoomExists(roomId: string): Promise<AxiosResponse<boolean>> {
-        return await axios.get(`http://localhost:9090/room/ensure-room-exists/${roomId}`, {withCredentials: true})
+        return this.instance.get(`room/ensure-room-exists/${roomId}`)
     }
 
     public logout(): Promise<AxiosResponse> {

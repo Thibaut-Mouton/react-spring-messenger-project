@@ -7,7 +7,7 @@ export class HttpMessageService extends HttpMainService {
         super()
     }
 
-    public getMessages(groupUrl: string): Promise<AxiosResponse<WrapperMessageModel>> {
-        return this.instance.get<WrapperMessageModel>(`/messages/group/${groupUrl}`)
+    public getMessages(groupUrl: string, offset: number): Promise<AxiosResponse<WrapperMessageModel>> {
+        return this.instance.get<WrapperMessageModel>(`/messages/${offset}/group/${groupUrl}`)
     }
 }

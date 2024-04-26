@@ -8,22 +8,15 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serializable;
 import java.util.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity implements UserDetails, Serializable {
-
-    public UserEntity(int id, String firstName, String password) {
-        this.id = id;
-        this.firstName = firstName;
-        this.password = password;
-    }
+public class UserEntity implements UserDetails {
 
     @Id
     private int id;
@@ -40,6 +33,8 @@ public class UserEntity implements UserDetails, Serializable {
     private String wsToken;
 
     private String jwt;
+
+    private String color;
 
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "userEntities", cascade = CascadeType.ALL)
     private Set<GroupEntity> groupSet = new HashSet<>();

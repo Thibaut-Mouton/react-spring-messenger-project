@@ -20,12 +20,10 @@ public class JwtUtil implements Serializable {
     // TODO generate key
     public static final String JWT_TOKEN = "d95d7dc9-0d56-4ef3-8d03-263c23b5bce5";
 
-    // retrieve username from jwt token
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(JWT_TOKEN).parseClaimsJws(token).getBody().getSubject();
     }
 
-    // retrieve expiration date from jwt token
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }

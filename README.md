@@ -1,5 +1,7 @@
-![maven build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/build-back/badge.svg?branch=master)
-![npm build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/build-front/badge.svg?branch=master)
+![maven build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/build-back/badge.svg?branch=develop)
+![npm build status](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/build-front/badge.svg?branch=develop)
+![coverage back](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/test-back/badge.svg?branch=develop)
+![coverage front](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/test-front/badge.svg?branch=develop)
 
 <p align="center">
    <img src="/assets/react.png" alt="React logo"/>

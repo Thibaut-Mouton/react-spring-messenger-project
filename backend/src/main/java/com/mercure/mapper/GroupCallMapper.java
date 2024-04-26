@@ -3,6 +3,7 @@ package com.mercure.mapper;
 import com.mercure.dto.user.GroupCallDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.service.RoomCacheService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class GroupCallMapper {
 
     @Autowired

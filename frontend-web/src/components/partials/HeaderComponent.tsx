@@ -1,27 +1,15 @@
 import ClearAllIcon from "@mui/icons-material/ClearAll"
 import {TextField, Toolbar, Typography} from "@mui/material"
-import React from "react"
+import React, {useContext} from "react"
 import {AccountMenu} from "../user-account/UseAccountComponent"
+import {UserContext} from "../../context/UserContext"
 
 export function HeaderComponent(): React.JSX.Element {
     const theme = "light"
+    const {user} = useContext(UserContext)!
     // useEffect(() => {
     //     setCookie("pref-theme", theme)
     // }, [theme])
-
-    // async function logoutUser(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-    //     event.preventDefault()
-    //     await httpService.logout()
-    //     setUser(undefined)
-    //     dispatch(setAlerts({
-    //         alert: {
-    //             text: "You log out successfully",
-    //             alert: "success",
-    //             isOpen: true
-    //         }
-    //     }))
-    //     history.push("/")
-    // }
 
     return (
         <>
@@ -39,7 +27,7 @@ export function HeaderComponent(): React.JSX.Element {
                     </Typography>
                     <TextField style={{width: "50%"}} variant={"outlined"} size={"small"}
                                label={"Rechercher dans les discussions"}/>
-                    <AccountMenu/>
+                    {user && <AccountMenu/>}
                 </Toolbar>
             </div>
         </>

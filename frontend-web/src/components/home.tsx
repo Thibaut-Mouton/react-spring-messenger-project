@@ -3,12 +3,12 @@ import React, {useContext, useEffect} from "react"
 import {generateColorMode} from "./utils/enable-dark-mode"
 import {useThemeContext} from "../context/theme-context"
 import {FooterComponent} from "./partials/footer-component"
-import {AuthUserContext} from "../context/AuthContext"
 import {LoginComponent} from "./login/LoginComponent"
+import {UserContext} from "../context/UserContext"
 
 export const HomeComponent = (): React.JSX.Element => {
     const {theme} = useThemeContext()
-    const {user} = useContext(AuthUserContext)!
+    const {user} = useContext(UserContext)!
 
     useEffect(() => {
         document.title = "Home | FLM"

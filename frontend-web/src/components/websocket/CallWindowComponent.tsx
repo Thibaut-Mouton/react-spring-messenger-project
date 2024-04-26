@@ -1,17 +1,18 @@
 import CallIcon from "@mui/icons-material/Call"
-import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from "@mui/material"
+import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton} from "@mui/material"
 import React, {useContext} from "react"
 import {RtcTransportDTO} from "../../interface-contract/rtc-transport-model"
 import {RtcActionEnum} from "../../utils/rtc-action-enum"
 import {WebSocketContext} from "../../context/WebsocketContext"
+import {UserContext} from "../../context/UserContext"
 
 interface CallWindowComponentProps {
-    userId: number
     groupUrl?: string
 }
 
-export function CallWindowComponent({userId, groupUrl}: CallWindowComponentProps) {
+export function CallWindowComponent({groupUrl}: CallWindowComponentProps) {
     const {ws} = useContext(WebSocketContext)!
+    const {user} = useContext(UserContext)!
     const {
         callStarted,
         callUrl
@@ -21,7 +22,7 @@ export function CallWindowComponent({userId, groupUrl}: CallWindowComponentProps
         event.preventDefault()
         const startedCallUrl = crypto.randomUUID()
         if (ws) {
-            const transport = new RtcTransportDTO(userId, groupUrl || "", RtcActionEnum.INIT_ROOM)
+            const transport = new RtcTransportDTO(user?.id || 0, groupUrl || "", RtcActionEnum.INIT_ROOM)
             ws.publish({
                 destination: `/rtc/${startedCallUrl}`,
                 body: JSON.stringify(transport)
@@ -50,9 +51,9 @@ export function CallWindowComponent({userId, groupUrl}: CallWindowComponentProps
 
     return (
         <React.Fragment>
-            <Button onClick={(event: any) => openCallPage(event)} variant="text" component="span">
+            <IconButton color="primary" onClick={(event: any) => openCallPage(event)} aria-label="delete">
                 <CallIcon/>
-            </Button>
+            </IconButton>
             <Dialog open={callStarted}>
                 <DialogTitle id="alert-dialog-title">{"Someone is calling you"}</DialogTitle>
                 <DialogContent>

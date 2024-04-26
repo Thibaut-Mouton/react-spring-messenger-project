@@ -25,7 +25,7 @@ import org.springframework.web.util.WebUtils;
 import java.util.*;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 public class ApiController {
 
     private final Logger log = LoggerFactory.getLogger(ApiController.class);
@@ -136,17 +136,19 @@ public class ApiController {
             }
             if (userService.checkIfUserIsAdmin(adminUserId, groupId)) {
                 try {
-                    if (action.equals("grant")) {
-                        groupUserJoinService.grantUserAdminInConversation(userId, groupId);
-                        return ResponseEntity.ok().body(userToChange + " has been granted administrator to " + groupService.getGroupName(groupUrl));
-                    }
-                    if (action.equals("delete")) {
-                        groupUserJoinService.removeUserFromConversation(userId, groupId);
-                        return ResponseEntity.ok().body(userToChange + " has been removed from " + groupService.getGroupName(groupUrl));
-                    }
-                    if (action.equals("removeAdmin")) {
-                        groupUserJoinService.removeUserAdminFromConversation(userId, groupId);
-                        return ResponseEntity.ok().body(userToChange + " has been removed from administrators of " + groupService.getGroupName(groupUrl));
+                    switch (action) {
+                        case "grant" -> {
+                            groupUserJoinService.grantUserAdminInConversation(userId, groupId);
+                            return ResponseEntity.ok().body(userToChange + " has been granted administrator to " + groupService.getGroupName(groupUrl));
+                        }
+                        case "delete" -> {
+                            groupUserJoinService.removeUserFromConversation(userId, groupId);
+                            return ResponseEntity.ok().body(userToChange + " has been removed from " + groupService.getGroupName(groupUrl));
+                        }
+                        case "removeAdmin" -> {
+                            groupUserJoinService.removeUserAdminFromConversation(userId, groupId);
+                            return ResponseEntity.ok().body(userToChange + " has been removed from administrators of " + groupService.getGroupName(groupUrl));
+                        }
                     }
                 } catch (Exception e) {
                     log.warn("Error during performing {} : {}", action, e.getMessage());

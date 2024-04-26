@@ -87,12 +87,12 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-    background: #656565;
+    background: #c4c4c4;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #c4c4c4;
+    background: #656565;
 }
 
 /* Handle on hover */

@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
@@ -19,15 +18,13 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageUserEntity implements Serializable {
+public class MessageUserEntity {
 
     @Id
     private int messageId;
 
     @Id
     private int userId;
-
-    private boolean seen;
 
     @Override
     public int hashCode() {

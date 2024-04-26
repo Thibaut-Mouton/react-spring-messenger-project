@@ -47,6 +47,10 @@ public class GroupUserJoinService {
         return groupUserJoinRepository.getAllByGroupId(groupId);
     }
 
+    public GroupUser findGroupUser(int userId, int groupId) {
+        return groupUserJoinRepository.getGroupUser(userId, groupId);
+    }
+
     public boolean checkIfUserIsAuthorizedInGroup(int userId, int groupId) {
         List<Integer> ids = groupUserJoinRepository.getUsersIdInGroup(groupId);
         return ids.stream().noneMatch(id -> id == userId);

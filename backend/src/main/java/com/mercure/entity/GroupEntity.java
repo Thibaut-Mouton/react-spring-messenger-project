@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +19,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupEntity implements Serializable {
+public class GroupEntity {
 
     public GroupEntity(String name) {
         this.name = name;
@@ -40,6 +39,12 @@ public class GroupEntity implements Serializable {
     private String name;
 
     private String url;
+
+    @Column(name = "active_call")
+    private boolean activeCall;
+
+    @Column(name = "call_url")
+    private String callUrl;
 
     @Column(name = "type")
     @Enumerated(value = EnumType.STRING)

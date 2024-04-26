@@ -17,9 +17,9 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    @GetMapping(value = "/group/{groupUrl}")
-    public WrapperMessageDTO fetchGroupMessages(@PathVariable String groupUrl) {
+    @GetMapping(value = "{offset}/group/{groupUrl}")
+    public WrapperMessageDTO fetchGroupMessages(@PathVariable String groupUrl, @PathVariable int offset) {
         this.log.debug("Fetching messages from conversation");
-        return this.messageService.getConversationMessage(groupUrl, -1);
+        return this.messageService.getConversationMessage(groupUrl, offset);
     }
 }

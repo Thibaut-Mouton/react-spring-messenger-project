@@ -3,7 +3,7 @@ import React, {useContext} from "react"
 import {LoaderContext} from "../../../context/loader-context"
 
 export function LoaderComponent() {
-    const {loading} = useContext(LoaderContext)
+    const {loading} = useContext(LoaderContext)!
     return <>
         {
             loading && <LinearProgress style={{

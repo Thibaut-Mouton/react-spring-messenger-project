@@ -17,5 +17,9 @@ public class WrapperMessageDTO {
 
     private String groupName;
 
+    private boolean isActiveCall;
+
+    private String callUrl;
+
     private List<MessageDTO> messages;
 }

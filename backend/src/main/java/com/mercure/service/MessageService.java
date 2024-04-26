@@ -6,6 +6,7 @@ import com.mercure.dto.WrapperMessageDTO;
 import com.mercure.entity.FileEntity;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.MessageEntity;
+import com.mercure.entity.UserEntity;
 import com.mercure.repository.MessageRepository;
 import com.mercure.utils.MessageTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,26 +34,9 @@ public class MessageService {
     @Autowired
     private FileService fileService;
 
-    private static final String[] colorsArray =
-            {
-                    "#FFC194", "#9CE03F", "#62C555", "#3AD079",
-                    "#44CEC3", "#F772EE", "#FFAFD2", "#FFB4AF",
-                    "#FF9207", "#E3D530", "#D2FFAF", "FF5733"
-            };
-
-    private static final Map<Integer, String> colors = new HashMap<>();
-
-    public String getRandomColor() {
-        return colorsArray[new Random().nextInt(colorsArray.length)];
-    }
-
     public MessageEntity createAndSaveMessage(int userId, int groupId, String type, String data) {
         MessageEntity msg = new MessageEntity(userId, groupId, type, data);
         return messageRepository.save(msg);
-    }
-
-    public void flush() {
-        messageRepository.flush();
     }
 
     public MessageEntity save(MessageEntity messageEntity) {
@@ -62,9 +46,9 @@ public class MessageService {
     public List<MessageEntity> findByGroupId(int id, int offset) {
         List<MessageEntity> list;
         if (offset == -1) {
-            list = messageRepository.findByGroupIdAndOffset(id, offset);
-        } else {
             list = messageRepository.findLastMessagesByGroupId(id);
+        } else {
+            list = messageRepository.findByGroupIdAndOffset(id, offset);
         }
         return list;
     }
@@ -93,19 +77,17 @@ public class MessageService {
      * @return a {@link MessageDTO}
      */
     public MessageDTO createMessageDTO(int id, String type, int userId, String date, int group_id, String message) {
-        colors.putIfAbsent(userId, getRandomColor());
-        String username = userService.findUsernameById(userId);
+        UserEntity user = userService.findById(userId);
         String fileUrl = "";
-        String[] arr = username.split(",");
-        String initials = arr[0].substring(0, 1).toUpperCase() + arr[1].substring(0, 1).toUpperCase();
-        String sender = StringUtils.capitalize(arr[0]) +
+        String initials = user.getFirstName().substring(0, 1).toUpperCase() + user.getLastName().substring(0, 1).toUpperCase();
+        String sender = StringUtils.capitalize(user.getFirstName()) +
                 " " +
-                StringUtils.capitalize(arr[1]);
+                StringUtils.capitalize(user.getLastName());
         if (type.equals(MessageTypeEnum.FILE.toString())) {
             FileEntity fileEntity = fileService.findByFkMessageId(id);
             fileUrl = fileEntity.getUrl();
         }
-        return new MessageDTO(id, type, message, userId, group_id, null, sender, date, initials, colors.get(userId), fileUrl, userId == id);
+        return new MessageDTO(id, type, message, userId, group_id, null, sender, date, initials, user.getColor(), fileUrl, userId == id);
     }
 
     public static String createUserInitials(String firstAndLastName) {
@@ -150,6 +132,7 @@ public class MessageService {
 
     public MessageDTO createNotificationMessageDTO(MessageEntity msg, int userId) {
         String groupUrl = groupService.getGroupUrlById(msg.getGroup_id());
+        UserEntity user = userService.findById(userId);
         String firstName = userService.findFirstNameById(msg.getUser_id());
         String initials = userService.findUsernameById(msg.getUser_id());
         MessageDTO messageDTO = new MessageDTO();
@@ -166,31 +149,28 @@ public class MessageService {
         messageDTO.setSender(firstName);
         messageDTO.setTime(msg.getCreatedAt().toString());
         messageDTO.setInitials(createUserInitials(initials));
-        messageDTO.setColor(colors.get(msg.getUser_id()));
+        messageDTO.setColor(user.getColor());
         messageDTO.setMessageSeen(msg.getUser_id() == userId);
         return messageDTO;
     }
 
-    /**
-     * Return history of group discussion
-     *
-     * @param url The group url to map
-     * @return List of message
-     */
     public WrapperMessageDTO getConversationMessage(String url, int messageId) {
         WrapperMessageDTO wrapper = new WrapperMessageDTO();
         if (url != null) {
             List<MessageDTO> messageDTOS = new ArrayList<>();
             GroupEntity group = groupService.getGroupByUrl(url);
             List<MessageEntity> newMessages = messageService.findByGroupId(group.getId(), messageId);
+            int lastMessageId = newMessages != null && !newMessages.isEmpty() ? newMessages.get(0).getId() : 0;
+            List<MessageEntity> afterMessages = messageService.findByGroupId(group.getId(), lastMessageId);
             if (newMessages != null) {
                 newMessages.forEach(msg ->
                         messageDTOS.add(messageService
                                 .createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()))
                 );
             }
-//            wrapper.setLastMessage(afterMessages != null && afterMessages.isEmpty());
-            wrapper.setLastMessage(true);
+            wrapper.setActiveCall(group.isActiveCall());
+            wrapper.setCallUrl(group.getCallUrl());
+            wrapper.setLastMessage(afterMessages != null && afterMessages.isEmpty());
             wrapper.setMessages(messageDTOS);
             wrapper.setGroupName(group.getName());
             return wrapper;

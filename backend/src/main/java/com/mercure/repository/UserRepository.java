@@ -13,19 +13,19 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
     UserEntity getUserByFirstNameOrMail(String firstName, String mail);
 
-    @Query(value = "SELECT u.firstname, u.lastname FROM user u WHERE u.id = :userId", nativeQuery = true)
+    @Query(value = "SELECT u.firstname, u.lastname FROM users u WHERE u.id = :userId", nativeQuery = true)
     String getUsernameByUserId(@Param(value = "userId") int id);
 
-    @Query(value = "SELECT u.firstname FROM user u WHERE u.id = :userId", nativeQuery = true)
+    @Query(value = "SELECT u.firstname FROM users u WHERE u.id = :userId", nativeQuery = true)
     String getFirstNameByUserId(@Param(value = "userId") int id);
 
-    @Query(value = "SELECT u.firstname FROM user u WHERE u.wstoken = :token", nativeQuery = true)
+    @Query(value = "SELECT u.firstname FROM users u WHERE u.wstoken = :token", nativeQuery = true)
     String getUsernameWithWsToken(@Param(value = "token") String token);
 
-    @Query(value = "SELECT u.id FROM user u WHERE u.wstoken = :token", nativeQuery = true)
+    @Query(value = "SELECT u.id FROM users u WHERE u.wstoken = :token", nativeQuery = true)
     int getUserIdWithWsToken(@Param(value = "token") String token);
 
-    @Query(value = "SELECT * FROM user u WHERE u.id NOT IN :ids", nativeQuery = true)
+    @Query(value = "SELECT * FROM users u WHERE u.id NOT IN :ids", nativeQuery = true)
     List<UserEntity> getAllUsersNotAlreadyInConversation(@Param(value = "ids") int[] ids);
 
     int countAllByFirstNameOrMail(String firstName, String mail);

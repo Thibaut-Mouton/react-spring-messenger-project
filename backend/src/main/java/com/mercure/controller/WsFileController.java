@@ -20,13 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-/**
- * API controller to handle file upload
- */
 @RestController
+@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 public class WsFileController {
 
-    private static Logger log = LoggerFactory.getLogger(WsFileController.class);
+    private static final Logger log = LoggerFactory.getLogger(WsFileController.class);
 
     @Autowired
     private MessageService messageService;

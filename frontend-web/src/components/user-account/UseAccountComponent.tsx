@@ -8,14 +8,16 @@ import ListItemIcon from "@mui/material/ListItemIcon"
 import Divider from "@mui/material/Divider"
 import IconButton from "@mui/material/IconButton"
 import Tooltip from "@mui/material/Tooltip"
-import PersonAdd from "@mui/icons-material/PersonAdd"
 import Settings from "@mui/icons-material/Settings"
 import Logout from "@mui/icons-material/Logout"
 import {HttpGroupService} from "../../service/http-group-service"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
+import {capitalize} from "@mui/material"
+import {UserContext} from "../../context/UserContext"
 
 export function AccountMenu() {
     const {dispatch} = useContext(AlertContext)!
+    const {user} = useContext(UserContext)!
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
     const open = Boolean(anchorEl)
 
@@ -25,6 +27,12 @@ export function AccountMenu() {
 
     const handleClose = () => {
         setAnchorEl(null)
+    }
+
+    function getUserInitials() {
+        const firstName = capitalize((user?.firstName || "").charAt(0))
+        const lastName = capitalize((user?.lastName || "").charAt(0))
+        return `${firstName}${lastName}`
     }
 
     async function logout() {
@@ -48,7 +56,7 @@ export function AccountMenu() {
                         aria-haspopup="true"
                         aria-expanded={open ? "true" : undefined}
                     >
-                        <Avatar>TM</Avatar>
+                        <Avatar>{getUserInitials()}</Avatar>
                     </IconButton>
                 </Tooltip>
             </Box>
@@ -90,16 +98,7 @@ export function AccountMenu() {
                 <MenuItem onClick={handleClose}>
                     <Avatar/> Profile
                 </MenuItem>
-                <MenuItem onClick={handleClose}>
-                    <Avatar/> My account
-                </MenuItem>
                 <Divider/>
-                <MenuItem onClick={handleClose}>
-                    <ListItemIcon>
-                        <PersonAdd fontSize="small"/>
-                    </ListItemIcon>
-                    Add another account
-                </MenuItem>
                 <MenuItem onClick={handleClose}>
                     <ListItemIcon>
                         <Settings fontSize="small"/>
