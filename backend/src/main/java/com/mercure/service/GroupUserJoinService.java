@@ -4,11 +4,14 @@ import com.mercure.controller.WsFileController;
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
 import com.mercure.repository.GroupUserJoinRepository;
+import org.aspectj.weaver.ast.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +25,9 @@ public class GroupUserJoinService {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    private GroupService groupService;
 
     public GroupUser save(GroupUser groupUser) {
         return groupUserJoinRepository.save(groupUser);
@@ -49,6 +55,14 @@ public class GroupUserJoinService {
 
     public GroupUser findGroupUser(int userId, int groupId) {
         return groupUserJoinRepository.getGroupUser(userId, groupId);
+    }
+
+    public void saveLastMessageDate(int userId, String groupUrl) {
+        int groupId = groupService.findGroupByUrl(groupUrl);
+        GroupUser groupUser = groupUserJoinRepository.getGroupUser(userId, groupId);
+        Date date = new Date();
+        Timestamp ts = new Timestamp(date.getTime());
+        groupUser.setLastMessageSeenDate(ts);
     }
 
     public boolean checkIfUserIsAuthorizedInGroup(int userId, int groupId) {

@@ -18,10 +18,11 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
-@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
+@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000", methods = {RequestMethod.GET, RequestMethod.POST})
 public class WsFileController {
 
     private static final Logger log = LoggerFactory.getLogger(WsFileController.class);
@@ -67,5 +68,10 @@ public class WsFileController {
             return ResponseEntity.status(500).build();
         }
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("files/groupUrl/{groupUrl}")
+    public List<String> getMultimediaContent(@PathVariable String groupUrl) {
+        return messageService.getMultimediaContentByGroup(groupUrl);
     }
 }

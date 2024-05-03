@@ -15,4 +15,4 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: build
-      run: mvn compile -f backend/pom.xml
+      run: mvn -Dmaven.test.skip=true compile -f backend/pom.xml

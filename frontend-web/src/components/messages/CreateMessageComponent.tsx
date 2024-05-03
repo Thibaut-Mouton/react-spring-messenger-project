@@ -22,8 +22,8 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
     const [, setImageLoaded] = useState(false)
     const [message, setMessage] = useState("")
     const [file, setFile] = React.useState<File | null>(null)
-
     const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string>("")
+    const groupService = new HttpGroupService()
 
     function submitMessage(event: any) {
         if (event.key !== undefined && event.shiftKey && event.keyCode === 13) {
@@ -86,7 +86,8 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
         }
     }
 
-    function markMessageSeen() {
+    async function markMessageSeen() {
+        await groupService.markMessageAsSeen(user?.id || 0, groupUrl)
         changeGroupState({
             type: GroupContextAction.UPDATE_SEEN_MESSAGE, payload: {groupUrl, isMessageSeen: true}
         })

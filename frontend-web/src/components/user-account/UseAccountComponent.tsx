@@ -29,6 +29,12 @@ export function AccountMenu() {
         setAnchorEl(null)
     }
 
+    function getUserFullName() {
+        const firstName = user?.firstName
+        const lastName = user?.lastName
+        return `${firstName} ${lastName}`
+    }
+
     function getUserInitials() {
         const firstName = capitalize((user?.firstName || "").charAt(0))
         const lastName = capitalize((user?.lastName || "").charAt(0))
@@ -96,7 +102,7 @@ export function AccountMenu() {
                 anchorOrigin={{horizontal: "right", vertical: "bottom"}}
             >
                 <MenuItem onClick={handleClose}>
-                    <Avatar/> Profile
+                    <Avatar/> {getUserFullName()}
                 </MenuItem>
                 <Divider/>
                 <MenuItem onClick={handleClose}>

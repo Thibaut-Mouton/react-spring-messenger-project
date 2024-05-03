@@ -24,6 +24,9 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Integer>
     @Query(value = "SELECT m1.id FROM message m1 INNER JOIN (SELECT MAX(m.id) as id FROM message m GROUP BY m.msg_group_id) temp ON temp.id = m1.id WHERE msg_group_id = :idOfGroup", nativeQuery = true)
     int findLastMessageIdByGroupId(@Param(value = "idOfGroup") int groupId);
 
+    @Query(value = "SELECT m. FROM message m WHERE m.id = :idOfGroup AND m.type = 'FILE'", nativeQuery = true)
+    List<MessageEntity> findAllFilesByGroupId(@Param(value = "idOfGroup") int groupId);
+
     @Modifying
     @Query(value = "DELETE m, mu FROM message m JOIN message_user mu ON m.id = mu.message_id WHERE m.msg_group_id = :groupId", nativeQuery = true)
     void deleteMessagesDataByGroupId(@Param(value = "groupId") int groupId);

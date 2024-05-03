@@ -138,8 +138,8 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
                     </div>
                 </div>
             }
-            <Box m={1}>
-                <List>
+            <Box style={{overflowY: "auto", height: "87%"}}>
+                <List disablePadding={true}>
                     {!loadingState && groups && groups.map((group) => (
                         <ListItemButton sx={{borderRadius: 2, my: 1}} className={styleSelectedGroup(group.url)}
                                         key={group.id}
