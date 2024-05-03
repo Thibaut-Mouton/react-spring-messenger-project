@@ -1,5 +1,5 @@
 package com.mercure.utils;
 
 public enum MessageTypeEnum {
-    TEXT, FILE
+    TEXT, FILE, CALL
 }

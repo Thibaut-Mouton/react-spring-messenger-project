@@ -10,7 +10,7 @@ import {
     MenuItem,
     Tooltip
 } from "@mui/material"
-import {ExpandLess, FolderCopy} from "@mui/icons-material"
+import {ExpandLess} from "@mui/icons-material"
 import SecurityIcon from "@mui/icons-material/Security"
 import ExpandMore from "@mui/icons-material/ExpandMore"
 import PersonIcon from "@mui/icons-material/Person"
@@ -30,6 +30,7 @@ import {WebSocketContext} from "../../context/WebsocketContext"
 import {GroupContext} from "../../context/GroupContext"
 import {UserContext} from "../../context/UserContext"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
+import {MultimediaListComponent} from "../partials/list-items/MultimediaListComponent"
 
 export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?: string }> = ({groupUrl}) => {
     const [paramsOpen, setParamsOpen] = useState(false)
@@ -328,12 +329,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
                             ))}
                         </List>
                     </Collapse>
-                    <ListItemButton disabled={isDisabled()}>
-                        <ListItemIcon>
-                            <FolderCopy color={"primary"}/>
-                        </ListItemIcon>
-                        <ListItemText primary="Multimedia content"/>
-                    </ListItemButton>
+                    {groupUrl && <MultimediaListComponent groupUrl={groupUrl} isDisabled={isDisabled()}/>}
                 </List>
             </div>
             <AllUsersDialog usersList={allUsers} open={popupOpen} setOpen={handlePopupState}

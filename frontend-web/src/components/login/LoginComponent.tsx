@@ -1,10 +1,9 @@
 import LockIcon from "@mui/icons-material/Lock"
-import {Button, Grid, Typography} from "@mui/material"
+import {Button, Grid, TextField, Typography} from "@mui/material"
 import React, {useContext, useEffect, useState} from "react"
-import {Link, redirect} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 import {useThemeContext} from "../../context/theme-context"
 import {generateIconColorMode, generateLinkColorMode} from "../utils/enable-dark-mode"
-import {CustomTextField} from "../partials/custom-material-textfield"
 import {HttpGroupService} from "../../service/http-group-service"
 import {LoaderContext} from "../../context/loader-context"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
@@ -13,6 +12,7 @@ export function LoginComponent(): React.JSX.Element {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
 
+    const navigate = useNavigate()
     const {dispatch} = useContext(AlertContext)!
     const {setLoading} = useContext(LoaderContext)
     const {theme} = useThemeContext()
@@ -52,7 +52,7 @@ export function LoginComponent(): React.JSX.Element {
                 username,
                 password
             })
-            redirect("t/messages")
+            navigate("/t/messages")
         } catch (err: any) {
             dispatch({
                 type: AlertAction.ADD_ALERT,
@@ -73,7 +73,7 @@ export function LoginComponent(): React.JSX.Element {
     return (
         <div className={theme}
              style={{
-                 height: "calc(100% - 64px)",
+                 height: "100%",
                  width: "100%"
              }}>
             <div className={"main-register-form"}>
@@ -91,25 +91,24 @@ export function LoginComponent(): React.JSX.Element {
                 <div>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
-                            <CustomTextField id={"loginUsernameInput"}
-                                             label={"Username"}
-                                             name={"username"}
-                                             value={username}
-                                             isDarkModeEnable={theme}
-                                             handleChange={handleChange}
-                                             isMultiline={false}
-                                             type={"text"}/>
+                            <TextField label={"Username"}
+                                       name={"username"}
+                                       value={username}
+                                       fullWidth={true}
+                                       variant="outlined"
+                                       onChange={handleChange}
+                                       multiline={false}
+                                       type={"text"}/>
                         </Grid>
                         <Grid item xs={12}>
-                            <CustomTextField id={"loginPasswordInput"}
-                                             label={"Password"}
-                                             name={"password"}
-                                             value={password}
-                                             isDarkModeEnable={theme}
-                                             handleChange={handleChange}
-                                             type={"password"}
-                                             isMultiline={false}
-                                             keyUp={submitLogin}
+                            <TextField label={"Password"}
+                                       name={"password"}
+                                       value={password}
+                                       fullWidth={true}
+                                       onChange={handleChange}
+                                       type={"password"}
+                                       multiline={false}
+                                       onKeyDown={submitLogin}
                             />
                         </Grid>
                     </Grid>

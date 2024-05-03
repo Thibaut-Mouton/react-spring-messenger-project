@@ -1,4 +1,4 @@
-import axios, {AxiosInstance} from "axios"
+import axios, {AxiosError, AxiosInstance} from "axios"
 
 export abstract class HttpMainService {
 
@@ -17,7 +17,12 @@ export abstract class HttpMainService {
         })
         this.instance.interceptors.response.use((response) => {
             return response
-        }, (error) => {
+        }, (error: AxiosError) => {
+            if (error.response && error.response.status === 403) {
+                if (window.location.pathname !== "/login") {
+                    window.location.pathname = "/login"
+                }
+            }
             console.log("ERROR", error)
             return Promise.reject(error)
         })

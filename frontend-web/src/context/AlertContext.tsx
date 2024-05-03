@@ -5,11 +5,13 @@ enum AlertAction {
     ADD_ALERT = "ADD_ALERT"
 }
 
+type AlertSeverityType = "success" | "info" | "warning" | "error" | undefined
+
 type AlertType = {
     id: string,
     isOpen: boolean,
     text: string,
-    alert: "success" | "info" | "warning" | "error" | undefined
+    alert: AlertSeverityType
 }
 
 export type AlertActionType =
@@ -49,4 +51,4 @@ const AlertContextProvider: React.FC<{ children: ReactNode }> = ({children}) => 
     )
 }
 
-export {AlertContextProvider, AlertAction}
+export {AlertContextProvider, AlertAction, type AlertSeverityType}

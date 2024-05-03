@@ -19,7 +19,9 @@ const router = createBrowserRouter([
     {
         path: "/",
         loader: async () => {
-            return new HttpGroupService().pingRoute().catch(() => redirect("/login"))
+            return new HttpGroupService().pingRoute()
+                .then(() => redirect("/t/messages"))
+                .catch(() => redirect("/login"))
         },
     },
     {

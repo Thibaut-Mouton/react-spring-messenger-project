@@ -77,4 +77,12 @@ export class HttpGroupService extends HttpMainService {
     public uploadFile(data: FormData): Promise<AxiosResponse> {
         return this.instance.post("upload", data)
     }
+
+    public getMultimediaFiles(groupUrl: string) {
+        return this.instance.get<string[]>(`files/groupUrl/${groupUrl}`)
+    }
+
+    public markMessageAsSeen(userId: number, groupUrl: string) {
+        return this.instance.get<Date>(`messages/seen/group/${groupUrl}/user/${userId}`)
+    }
 }

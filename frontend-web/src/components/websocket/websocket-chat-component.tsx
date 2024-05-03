@@ -66,7 +66,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                     }}>
                         <div style={{
                             backgroundColor: "white",
-                            borderRadius: "15px 15px 0 0",
+                            borderRadius: "20px 20px 0 0",
                             width: "100%",
                             borderBottom: "1px solid #d5d5d5"
                         }}>

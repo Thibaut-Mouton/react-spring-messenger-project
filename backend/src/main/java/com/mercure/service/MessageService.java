@@ -3,10 +3,7 @@ package com.mercure.service;
 import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
 import com.mercure.dto.WrapperMessageDTO;
-import com.mercure.entity.FileEntity;
-import com.mercure.entity.GroupEntity;
-import com.mercure.entity.MessageEntity;
-import com.mercure.entity.UserEntity;
+import com.mercure.entity.*;
 import com.mercure.repository.MessageRepository;
 import com.mercure.utils.MessageTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,9 @@ public class MessageService {
     private MessageRepository messageRepository;
 
     @Autowired
+    private FileService fileService;
+
+    @Autowired
     private MessageService messageService;
 
     @Autowired
@@ -30,9 +30,6 @@ public class MessageService {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private FileService fileService;
 
     public MessageEntity createAndSaveMessage(int userId, int groupId, String type, String data) {
         MessageEntity msg = new MessageEntity(userId, groupId, type, data);
@@ -116,6 +113,10 @@ public class MessageService {
             notificationDTO.setType(MessageTypeEnum.TEXT);
             notificationDTO.setMessage(msg.getMessage());
         }
+        if (msg.getType().equals(MessageTypeEnum.CALL.toString())) {
+            notificationDTO.setType(MessageTypeEnum.CALL);
+            notificationDTO.setMessage(msg.getMessage());
+        }
         if (msg.getType().equals(MessageTypeEnum.FILE.toString())) {
             FileEntity fileEntity = fileService.findByFkMessageId(msg.getId());
             notificationDTO.setType(MessageTypeEnum.FILE);
@@ -152,6 +153,12 @@ public class MessageService {
         messageDTO.setColor(user.getColor());
         messageDTO.setMessageSeen(msg.getUser_id() == userId);
         return messageDTO;
+    }
+
+    // TODO check that the request is authorized by user making the call
+    public List<String> getMultimediaContentByGroup(String groupUrl) {
+        int groupId = groupService.findGroupByUrl(groupUrl);
+        return fileService.getFilesUrlByGroupId(groupId);
     }
 
     public WrapperMessageDTO getConversationMessage(String url, int messageId) {

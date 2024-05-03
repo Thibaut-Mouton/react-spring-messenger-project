@@ -4,7 +4,7 @@ import NoteAddOutlinedIcon from "@mui/icons-material/NoteAddOutlined"
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@mui/material"
 import {HttpGroupService} from "../../service/http-group-service"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
-import {redirect} from "react-router-dom"
+import {useNavigate} from "react-router-dom"
 import {GroupContext, GroupContextAction} from "../../context/GroupContext"
 
 export function CreateConversationComponent(): React.JSX.Element {
@@ -14,6 +14,7 @@ export function CreateConversationComponent(): React.JSX.Element {
     const httpService = new HttpGroupService()
     const {changeGroupState} = useContext(GroupContext)!
     const {dispatch} = useContext(AlertContext)!
+    const navigate = useNavigate()
 
     function handleClickOpen() {
         setOpen(true)
@@ -39,7 +40,7 @@ export function CreateConversationComponent(): React.JSX.Element {
                 })
                 changeGroupState({type: GroupContextAction.ADD_GROUP, payload: data})
                 setOpen(false)
-                redirect(`/t/messages/${data.url}`)
+                navigate(`/t/messages/${data.url}`)
             } catch (error) {
                 dispatch({
                     type: AlertAction.ADD_ALERT,
