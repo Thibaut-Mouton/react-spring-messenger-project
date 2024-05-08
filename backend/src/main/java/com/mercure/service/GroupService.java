@@ -41,6 +41,14 @@ public class GroupService {
         return users.stream().map(GroupUser::getUserId).collect(Collectors.toList());
     }
 
+    public void saveGroup(GroupEntity group) {
+        try {
+            groupRepository.save(group);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
     public String getGroupName(String url) {
         return groupRepository.getGroupEntitiesBy(url);
     }
@@ -124,5 +132,12 @@ public class GroupService {
         groupUser2.setUserEntities(user2);
         groupUser2.setGroupUsers(groupEntity);
         groupUserJoinService.saveAll(Arrays.asList(groupUser1, groupUser2));
+    }
+
+    public void deleteGroup() {
+        // TODO delete messages
+        // TODO delete group
+        // TODO delete multimedia
+        // TODO user join service
     }
 }

@@ -25,7 +25,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                     setMessages(data.messages)
                     setAllMessagesFetched(data.lastMessage)
                     setGroupName(data.groupName)
-                    setActiveCall(data.isActiveCall)
+                    setActiveCall(data.activeCall)
                 } catch (error) {
                     dispatch({
                         type: AlertAction.ADD_ALERT,

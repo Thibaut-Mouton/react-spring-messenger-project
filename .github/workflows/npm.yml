@@ -11,4 +11,4 @@ jobs:
       with:
         node-version: 20.x
     - name: build
-      run: npm run --prefix ./frontend-web build
+      run: npm --prefix ./frontend-web run build

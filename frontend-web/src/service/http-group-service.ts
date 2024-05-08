@@ -25,7 +25,7 @@ export class HttpGroupService extends HttpMainService {
         return this.instance.get("fetch")
     }
 
-    public async ensureRoomExists(roomId: string): Promise<AxiosResponse<boolean>> {
+    public async ensureRoomExists(roomId?: string): Promise<AxiosResponse<boolean>> {
         return this.instance.get(`room/ensure-room-exists/${roomId}`)
     }
 
@@ -84,5 +84,9 @@ export class HttpGroupService extends HttpMainService {
 
     public markMessageAsSeen(userId: number, groupUrl: string) {
         return this.instance.get<Date>(`messages/seen/group/${groupUrl}/user/${userId}`)
+    }
+
+    public searchInConversations(data: { text: string }) {
+        return this.instance.post("search", data)
     }
 }

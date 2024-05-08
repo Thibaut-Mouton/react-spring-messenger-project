@@ -15,6 +15,9 @@ public interface GroupUserJoinRepository extends JpaRepository<GroupUser, GroupR
     @Query(value = "SELECT * FROM group_user WHERE group_id=:groupId", nativeQuery = true)
     List<GroupUser> getAllByGroupId(@Param("groupId") int groupId);
 
+    @Query(value = "SELECT group_id FROM group_user WHERE user_id= :userId", nativeQuery = true)
+    List<Integer> getGroupUserByUserId(@Param("userId") int userId);
+
     @Query(value = "SELECT * FROM group_user WHERE group_id=:groupId and user_id = :userId", nativeQuery = true)
     GroupUser getGroupUser(@Param("userId") int userId, @Param("groupId") int groupId);
 

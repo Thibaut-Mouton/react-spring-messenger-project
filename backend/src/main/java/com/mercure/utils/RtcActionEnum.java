@@ -1,7 +1,6 @@
 package com.mercure.utils;
 
 public enum RtcActionEnum {
-
     INIT_ROOM,
     LEAVE_ROOM,
     JOIN_ROOM,

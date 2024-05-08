@@ -10,6 +10,8 @@ import {CallWindowComponent} from "../websocket/CallWindowComponent"
 import {UserContext} from "../../context/UserContext"
 import {GroupContext, GroupContextAction} from "../../context/GroupContext"
 import {InsertPhoto} from "@mui/icons-material"
+import SendIcon from "@mui/icons-material/Send"
+import {TypeMessageEnum} from "../../utils/type-message-enum"
 
 interface CreateMessageComponentProps {
     groupUrl: string
@@ -21,6 +23,7 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
     const {changeGroupState} = useContext(GroupContext)!
     const [, setImageLoaded] = useState(false)
     const [message, setMessage] = useState("")
+    const [messageType, setMessageType] = useState<TypeMessageEnum>(TypeMessageEnum.TEXT)
     const [file, setFile] = React.useState<File | null>(null)
     const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string>("")
     const groupService = new HttpGroupService()
@@ -64,7 +67,7 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
     async function sendMessage() {
         if (message !== "") {
             if (getPayloadSize(message) < 8192 && ws?.active) {
-                const transport = new TransportModel(user?.id || 0, TransportActionEnum.SEND_GROUP_MESSAGE, undefined, groupUrl, message)
+                const transport = new TransportModel(user?.id || 0, TransportActionEnum.SEND_GROUP_MESSAGE, undefined, groupUrl, message, messageType)
                 ws.publish({
                     destination: "/message",
                     body: JSON.stringify(transport)
@@ -84,6 +87,12 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
             setFile(null)
             setImagePreviewUrl("")
         }
+    }
+
+    function sendCallMessage(url: string) {
+        const callMessage = `http://localhost:3000/room/${url}`
+        setMessageType(TypeMessageEnum.CALL)
+        setMessage(callMessage)
     }
 
     async function markMessageSeen() {
@@ -148,7 +157,7 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
                 >
                     <VisuallyHiddenInput type="file" onChange={previewFile}/>
                 </Button>
-                <CallWindowComponent/>
+                <CallWindowComponent sendCallMessage={sendCallMessage}/>
                 <TextField
                     variant={"outlined"}
                     label={"Write a message"}
@@ -160,18 +169,18 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
                     onKeyDown={submitMessage}
                     multiline={true}
                     name={"mainWriteMessage"}/>
-                {/*<Button*/}
-                {/*    onClick={sendMessage}*/}
-                {/*    variant="contained"*/}
-                {/*    color="primary"*/}
-                {/*    style={{*/}
-                {/*        marginLeft: "3px",*/}
-                {/*        maxWidth: "20px"*/}
-                {/*    }}*/}
-                {/*    disabled={!imageLoaded && message === ""}*/}
-                {/*>*/}
-                {/*    <SendIcon/>*/}
-                {/*</Button>*/}
+                <Button
+                    onClick={sendMessage}
+                    variant="outlined"
+                    color="primary"
+                    style={{
+                        marginLeft: "3px",
+                        maxWidth: "20px"
+                    }}
+                    disabled={message === ""}
+                >
+                    <SendIcon/>
+                </Button>
             </div>
         </>
     )
