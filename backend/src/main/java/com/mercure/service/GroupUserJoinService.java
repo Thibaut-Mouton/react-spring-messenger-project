@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class GroupUserJoinService {
 
-    private static final Logger log = LoggerFactory.getLogger(WsFileController.class);
+    private static final Logger log = LoggerFactory.getLogger(GroupUserJoinService.class);
 
     @Autowired
     private GroupUserJoinRepository groupUserJoinRepository;
@@ -51,6 +51,10 @@ public class GroupUserJoinService {
 
     public List<GroupUser> findAllByGroupId(int groupId) {
         return groupUserJoinRepository.getAllByGroupId(groupId);
+    }
+
+    public List<Integer> findAllGroupsByUserId(int userId) {
+        return groupUserJoinRepository.getGroupUserByUserId(userId);
     }
 
     public GroupUser findGroupUser(int userId, int groupId) {

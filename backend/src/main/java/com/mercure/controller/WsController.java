@@ -2,6 +2,7 @@ package com.mercure.controller;
 
 import com.google.gson.Gson;
 import com.mercure.dto.*;
+import com.mercure.entity.GroupEntity;
 import com.mercure.entity.MessageEntity;
 import com.mercure.entity.MessageUserEntity;
 import com.mercure.service.*;
@@ -35,8 +36,6 @@ public class WsController {
 
     private final Logger log = LoggerFactory.getLogger(WsController.class);
 
-    private final Map<String, ArrayList<Integer>> usersIndexedByRoomId = new HashMap<>();
-
     @Autowired
     private GroupService groupService;
 
@@ -65,7 +64,7 @@ public class WsController {
         TransportActionEnum action = dto.getAction();
         switch (action) {
             case SEND_GROUP_MESSAGE:
-                this.getAndSaveMessage(dto.getUserId(), dto.getGroupUrl(), dto.getMessage());
+                this.getAndSaveMessage(dto.getUserId(), dto.getGroupUrl(), dto.getMessage(), dto.getMessageType());
                 break;
 //            case FETCH_GROUP_MESSAGES:
 //                if (!dto.getGroupUrl().equals("")) {
@@ -89,7 +88,8 @@ public class WsController {
                     MessageUserEntity messageUserEntity = seenMessageService.findByMessageId(messageId, dto.getUserId());
                     if (messageUserEntity == null) {
                         break;
-                    };
+                    }
+                    ;
                     seenMessageService.saveMessageUserEntity(messageUserEntity);
                 }
                 break;
@@ -111,18 +111,18 @@ public class WsController {
                     log.warn("User cannot left group because groupUrl is empty");
                 }
                 break;
-            case CHECK_EXISTING_CALL:
-                OutputTransportDTO outputTransportDTO = new OutputTransportDTO();
-                for (String key : usersIndexedByRoomId.keySet()) {
-                    if (key.contains(dto.getGroupUrl())) {
-                        outputTransportDTO.setAction(TransportActionEnum.CALL_IN_PROGRESS);
-                        this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), outputTransportDTO);
-                        break;
-                    }
-                }
-                outputTransportDTO.setAction(TransportActionEnum.NO_CALL_IN_PROGRESS);
-                this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), outputTransportDTO);
-                break;
+//            case CHECK_EXISTING_CALL:
+//                OutputTransportDTO outputTransportDTO = new OutputTransportDTO();
+//                for (String key : usersIndexedByRoomId.keySet()) {
+//                    if (key.contains(dto.getGroupUrl())) {
+//                        outputTransportDTO.setAction(TransportActionEnum.CALL_IN_PROGRESS);
+//                        this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), outputTransportDTO);
+//                        break;
+//                    }
+//                }
+//                outputTransportDTO.setAction(TransportActionEnum.NO_CALL_IN_PROGRESS);
+//                this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), outputTransportDTO);
+//                break;
             default:
                 break;
         }
@@ -133,66 +133,62 @@ public class WsController {
         RtcActionEnum action = dto.getAction();
         switch (action) {
             case INIT_ROOM -> {
-                List<Integer> usersId = this.groupService.getAllUsersIdByGroupUrl(dto.getGroupUrl());
-                ArrayList<Integer> userIDs = new ArrayList<>();
-                userIDs.add(dto.getUserId());
-
-                roomCacheService.putNewRoom(dto.getGroupUrl(), roomUrl, userIDs);
-
-                OutputTransportDTO outputTransportDTO = new OutputTransportDTO();
-                outputTransportDTO.setAction(TransportActionEnum.CALL_INCOMING);
-                outputTransportDTO.setObject(roomUrl);
-                usersId.stream()
-                        .filter((user) -> !user.equals(dto.getUserId()))
-                        .forEach((userId) -> this.messagingTemplate.convertAndSend("/topic/user/" + userId, outputTransportDTO));
+                Object offer = roomCacheService.getRoomByKey(roomUrl);
+                if (offer != null) {
+                    RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
+                    rtcTransportDTO.setUserId(dto.getUserId());
+                    rtcTransportDTO.setAction(RtcActionEnum.JOIN_ROOM);
+                    this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), rtcTransportDTO);
+                    return;
+                }
+                roomCacheService.setNewRoom(roomUrl, dto.getOffer());
             }
             case SEND_ANSWER -> {
                 String key = roomUrl + "_" + dto.getGroupUrl();
-                ArrayList<Integer> hostList = usersIndexedByRoomId.get(key);
                 RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
                 rtcTransportDTO.setUserId(dto.getUserId());
                 rtcTransportDTO.setAction(RtcActionEnum.SEND_ANSWER);
                 rtcTransportDTO.setAnswer(dto.getAnswer());
-                hostList.stream()
-                        .filter((user) -> !user.equals(dto.getUserId()))
-                        .forEach((userId) -> this.messagingTemplate.convertAndSend("/topic/rtc/" + userId, rtcTransportDTO));
+//                hostList.stream()
+//                        .filter((user) -> !user.equals(dto.getUserId()))
+//                        .forEach((userId) -> this.messagingTemplate.convertAndSend("/topic/rtc/" + userId, rtcTransportDTO));
             }
-            case JOIN_ROOM -> {
-                String key = roomUrl + "_" + dto.getGroupUrl();
-                ArrayList<Integer> hostList = usersIndexedByRoomId.get(key);
-                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
-                rtcTransportDTO.setUserId(dto.getUserId());
-                rtcTransportDTO.setAction(RtcActionEnum.SEND_OFFER);
-                rtcTransportDTO.setOffer(dto.getOffer());
-                hostList.add(dto.getUserId());
-                usersIndexedByRoomId.put(roomUrl, hostList);
-                hostList.stream()
-                        .filter((user) -> !user.equals(dto.getUserId()))
-                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
-            }
-            case ICE_CANDIDATE -> {
-                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
-                rtcTransportDTO.setUserId(dto.getUserId());
-                rtcTransportDTO.setAction(RtcActionEnum.ICE_CANDIDATE);
-                ArrayList<Integer> hostList = usersIndexedByRoomId.get(roomUrl);
-                hostList.stream()
-                        .filter((user) -> !user.equals(dto.getUserId()))
-                        // TODO null ici ?
-                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
-            }
-            case LEAVE_ROOM -> {
-                String key = roomUrl + "_" + dto.getGroupUrl();
-                List<Integer> userIds = groupService.getAllUsersIdByGroupUrl(dto.getGroupUrl());
-                HashMap<String, ArrayList<Integer>> hostListsIndexedByRoomUrl = roomCacheService.getRoomByKey(key);
-                if (hostListsIndexedByRoomUrl.isEmpty()) {
-                    log.info("All users left the call, removing room from list");
-                    OutputTransportDTO outputTransportDTO = new OutputTransportDTO();
-                    outputTransportDTO.setAction(TransportActionEnum.END_CALL);
-                    outputTransportDTO.setObject(dto.getGroupUrl());
-                    usersIndexedByRoomId.remove(key);
-                    userIds.forEach(userId -> this.messagingTemplate.convertAndSend("/topic/user/" + userId, outputTransportDTO));
-                }
-            }
+//            case JOIN_ROOM -> {
+//                String key = roomUrl + "_" + dto.getGroupUrl();
+//                ArrayList<Integer> hostList = usersIndexedByRoomId.get(key);
+//                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
+//                rtcTransportDTO.setUserId(dto.getUserId());
+//                rtcTransportDTO.setAction(RtcActionEnum.SEND_OFFER);
+//                rtcTransportDTO.setOffer(dto.getOffer());
+//                hostList.add(dto.getUserId());
+//                usersIndexedByRoomId.put(roomUrl, hostList);
+//                hostList.stream()
+//                        .filter((user) -> !user.equals(dto.getUserId()))
+//                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
+//            }
+//            case ICE_CANDIDATE -> {
+//                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
+//                rtcTransportDTO.setUserId(dto.getUserId());
+//                rtcTransportDTO.setAction(RtcActionEnum.ICE_CANDIDATE);
+//                ArrayList<Integer> hostList = usersIndexedByRoomId.get(roomUrl);
+//                hostList.stream()
+//                        .filter((user) -> !user.equals(dto.getUserId()))
+//                        // TODO null ici ?
+//                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
+//            }
+//            case LEAVE_ROOM -> {
+//                String key = roomUrl + "_" + dto.getGroupUrl();
+//                List<Integer> userIds = groupService.getAllUsersIdByGroupUrl(dto.getGroupUrl());
+//                HashMap<String, ArrayList<Integer>> hostListsIndexedByRoomUrl = roomCacheService.getRoomByKey(key);
+//                if (hostListsIndexedByRoomUrl.isEmpty()) {
+//                    log.info("All users left the call, removing room from list");
+//                    OutputTransportDTO outputTransportDTO = new OutputTransportDTO();
+//                    outputTransportDTO.setAction(TransportActionEnum.END_CALL);
+//                    outputTransportDTO.setObject(dto.getGroupUrl());
+//                    usersIndexedByRoomId.remove(key);
+//                    userIds.forEach(userId -> this.messagingTemplate.convertAndSend("/topic/user/" + userId, outputTransportDTO));
+//                }
+//            }
             default -> log.warn("Unknown action : {}", dto.getAction());
         }
     }
@@ -204,12 +200,18 @@ public class WsController {
      * @param groupUrl the string groupUrl for mapping message to a group
      * @param message  the payload received
      */
-    public void getAndSaveMessage(int userId, String groupUrl, String message) {
+    public void getAndSaveMessage(int userId, String groupUrl, String message, MessageTypeEnum messageType) {
         int groupId = groupService.findGroupByUrl(groupUrl);
         if (groupUserJoinService.checkIfUserIsAuthorizedInGroup(userId, groupId)) {
             return;
         }
-        MessageEntity messageEntity = new MessageEntity(userId, groupId, MessageTypeEnum.TEXT.toString(), message);
+        if (messageType.equals(MessageTypeEnum.CALL)) {
+            GroupEntity group = groupService.getGroupByUrl(groupUrl);
+            group.setCallUrl(message);
+            group.setActiveCall(true);
+            groupService.saveGroup(group);
+        }
+        MessageEntity messageEntity = new MessageEntity(userId, groupId, messageType.toString(), message);
         MessageEntity msg = messageService.save(messageEntity);
         List<Integer> toSend = messageService.createNotificationList(userId, groupUrl);
 

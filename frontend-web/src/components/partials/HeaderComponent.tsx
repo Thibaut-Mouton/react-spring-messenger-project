@@ -1,8 +1,9 @@
 import ClearAllIcon from "@mui/icons-material/ClearAll"
-import {TextField, Toolbar, Typography} from "@mui/material"
+import {Toolbar, Typography} from "@mui/material"
 import React, {useContext} from "react"
 import {AccountMenu} from "../user-account/UseAccountComponent"
 import {UserContext} from "../../context/UserContext"
+import {SearchComponent} from "../search/SearchComponent"
 
 export function HeaderComponent(): React.JSX.Element {
     const theme = "light"
@@ -25,8 +26,7 @@ export function HeaderComponent(): React.JSX.Element {
                             flexWrap: "wrap"
                         }}><ClearAllIcon/><span style={{letterSpacing: "1px"}}>FastLiteMessage</span></span>
                     </Typography>
-                    <TextField style={{width: "50%"}} variant={"outlined"} size={"small"}
-                               label={"Rechercher dans les discussions"}/>
+                    <SearchComponent/>
                     {user && <AccountMenu/>}
                 </Toolbar>
             </div>

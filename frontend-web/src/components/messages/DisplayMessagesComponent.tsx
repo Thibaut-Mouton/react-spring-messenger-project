@@ -6,6 +6,7 @@ import {GroupActionEnum} from "../websocket/group-action-enum"
 import {ImagePreviewComponent} from "../partials/image-preview"
 import {WebSocketContext} from "../../context/WebsocketContext"
 import {HttpMessageService} from "../../service/http-message.service"
+import {VideoCallMessageComponent} from "./VideoCallMessageComponent"
 
 interface DisplayMessagesProps {
     messages: FullMessageModel[]
@@ -148,14 +149,19 @@ export function DisplayMessagesComponent({messages, groupUrl, updateMessages}: D
                             </div>
                         }
                         {
-                            messageModel.type === TypeMessageEnum.TEXT
-                                ? <div style={{overflowWrap: "break-word"}}>
-                                    {messageModel.message}
-                                </div>
-                                : <div>
-                                    {generateImageRender(messageModel)}
-                                </div>
+                            messageModel.type === TypeMessageEnum.CALL &&
+                            <VideoCallMessageComponent url={messageModel.message}/>
                         }
+                        {
+                            messageModel.type === TypeMessageEnum.TEXT &&
+                            <div style={{overflowWrap: "break-word"}}>
+                                {messageModel.message}
+                            </div>
+                        }
+                        {
+                            messageModel.type === TypeMessageEnum.FILE && generateImageRender(messageModel)
+                        }
+
                     </div>
                 </div>
             </Tooltip>

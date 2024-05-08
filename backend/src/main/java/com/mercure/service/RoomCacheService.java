@@ -18,12 +18,9 @@ public class RoomCacheService {
         return cacheManager.getCache("rooms");
     }
 
-    public void putNewRoom(String groupUrl, String roomUrl, ArrayList<Integer> usersList) {
-        String key = groupUrl +
-                "_" +
-                roomUrl;
+    public void setNewRoom(String roomUrl, Object object) {
         Cache roomsCache = this.getCache();
-        roomsCache.put(key, usersList);
+        roomsCache.put(roomUrl, object);
     }
 
     public List<String> getAllKeys() {
@@ -31,7 +28,7 @@ public class RoomCacheService {
         return Collections.list(map.keys());
     }
 
-    public HashMap<String, ArrayList<Integer>> getRoomByKey(String groupUrl) {
+    public Object getRoomByKey(String groupUrl) {
         HashMap<String, ArrayList<Integer>> hostsList = new HashMap<>();
         Cache roomsCache = this.getCache();
         if (roomsCache != null) {

@@ -1,3 +1,5 @@
 export enum TypeMessageEnum {
-    TEXT = "TEXT"
+    TEXT = "TEXT",
+    FILE = "FILE",
+    CALL = "CALL"
 }

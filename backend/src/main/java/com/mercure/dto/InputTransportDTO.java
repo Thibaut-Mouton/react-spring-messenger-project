@@ -1,5 +1,6 @@
 package com.mercure.dto;
 
+import com.mercure.utils.MessageTypeEnum;
 import com.mercure.utils.TransportActionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,8 @@ public class InputTransportDTO {
     private String groupUrl;
 
     private String message;
+
+    private MessageTypeEnum messageType;
 
     private int messageId;
 }
