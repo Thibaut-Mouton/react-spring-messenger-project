@@ -1,7 +1,10 @@
+import {GroupModel} from "../group-model"
+
 export interface IUser {
-  id: number
-  firstName: string
-  lastName: string
-  wsToken: string
-  firstGroupUrl: string
+    id: number
+    firstName: string
+    lastName: string
+    firstGroupUrl: string
+    wsToken: string
+    groups: GroupModel[]
 }

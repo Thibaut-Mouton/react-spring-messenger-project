@@ -14,10 +14,14 @@ import {HttpGroupService} from "../../service/http-group-service"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
 import {capitalize} from "@mui/material"
 import {UserContext} from "../../context/UserContext"
+import {useNavigate} from "react-router-dom"
+import {LoaderContext} from "../../context/loader-context"
 
 export function AccountMenu() {
     const {dispatch} = useContext(AlertContext)!
     const {user} = useContext(UserContext)!
+    const {setLoading} = useContext(LoaderContext)
+    const navigate = useNavigate()
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
     const open = Boolean(anchorEl)
 
@@ -42,13 +46,35 @@ export function AccountMenu() {
     }
 
     async function logout() {
+        setLoading(true)
         const http = new HttpGroupService()
-        await http.logout()
-        dispatch({
-            type: AlertAction.ADD_ALERT,
-            payload: {alert: "success", id: crypto.randomUUID(), isOpen: true, text: "You have successfully logged out"}
-        })
-        handleClose()
+        try {
+            await http.logout()
+            dispatch({
+                type: AlertAction.ADD_ALERT,
+                payload: {
+                    alert: "success",
+                    id: crypto.randomUUID(),
+                    isOpen: true,
+                    text: "You have successfully logged out"
+                }
+            })
+            navigate("/login")
+        } catch (error) {
+            dispatch({
+                type: AlertAction.ADD_ALERT,
+                payload: {
+                    alert: "error",
+                    id: crypto.randomUUID(),
+                    isOpen: true,
+                    text: "Cannot perform logout. Unexpected error."
+                }
+            })
+        } finally {
+            handleClose()
+            setLoading(false)
+        }
+
     }
 
     return (

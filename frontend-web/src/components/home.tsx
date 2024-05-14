@@ -1,4 +1,4 @@
-import {Card, CardContent, Grid, Typography} from "@mui/material"
+import {Box, Card, CardContent, Grid, Typography} from "@mui/material"
 import React, {useEffect} from "react"
 import {generateColorMode} from "./utils/enable-dark-mode"
 import {useThemeContext} from "../context/theme-context"
@@ -13,31 +13,32 @@ export const HomeComponent = (): React.JSX.Element => {
     }, [])
 
     return (
-        <div className={generateColorMode(theme)} style={{height: "100%"}}>
-            <Grid container style={{height: "100%", verticalAlign: "middle"}}>
-                <Grid item xs={6}>
-                    <Card variant="outlined">
-                        <CardContent>
-                            <Typography variant="h5" gutterBottom>
-                                Welcome to FastLiteMessage
-                            </Typography>
+        <div className={generateColorMode(theme)} style={{height: "100%", display: "flex", alignItems: "center"}}>
+            <Grid sx={{m: 2}} container xs={12}>
+                <Card variant="outlined">
+                    <CardContent>
+                        <Typography variant="h5" gutterBottom>
+                            Welcome to FastLiteMessage
+                        </Typography>
 
-                            <img src={"/assets/icons/landing_logo.svg"} height={"300"} alt={"test svg"}/>
-
-                            <Typography variant="h5" gutterBottom>
-                                Simple, fast and secure
-                            </Typography>
-                            <div>FastLiteMessage allow to communicate with other people, create groups, make
-                                serverless video calls in an easy way. Log into your account or register to start
-                                using FastLiteMessage.
-                            </div>
-                            <FooterComponent/>
-                        </CardContent>
-                    </Card>
-                </Grid>
-                <Grid xs={6}>
-                    <LoginComponent/>
-                </Grid>
+                        <Typography variant="h6" gutterBottom>
+                            Simple, fast and secure
+                        </Typography>
+                        <Box sx={{display: "flex"}}>
+                            <Box display={"flex"} flexDirection={"column"}>
+                                <img src={"/assets/icons/landing_logo.svg"} height={"150"} alt={"test svg"}/>
+                                <Box>
+                                    FastLiteMessage allows to communicate with other people everywhere, create groups, make
+                                    serverless video calls in an easy way. Log into your account or register to start
+                                    using FastLiteMessage.
+                                </Box>
+                                <img src={"/assets/icons/landing_logo2.svg"} height={"150"} alt={"test svg"}/>
+                            </Box>
+                            <LoginComponent/>
+                        </Box>
+                        <FooterComponent/>
+                    </CardContent>
+                </Card>
             </Grid>
         </div>
     )
