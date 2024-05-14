@@ -70,6 +70,6 @@ public class UserMapper {
         Optional<GroupEntity> groupUrl = groups.stream().findFirst();
         String lastGroupUrl = groupUrl.isPresent() ? groupUrl.get().getUrl() : "";
         allUserGroups.sort(new ComparatorListGroupDTO());
-        return new AuthUserDTO(userEntity.getId(), userEntity.getFirstName(), lastGroupUrl, userEntity.getWsToken(), allUserGroups);
+        return new AuthUserDTO(userEntity.getId(), userEntity.getFirstName(), userEntity.getLastName(), lastGroupUrl, userEntity.getWsToken(), allUserGroups);
     }
 }

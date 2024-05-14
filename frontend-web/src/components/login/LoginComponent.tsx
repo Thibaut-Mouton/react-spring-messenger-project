@@ -1,18 +1,21 @@
-import LockIcon from "@mui/icons-material/Lock"
 import {Button, Grid, TextField, Typography} from "@mui/material"
 import React, {useContext, useEffect, useState} from "react"
 import {Link, useNavigate} from "react-router-dom"
 import {useThemeContext} from "../../context/theme-context"
-import {generateIconColorMode, generateLinkColorMode} from "../utils/enable-dark-mode"
+import {generateLinkColorMode} from "../utils/enable-dark-mode"
 import {HttpGroupService} from "../../service/http-group-service"
 import {LoaderContext} from "../../context/loader-context"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
+import {UserContext} from "../../context/UserContext"
+import {GroupContext, GroupContextAction} from "../../context/GroupContext"
 
 export function LoginComponent(): React.JSX.Element {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
 
     const navigate = useNavigate()
+    const {setUser} = useContext(UserContext)!
+    const {changeGroupState} = useContext(GroupContext)!
     const {dispatch} = useContext(AlertContext)!
     const {setLoading} = useContext(LoaderContext)
     const {theme} = useThemeContext()
@@ -48,9 +51,14 @@ export function LoginComponent(): React.JSX.Element {
     const login = async () => {
         setLoading(true)
         try {
-            await httpService.authenticate({
+            const {data} = await httpService.authenticate({
                 username,
                 password
+            })
+            setUser(data)
+            changeGroupState({
+                type: GroupContextAction.SET_GROUPS,
+                payload: data.groups
             })
             navigate("/t/messages")
         } catch (err: any) {
@@ -74,23 +82,18 @@ export function LoginComponent(): React.JSX.Element {
         <div className={theme}
              style={{
                  height: "100%",
-                 width: "100%"
+                 width: "100%",
+                 display: "flex",
+                 justifyContent: "center",
+                 alignItems: "center"
              }}>
             <div className={"main-register-form"}>
-                <div style={{
-                    display: "flex",
-                    justifyContent: "center"
-                }}>
-                    <LockIcon fontSize={"large"}
-                              className={generateIconColorMode(theme)}
-                    />
-                </div>
-                <Typography component="h1" variant="h5">
+                <Typography variant="h6" gutterBottom>
                     Sign in
                 </Typography>
-                <div>
-                    <Grid container spacing={2}>
-                        <Grid item xs={12}>
+                <Grid>
+                    <Grid container>
+                        <Grid item sx={{my: 1}} xs={12}>
                             <TextField label={"Username"}
                                        name={"username"}
                                        value={username}
@@ -100,7 +103,7 @@ export function LoginComponent(): React.JSX.Element {
                                        multiline={false}
                                        type={"text"}/>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item sx={{my: 1}} xs={12}>
                             <TextField label={"Password"}
                                        name={"password"}
                                        value={password}
@@ -112,21 +115,19 @@ export function LoginComponent(): React.JSX.Element {
                             />
                         </Grid>
                     </Grid>
-                    <div>
-                        <Grid item xs={12}>
-                            <Button
-                                disabled={username === "" || password === ""}
-                                className={"button-register-form"}
-                                style={{marginTop: "15px"}}
-                                onClick={(event) => submitLogin(event)}
-                                fullWidth
-                                variant="outlined"
-                                color="primary"
-                            >
-                                Sign in
-                            </Button>
-                        </Grid>
-                    </div>
+                    <Grid item xs={12}>
+                        <Button
+                            disabled={username === "" || password === ""}
+                            className={"button-register-form"}
+                            style={{marginTop: "15px"}}
+                            onClick={(event) => submitLogin(event)}
+                            fullWidth
+                            variant="outlined"
+                            color="primary"
+                        >
+                            Sign in
+                        </Button>
+                    </Grid>
                     <Grid container justifyContent={"space-between"}>
                         <Link className={"lnk"}
                               style={{color: generateLinkColorMode(theme)}}
@@ -139,7 +140,7 @@ export function LoginComponent(): React.JSX.Element {
                             Sign up
                         </Link>
                     </Grid>
-                </div>
+                </Grid>
             </div>
         </div>
     )

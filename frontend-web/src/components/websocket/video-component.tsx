@@ -7,10 +7,10 @@ import {RtcTransportDTO} from "../../interface-contract/rtc-transport-model"
 import {RtcActionEnum} from "../../utils/rtc-action-enum"
 import {SoundControl} from "../partials/video/sound-control"
 import {VideoControl} from "../partials/video/video-control"
-import {EmptyRoom} from "../partials/video/empty-room"
 import {HangUpControl} from "../partials/video/hang-up-control"
 import {CallEnded} from "../partials/video/call-ended"
 import {HttpGroupService} from "../../service/http-group-service"
+import {EmptyRoom} from "../partials/video/empty-room"
 
 export const VideoComponent = (): React.JSX.Element => {
     const {callUrl} = useParams()
@@ -19,6 +19,7 @@ export const VideoComponent = (): React.JSX.Element => {
     const [isPageAuthorized, setPageStatus] = useState<boolean>(true)
     const [callEnded, setCallEnded] = useState<boolean>(false)
     const [currentLocalStream, setLocalStream] = useState<MediaStream | undefined>()
+    const [activeLocalVideo, setActiveLocalVideo] = useState(false)
 
     // const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] }
     const [localVideoReady, setLocalVideoState] = useState<boolean>(false)
@@ -29,21 +30,26 @@ export const VideoComponent = (): React.JSX.Element => {
 
     peerConnection.addEventListener("connectionstatechange", () => {
         switch (peerConnection.connectionState) {
-            case "new":
+            case "new": {
                 console.log("Connecting...")
                 break
-            case "connected":
+            }
+            case "connected": {
                 console.log("Online")
                 break
-            case "disconnected":
+            }
+            case "disconnected": {
                 console.log("Disconnecting...")
                 break
-            case "closed":
+            }
+            case "closed": {
                 console.log("Offline")
                 break
-            case "failed":
+            }
+            case "failed": {
                 console.log("Error")
                 break
+            }
             default:
                 console.log("Unknown")
                 break
@@ -95,7 +101,7 @@ export const VideoComponent = (): React.JSX.Element => {
             wsObj.subscribe(`/topic/rtc/${user.id}`, async (res: IMessage) => {
                 const rtcTransportDto = JSON.parse(res.body) as RtcTransportDTO
                 switch (rtcTransportDto.action) {
-                    case RtcActionEnum.JOIN_ROOM:
+                    case RtcActionEnum.JOIN_ROOM: {
                         if (rtcTransportDto.offer) {
                             await peerConnection.setRemoteDescription(rtcTransportDto.offer)
                         }
@@ -107,6 +113,7 @@ export const VideoComponent = (): React.JSX.Element => {
                         })
                         // TODO get the offer and send back the answer
                         break
+                    }
                     case RtcActionEnum.RECEIVE_ANSWER: {
                         if (rtcTransportDto.answer) {
                             const answer = new RTCSessionDescription(rtcTransportDto.answer)
@@ -135,13 +142,15 @@ export const VideoComponent = (): React.JSX.Element => {
         wsObj.activate()
     }
 
-    const changeVideoStatus = (stopVideo: boolean) => {
+    function changeVideoStatus() {
         if (currentLocalStream) {
-            if (stopVideo) {
+            if (activeLocalVideo) {
+                setActiveLocalVideo(true)
                 currentLocalStream.getTracks().forEach((track) => {
                     track.stop()
                 })
             } else {
+                setActiveLocalVideo(false)
                 currentLocalStream.getTracks().forEach((track) => {
                     peerConnection.addTrack(track, currentLocalStream)
                 })
@@ -163,12 +172,14 @@ export const VideoComponent = (): React.JSX.Element => {
             }
             const localStream = await navigator.mediaDevices.getUserMedia(constraints)
             setLocalStream(localStream)
+            setLocalVideoState(true)
             const videoElement = document.querySelector("video#localVideo") as HTMLVideoElement
+            setActiveLocalVideo(true)
             localStream.getTracks().forEach((track) => {
                 peerConnection.addTrack(track, localStream)
             })
             if (videoElement) {
-                setLocalVideoState(true)
+                setActiveLocalVideo(true)
                 videoElement.srcObject = localStream
             }
             return true
