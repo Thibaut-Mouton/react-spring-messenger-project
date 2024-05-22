@@ -3,6 +3,7 @@ package com.mercure.controller;
 import com.google.gson.Gson;
 import com.mercure.dto.*;
 import com.mercure.entity.GroupEntity;
+import com.mercure.entity.GroupUser;
 import com.mercure.entity.MessageEntity;
 import com.mercure.entity.MessageUserEntity;
 import com.mercure.service.*;
@@ -133,49 +134,39 @@ public class WsController {
         RtcActionEnum action = dto.getAction();
         switch (action) {
             case INIT_ROOM -> {
-                Object offer = roomCacheService.getRoomByKey(roomUrl);
+                Object offer = dto.getOffer();
                 if (offer != null) {
                     RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
                     rtcTransportDTO.setUserId(dto.getUserId());
                     rtcTransportDTO.setAction(RtcActionEnum.JOIN_ROOM);
-                    this.messagingTemplate.convertAndSend("/topic/user/" + dto.getUserId(), rtcTransportDTO);
-                    return;
+                    rtcTransportDTO.setOffer(offer);
+                    this.messagingTemplate.convertAndSend("/topic/rtc/" + dto.getUserId(), rtcTransportDTO);
                 }
-                roomCacheService.setNewRoom(roomUrl, dto.getOffer());
             }
             case SEND_ANSWER -> {
-                String key = roomUrl + "_" + dto.getGroupUrl();
                 RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
                 rtcTransportDTO.setUserId(dto.getUserId());
                 rtcTransportDTO.setAction(RtcActionEnum.SEND_ANSWER);
                 rtcTransportDTO.setAnswer(dto.getAnswer());
-//                hostList.stream()
-//                        .filter((user) -> !user.equals(dto.getUserId()))
-//                        .forEach((userId) -> this.messagingTemplate.convertAndSend("/topic/rtc/" + userId, rtcTransportDTO));
+                int groupId = groupService.findGroupByUrl(dto.getGroupUrl());
+                List<GroupUser> groupUsers = groupUserJoinService.findAllByGroupId(groupId);
+                groupUsers.stream()
+                        .map(GroupUser::getUserId)
+                        .filter((userId) -> !userId.equals(dto.getUserId()))
+                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
             }
-//            case JOIN_ROOM -> {
-//                String key = roomUrl + "_" + dto.getGroupUrl();
-//                ArrayList<Integer> hostList = usersIndexedByRoomId.get(key);
-//                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
-//                rtcTransportDTO.setUserId(dto.getUserId());
-//                rtcTransportDTO.setAction(RtcActionEnum.SEND_OFFER);
-//                rtcTransportDTO.setOffer(dto.getOffer());
-//                hostList.add(dto.getUserId());
-//                usersIndexedByRoomId.put(roomUrl, hostList);
-//                hostList.stream()
-//                        .filter((user) -> !user.equals(dto.getUserId()))
-//                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
-//            }
-//            case ICE_CANDIDATE -> {
-//                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
-//                rtcTransportDTO.setUserId(dto.getUserId());
-//                rtcTransportDTO.setAction(RtcActionEnum.ICE_CANDIDATE);
-//                ArrayList<Integer> hostList = usersIndexedByRoomId.get(roomUrl);
-//                hostList.stream()
-//                        .filter((user) -> !user.equals(dto.getUserId()))
-//                        // TODO null ici ?
-//                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
-//            }
+            case ICE_CANDIDATE -> {
+                RtcTransportDTO rtcTransportDTO = new RtcTransportDTO();
+                rtcTransportDTO.setUserId(dto.getUserId());
+                rtcTransportDTO.setAction(RtcActionEnum.ICE_CANDIDATE);
+                rtcTransportDTO.setIceCandidate(dto.getIceCandidate());
+                int groupId = groupService.findGroupByUrl(dto.getGroupUrl());
+                List<GroupUser> groupUsers = groupUserJoinService.findAllByGroupId(groupId);
+                groupUsers.stream()
+                        .map(GroupUser::getUserId)
+                        .filter((userId) -> !userId.equals(dto.getUserId()))
+                        .forEach(toUserId -> this.messagingTemplate.convertAndSend("/topic/rtc/" + toUserId, rtcTransportDTO));
+            }
 //            case LEAVE_ROOM -> {
 //                String key = roomUrl + "_" + dto.getGroupUrl();
 //                List<Integer> userIds = groupService.getAllUsersIdByGroupUrl(dto.getGroupUrl());

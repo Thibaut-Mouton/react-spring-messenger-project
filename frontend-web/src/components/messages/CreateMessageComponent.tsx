@@ -1,5 +1,5 @@
-import {Button, IconButton, styled, TextField} from "@mui/material"
-import React, {useContext, useState} from "react"
+import {Button, IconButton, TextField, Tooltip} from "@mui/material"
+import React, {useContext, useRef, useState} from "react"
 import {getPayloadSize} from "../../utils/string-size-calculator"
 import {TransportModel} from "../../interface-contract/transport-model"
 import {TransportActionEnum} from "../../utils/transport-action-enum"
@@ -26,6 +26,7 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
     const [messageType, setMessageType] = useState<TypeMessageEnum>(TypeMessageEnum.TEXT)
     const [file, setFile] = React.useState<File | null>(null)
     const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string>("")
+    const fileInput = useRef<HTMLInputElement>(null)
     const groupService = new HttpGroupService()
 
     function submitMessage(event: any) {
@@ -54,6 +55,12 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
                 setImagePreviewUrl(reader.result as string)
                 setImageLoaded(true)
             }
+        }
+    }
+
+    function handleFileInputClick() {
+        if (fileInput.current) {
+            fileInput.current.click()
         }
     }
 
@@ -102,18 +109,6 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
         })
     }
 
-    const VisuallyHiddenInput = styled("input")({
-        clip: "rect(0 0 0 0)",
-        clipPath: "inset(50%)",
-        height: 1,
-        overflow: "hidden",
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        whiteSpace: "nowrap",
-        width: 1,
-    })
-
     return (
         <>
             <div>
@@ -148,15 +143,17 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
                 bottom: "0",
                 padding: "5px"
             }}>
-                <Button
-                    component="label"
-                    role={undefined}
-                    variant="outlined"
-                    tabIndex={-1}
-                    startIcon={<InsertPhoto/>}
-                >
-                    <VisuallyHiddenInput type="file" onChange={previewFile}/>
-                </Button>
+                <Tooltip title="Attach a file">
+                    <IconButton onClick={handleFileInputClick} color="primary">
+                        <InsertPhoto/>
+                    </IconButton>
+                </Tooltip>
+                <input
+                    type="file"
+                    onChange={previewFile}
+                    ref={fileInput}
+                    style={{display: "none"}}
+                />
                 <CallWindowComponent sendCallMessage={sendCallMessage}/>
                 <TextField
                     variant={"outlined"}

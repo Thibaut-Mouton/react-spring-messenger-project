@@ -1,6 +1,6 @@
 import React from "react"
 import CallIcon from "@mui/icons-material/Call"
-import {IconButton} from "@mui/material"
+import {IconButton, Tooltip} from "@mui/material"
 
 interface CallWindowComponentProps {
     sendCallMessage: (id: string) => void
@@ -15,9 +15,11 @@ export function CallWindowComponent({sendCallMessage}: CallWindowComponentProps)
 
     return (
         <React.Fragment>
-            <IconButton color="primary" onClick={initCall} aria-label="delete">
-                <CallIcon/>
-            </IconButton>
+            <Tooltip title="Start a call">
+                <IconButton color="primary" onClick={initCall} aria-label="delete">
+                    <CallIcon/>
+                </IconButton>
+            </Tooltip>
         </React.Fragment>
     )
 }
