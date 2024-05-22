@@ -21,4 +21,6 @@ public class RtcTransportDTO {
     private Object offer;
 
     private Object answer;
+
+    private Object iceCandidate;
 }

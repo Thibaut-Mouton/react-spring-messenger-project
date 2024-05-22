@@ -57,9 +57,9 @@ export const VideoComponent = (): React.JSX.Element => {
     })
 
     peerConnection.addEventListener("icecandidate", (event) => {
-        console.log("EVENT", event.candidate)
+        console.log("EVENT ICE candidate", event.candidate)
         if (ws && event.candidate) {
-            const iceCandidateResponse = new RtcTransportDTO(currentUserId, "", RtcActionEnum.ICE_CANDIDATE, undefined, undefined, event.candidate)
+            const iceCandidateResponse = new RtcTransportDTO(currentUserId, "a9ec7f95-2c9c-4d51-9d3e-d46dc2a0f257", RtcActionEnum.ICE_CANDIDATE, undefined, undefined, event.candidate)
             ws.publish({
                 destination: `/rtc/${callUrl}`,
                 body: JSON.stringify(iceCandidateResponse)
@@ -72,11 +72,8 @@ export const VideoComponent = (): React.JSX.Element => {
         console.log("ERROR EVENT", event)
     })
 
-    // peerConnection.addEventListener('icegatheringstatechange', (event) => {
-    //   console.log('icegatheringstatechange', event)
-    // })
-
     peerConnection.addEventListener("track", (event) => {
+        console.log("Track event", event)
         const remoteVideo = document.querySelector("video#localVideo") as HTMLVideoElement
         const [remoteStream] = event.streams
         remoteVideo.srcObject = remoteStream
@@ -100,6 +97,7 @@ export const VideoComponent = (): React.JSX.Element => {
         wsObj.onConnect = async () => {
             wsObj.subscribe(`/topic/rtc/${user.id}`, async (res: IMessage) => {
                 const rtcTransportDto = JSON.parse(res.body) as RtcTransportDTO
+                console.log("RTC WS EVENT RECEIVED", res.body)
                 switch (rtcTransportDto.action) {
                     case RtcActionEnum.JOIN_ROOM: {
                         if (rtcTransportDto.offer) {
@@ -107,9 +105,11 @@ export const VideoComponent = (): React.JSX.Element => {
                         }
                         const answer = await peerConnection.createAnswer()
                         await peerConnection.setLocalDescription(answer)
+
+                        const answerRtcResponse = new RtcTransportDTO(currentUserId, "a9ec7f95-2c9c-4d51-9d3e-d46dc2a0f257", RtcActionEnum.SEND_ANSWER, undefined, answer)
                         wsObj?.publish({
                             destination: `/rtc/${callUrl}`,
-                            body: JSON.stringify(answer)
+                            body: JSON.stringify(answerRtcResponse)
                         })
                         // TODO get the offer and send back the answer
                         break
@@ -133,7 +133,7 @@ export const VideoComponent = (): React.JSX.Element => {
             })
             const offer = await peerConnection.createOffer()
             await peerConnection.setLocalDescription(offer)
-            const transport = new RtcTransportDTO(user.id, "", RtcActionEnum.INIT_ROOM, offer)
+            const transport = new RtcTransportDTO(user.id, "a9ec7f95-2c9c-4d51-9d3e-d46dc2a0f257", RtcActionEnum.INIT_ROOM, offer)
             wsObj.publish({
                 destination: `/rtc/${callUrl}`,
                 body: JSON.stringify(transport)
@@ -194,7 +194,7 @@ export const VideoComponent = (): React.JSX.Element => {
         peerConnection.close()
         setCallEnded(true)
         if (ws) {
-            const transport = new RtcTransportDTO(currentUserId, "groupUrlFromParent", RtcActionEnum.LEAVE_ROOM)
+            const transport = new RtcTransportDTO(currentUserId, "a9ec7f95-2c9c-4d51-9d3e-d46dc2a0f257", RtcActionEnum.LEAVE_ROOM)
             ws.publish({
                 destination: `/rtc/${callUrl}`,
                 body: JSON.stringify(transport)
@@ -214,14 +214,21 @@ export const VideoComponent = (): React.JSX.Element => {
                     !callEnded &&
                     <>
                         <Box m={2} display={"flex"} justifyContent={"center"}>
-                            <Box m={1}>
-                                <video style={{display: localVideoReady ? "block" : "none"}} id="localVideo" width={600}
+                            <Box display={"flex"} m={1}>
+                                {
+                                    localVideoReady ?
+                                        <video id="localVideo"
+                                               width={600}
+                                               height={400}
+                                               autoPlay playsInline
+                                               controls={false}/> :
+                                        <Skeleton variant={"rectangular"} width={600} height={400}/>
+                                }
+                                <video id="remoteVideo"
+                                       width={600}
                                        height={400}
                                        autoPlay playsInline
                                        controls={false}/>
-                                {!localVideoReady &&
-                                    <Skeleton variant={"rectangular"} width={600} height={400}/>
-                                }
                             </Box>
                         </Box>
                         <Box position={"fixed"} width={"100%"} bottom={"10px"} display={"flex"}
