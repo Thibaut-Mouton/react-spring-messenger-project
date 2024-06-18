@@ -1,6 +1,7 @@
-import React, {createContext, useEffect, useState} from "react"
+import React, {createContext, useContext, useEffect, useState} from "react"
 import {IUser} from "../interface-contract/user/user-model"
 import {HttpGroupService} from "../service/http-group-service"
+import {GroupContext, GroupContextAction} from "./GroupContext"
 
 type UserContextType = {
     user: IUser | undefined;
@@ -11,12 +12,19 @@ const UserContext = createContext<UserContextType | undefined>(undefined)
 
 const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const [user, setUser] = useState<IUser | undefined>(undefined)
+    const {changeGroupState} = useContext(GroupContext)!
 
     useEffect(() => {
         const getUserData = async () => {
             try {
-                const {data} = await new HttpGroupService().pingRoute()
-                setUser(data.user)
+                if (window.location.pathname !== "/register") {
+                    const {data} = await new HttpGroupService().pingRoute()
+                    setUser(data.user)
+                    changeGroupState({
+                        type: GroupContextAction.SET_GROUPS,
+                        payload: data.groupsWrapper.map((group) => group.group)
+                    })
+                }
             } catch (error) {
                 if (window.location.pathname !== "/login") {
                     window.location.pathname = "/login"

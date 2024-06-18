@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/messenger", "/websocket", "/ws").permitAll()
                         .requestMatchers("/csrf").permitAll()
                         .requestMatchers("/auth").permitAll()
+                        .requestMatchers("/user/register").permitAll()
                         .requestMatchers("/health-check").permitAll()
                         .anyRequest().authenticated())
                 .logout(AbstractHttpConfigurer::disable)

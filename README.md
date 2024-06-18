@@ -20,6 +20,9 @@ Real time chat application group oriented built with React and Spring Boot. Talk
 * [Material UI](https://mui.com/) v5.7.0
 * [MySQL Server](https://www.mysql.com/)
 
+# What's next ?
+You want to know the roadmap of the project, next release or next fixes ? Check the "Projects" tab or visit the [Fast Lite Message's roadmap](https://github.com/users/Thibaut-Mouton/projects/4)
+
 # Project fast start up
 In a hurry ? Juste type ```docker-compose up``` in the root directory.
 This will start 3 containers : MySQL, backend and frontend together.  Liquibase will take care of the database setup. For development purpose, the DB is filled with 5 accounts (password: ```root```) :

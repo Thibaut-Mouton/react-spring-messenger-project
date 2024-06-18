@@ -88,7 +88,7 @@ export function AccountMenu() {
                         aria-haspopup="true"
                         aria-expanded={open ? "true" : undefined}
                     >
-                        <Avatar>{getUserInitials()}</Avatar>
+                        <Avatar sx={{bgcolor: user?.color}}>{getUserInitials()}</Avatar>
                     </IconButton>
                 </Tooltip>
             </Box>

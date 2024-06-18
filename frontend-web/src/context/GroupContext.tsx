@@ -1,5 +1,4 @@
-import React, {createContext, Dispatch, useEffect, useReducer} from "react"
-import {HttpGroupService} from "../service/http-group-service"
+import React, {createContext, Dispatch, useReducer} from "react"
 import {GroupModel} from "../interface-contract/group-model"
 
 enum GroupContextAction {
@@ -64,24 +63,6 @@ export const groupReducer = (state: GroupModel[], action: GroupActionType): Grou
 
 const GroupContextProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const [groups, changeGroupState] = useReducer(groupReducer, [])
-
-    useEffect(() => {
-        const getUserData = async () => {
-            try {
-                const {data} = await new HttpGroupService().pingRoute()
-                changeGroupState({
-                    type: GroupContextAction.SET_GROUPS,
-                    payload: data.groupsWrapper.map((group) => group.group)
-                })
-
-            } catch (error) {
-                if (window.location.pathname !== "/login") {
-                    window.location.pathname = "/login"
-                }
-            }
-        }
-        getUserData()
-    }, [])
     return (
         <GroupContext.Provider value={{groups, changeGroupState}}>
             {children}

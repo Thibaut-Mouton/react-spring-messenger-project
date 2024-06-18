@@ -3,6 +3,9 @@ package com.mercure.service;
 import com.mercure.dto.MessageDTO;
 import com.mercure.dto.NotificationDTO;
 import com.mercure.dto.WrapperMessageDTO;
+import com.mercure.dto.search.FullTextSearchDatabaseResponse;
+import com.mercure.dto.search.FullTextSearchDatabaseResponseDTO;
+import com.mercure.dto.search.FullTextSearchResponseDTO;
 import com.mercure.entity.*;
 import com.mercure.repository.MessageRepository;
 import com.mercure.utils.MessageTypeEnum;
@@ -12,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class MessageService {
@@ -30,6 +34,9 @@ public class MessageService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private GroupUserJoinService groupUserJoinService;
 
     public MessageEntity createAndSaveMessage(int userId, int groupId, String type, String data) {
         MessageEntity msg = new MessageEntity(userId, groupId, type, data);
@@ -159,6 +166,29 @@ public class MessageService {
     public List<String> getMultimediaContentByGroup(String groupUrl) {
         int groupId = groupService.findGroupByUrl(groupUrl);
         return fileService.getFilesUrlByGroupId(groupId);
+    }
+
+    public FullTextSearchResponseDTO searchMessages(int userId, String searchText) {
+        List<Integer> groupIds = groupUserJoinService.findAllGroupsByUserId(userId);
+        List<FullTextSearchDatabaseResponse> responseFromDB = messageRepository.findMessagesBySearchQuery(searchText, groupIds);
+        FullTextSearchResponseDTO result = new FullTextSearchResponseDTO();
+        Map<Integer, List<FullTextSearchDatabaseResponse>> studlistGrouped =
+                responseFromDB.stream().collect(Collectors.groupingBy(FullTextSearchDatabaseResponse::getId));
+        result.setMatchingText(searchText);
+        List<FullTextSearchDatabaseResponseDTO> matchingMessages = new ArrayList<>();
+        for (Map.Entry<Integer, List<FullTextSearchDatabaseResponse>> entry : studlistGrouped.entrySet()) {
+            if (entry.getValue().get(0) != null) {
+                FullTextSearchDatabaseResponseDTO fullTextSearchDTO = new FullTextSearchDatabaseResponseDTO();
+                List<String> messages = entry.getValue().stream().map(FullTextSearchDatabaseResponse::getMessage).toList();
+                fullTextSearchDTO.setMessages(messages);
+                fullTextSearchDTO.setId(entry.getKey());
+                fullTextSearchDTO.setGroupUrl(entry.getValue().get(0).getGroupUrl());
+                fullTextSearchDTO.setGroupName(entry.getValue().get(0).getGroupName());
+                matchingMessages.add(fullTextSearchDTO);
+            }
+        }
+        result.setMatchingMessages(matchingMessages);
+        return result;
     }
 
     public WrapperMessageDTO getConversationMessage(String url, int messageId) {

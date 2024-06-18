@@ -6,5 +6,6 @@ export interface IUser {
     lastName: string
     firstGroupUrl: string
     wsToken: string
+    color: string
     groups: GroupModel[]
 }

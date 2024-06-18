@@ -4,7 +4,6 @@ import com.mercure.dto.AuthUserDTO;
 import com.mercure.dto.user.GroupDTO;
 import com.mercure.dto.user.GroupWrapperDTO;
 import com.mercure.dto.user.InitUserDTO;
-import com.mercure.dto.user.UserDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.UserEntity;
 import com.mercure.utils.ComparatorListGroupDTO;
@@ -31,10 +30,10 @@ public class UserMapper {
      * The password is not sent
      *
      * @param userEntity the {@link UserEntity} to map
-     * @return a {@link UserDTO}
+     * @return a {@link AuthUserDTO}
      */
     public InitUserDTO toUserDTO(UserEntity userEntity) {
-        UserDTO userDTO = new UserDTO();
+        AuthUserDTO userDTO = new AuthUserDTO();
         InitUserDTO initUserDTO = new InitUserDTO();
         List<GroupWrapperDTO> groupWrapperDTOS = new ArrayList<>();
 
@@ -42,7 +41,7 @@ public class UserMapper {
         userDTO.setFirstName(userEntity.getFirstName());
         userDTO.setLastName(userEntity.getLastName());
         userDTO.setWsToken(userEntity.getWsToken());
-        userDTO.setJwt(userEntity.getJwt());
+        userDTO.setColor(userEntity.getColor());
 
         userEntity.getGroupSet().forEach(groupEntity -> {
                     GroupWrapperDTO groupWrapperDTO = new GroupWrapperDTO();
@@ -62,7 +61,6 @@ public class UserMapper {
         return initUserDTO;
     }
 
-
     public AuthUserDTO toLightUserDTO(UserEntity userEntity) {
         Set<GroupEntity> groups = userEntity.getGroupSet();
         List<GroupDTO> allUserGroups = new ArrayList<>(userEntity.getGroupSet().stream()
@@ -70,6 +68,6 @@ public class UserMapper {
         Optional<GroupEntity> groupUrl = groups.stream().findFirst();
         String lastGroupUrl = groupUrl.isPresent() ? groupUrl.get().getUrl() : "";
         allUserGroups.sort(new ComparatorListGroupDTO());
-        return new AuthUserDTO(userEntity.getId(), userEntity.getFirstName(), userEntity.getLastName(), lastGroupUrl, userEntity.getWsToken(), allUserGroups);
+        return new AuthUserDTO(userEntity.getId(), userEntity.getFirstName(), userEntity.getLastName(), lastGroupUrl, userEntity.getWsToken(), userEntity.getColor(), allUserGroups);
     }
 }

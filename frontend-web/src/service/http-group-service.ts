@@ -6,6 +6,7 @@ import {IUser} from "../interface-contract/user/user-model"
 import {GroupUserModel} from "../interface-contract/group-user-model"
 import {HttpMainService} from "./http-main.service"
 import {Csrf} from "../interface-contract/csrf/csrf.type"
+import {FullTextSearchResponseType} from "../interface-contract/search-text/search-text.type"
 
 export class HttpGroupService extends HttpMainService {
 
@@ -87,6 +88,6 @@ export class HttpGroupService extends HttpMainService {
     }
 
     public searchInConversations(data: { text: string }) {
-        return this.instance.post("search", data)
+        return this.instance.post<FullTextSearchResponseType>("search", data)
     }
 }
