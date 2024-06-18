@@ -1,5 +1,6 @@
 package com.mercure.dto.user;
 
+import com.mercure.dto.AuthUserDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class InitUserDTO {
 
-    private UserDTO user;
+    private AuthUserDTO user;
 
     private List<GroupWrapperDTO> groupsWrapper;
 }

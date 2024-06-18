@@ -28,7 +28,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     @Query(value = "SELECT * FROM users u WHERE u.id NOT IN :ids", nativeQuery = true)
     List<UserEntity> getAllUsersNotAlreadyInConversation(@Param(value = "ids") int[] ids);
 
-    int countAllByFirstNameOrMail(String firstName, String mail);
+    int countAllByMail(String mail);
 
     int countAllByShortUrl(String shortUrl);
 }

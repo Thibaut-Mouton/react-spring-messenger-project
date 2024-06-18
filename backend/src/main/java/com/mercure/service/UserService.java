@@ -1,8 +1,6 @@
 package com.mercure.service;
 
 import com.mercure.dto.GroupMemberDTO;
-import com.mercure.dto.user.InitUserDTO;
-import com.mercure.dto.user.UserDTO;
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
@@ -120,7 +118,7 @@ public class UserService {
         return passwordEncoder.encode(str);
     }
 
-    public boolean checkIfUserNameOrMailAlreadyUsed(String firstName, String mail) {
-        return userRepository.countAllByFirstNameOrMail(firstName, mail) > 0;
+    public boolean checkIfUserNameOrMailAlreadyUsed(String mail) {
+        return userRepository.countAllByMail(mail) > 0;
     }
 }

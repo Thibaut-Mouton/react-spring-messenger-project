@@ -4,7 +4,6 @@ import * as serviceWorker from "./serviceWorker"
 import {createBrowserRouter, redirect, RouterProvider} from "react-router-dom"
 import {HomeComponent} from "./components/home"
 import {createRoot} from "react-dom/client"
-import {RegisterFormComponent} from "./components/register/register-user"
 import {WebSocketMainComponent} from "./components/websocket/websocket-main-component"
 import {VideoComponent} from "./components/websocket/video-component"
 import {LoaderProvider} from "./context/loader-context"
@@ -14,6 +13,8 @@ import {HttpGroupService} from "./service/http-group-service"
 import {AlertContextProvider} from "./context/AlertContext"
 import {UserContextProvider} from "./context/UserContext"
 import {GroupContextProvider} from "./context/GroupContext"
+import {RegisterUserComponent} from "./components/register/RegisterUser"
+import {SearchProvider} from "./context/SearchContext"
 
 const router = createBrowserRouter([
     {
@@ -30,7 +31,7 @@ const router = createBrowserRouter([
     },
     {
         path: "register",
-        element: <RegisterFormComponent/>
+        element: <RegisterUserComponent/>
     },
     {
         path: "t/messages",
@@ -49,15 +50,17 @@ const router = createBrowserRouter([
 function RootComponent() {
     return (
         <LoaderProvider>
-            <UserContextProvider>
-                <GroupContextProvider>
-                    <AlertContextProvider>
-                        <LoaderComponent/>
-                        <RouterProvider router={router}/>
-                        <AlertComponent/>
-                    </AlertContextProvider>
-                </GroupContextProvider>
-            </UserContextProvider>
+            <GroupContextProvider>
+                <UserContextProvider>
+                    <SearchProvider>
+                        <AlertContextProvider>
+                            <LoaderComponent/>
+                            <RouterProvider router={router}/>
+                            <AlertComponent/>
+                        </AlertContextProvider>
+                    </SearchProvider>
+                </UserContextProvider>
+            </GroupContextProvider>
         </LoaderProvider>
     )
 }

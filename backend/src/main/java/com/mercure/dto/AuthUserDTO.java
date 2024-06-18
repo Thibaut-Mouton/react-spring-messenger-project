@@ -24,5 +24,7 @@ public class AuthUserDTO {
 
     private String wsToken;
 
+    private String color;
+
     private List<GroupDTO> groups;
 }

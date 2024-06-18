@@ -14,7 +14,7 @@ export const HomeComponent = (): React.JSX.Element => {
 
     return (
         <div className={generateColorMode(theme)} style={{height: "100%", display: "flex", alignItems: "center"}}>
-            <Grid sx={{m: 2}} container xs={12}>
+            <Grid sx={{m: 2}} container>
                 <Card variant="outlined">
                     <CardContent>
                         <Typography variant="h5" gutterBottom>
@@ -28,7 +28,8 @@ export const HomeComponent = (): React.JSX.Element => {
                             <Box display={"flex"} flexDirection={"column"}>
                                 <img src={"/assets/icons/landing_logo.svg"} height={"150"} alt={"test svg"}/>
                                 <Box>
-                                    FastLiteMessage allows to communicate with other people everywhere, create groups, make
+                                    FastLiteMessage allows to communicate with other people everywhere, create groups,
+                                    make
                                     serverless video calls in an easy way. Log into your account or register to start
                                     using FastLiteMessage.
                                 </Box>

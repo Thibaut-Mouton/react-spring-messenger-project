@@ -11,6 +11,7 @@ import com.mercure.mapper.GroupMapper;
 import com.mercure.service.GroupService;
 import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.UserService;
+import com.mercure.utils.ColorsUtils;
 import com.mercure.utils.JwtUtil;
 import com.mercure.utils.StaticVariable;
 import jakarta.servlet.http.Cookie;
@@ -171,17 +172,17 @@ public class ApiController {
         Gson gson = new Gson();
         AuthenticationUserDTO userDTO = gson.fromJson(data, AuthenticationUserDTO.class);
 
-        // Check if there are matched in DB
-        if ((userService.checkIfUserNameOrMailAlreadyUsed(userDTO.getFirstName(), userDTO.getEmail()))) {
-            return ResponseEntity.badRequest().body("Username or mail already used, please try again");
+        if ((userService.checkIfUserNameOrMailAlreadyUsed(userDTO.getEmail()))) {
+            return ResponseEntity.badRequest().body("mail already used, please choose another");
         }
         UserEntity user = new UserEntity();
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
+        user.setFirstName(userDTO.getFirstname());
+        user.setLastName(userDTO.getLastname());
         user.setMail(userDTO.getEmail());
         user.setPassword(userService.passwordEncoder(userDTO.getPassword()));
-        user.setShortUrl(userService.createShortUrl(userDTO.getFirstName(), userDTO.getLastName()));
+        user.setShortUrl(userService.createShortUrl(userDTO.getFirstname(), userDTO.getLastname()));
         user.setWsToken(UUID.randomUUID().toString());
+        user.setColor(new ColorsUtils().getRandomColor());
         user.setRole(1);
         user.setAccountNonExpired(true);
         user.setAccountNonLocked(true);
@@ -190,7 +191,7 @@ public class ApiController {
         try {
             userService.save(user);
             log.info("User saved successfully");
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body("User saved successfully");
         } catch (Exception e) {
             log.error("Error while registering user : {}", e.getMessage());
         }
