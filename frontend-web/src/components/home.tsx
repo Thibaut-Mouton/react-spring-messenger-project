@@ -17,7 +17,7 @@ export const HomeComponent = (): React.JSX.Element => {
             <Grid sx={{m: 2}} container>
                 <Card variant="outlined">
                     <CardContent>
-                        <Typography variant="h5" gutterBottom>
+                        <Typography variant="h4" gutterBottom>
                             Welcome to FastLiteMessage
                         </Typography>
 

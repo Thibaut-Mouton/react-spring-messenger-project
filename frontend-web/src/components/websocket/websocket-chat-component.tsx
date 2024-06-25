@@ -52,7 +52,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                 !groupUrl ?
                     <div style={{
                         display: "flex",
-                        width: "100%",
+                        width: "56%",
                         flexDirection: "column",
                     }}>
                         <NoDataComponent/>
@@ -61,7 +61,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                     <div style={{
                         backgroundColor: "#f6f8fc",
                         display: "flex",
-                        width: "90%",
+                        width: "56%",
                         flexDirection: "column",
                     }}>
                         <div style={{
@@ -86,11 +86,11 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl?: string
                                 backgroundColor: "white",
                                 display: "flex",
                                 flexDirection: "column",
-                                width: "100%",
-                                height: "92%",
+                                height: "100%",
                             }}>
 
-                            <DisplayMessagesComponent updateMessages={updateMessages} groupUrl={groupUrl} messages={messages}/>
+                            <DisplayMessagesComponent updateMessages={updateMessages} groupUrl={groupUrl}
+                                                      messages={messages}/>
                             <CreateMessageComponent groupUrl={groupUrl}/>
                         </div>
                     </div>

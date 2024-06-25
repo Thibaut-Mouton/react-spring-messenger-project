@@ -17,7 +17,7 @@ export function LoginComponent(): React.JSX.Element {
     const {setUser} = useContext(UserContext)!
     const {changeGroupState} = useContext(GroupContext)!
     const {dispatch} = useContext(AlertContext)!
-    const {setLoading} = useContext(LoaderContext)
+    const {loading, setLoading} = useContext(LoaderContext)
     const {theme} = useThemeContext()
     const httpService = new HttpGroupService()
 
@@ -46,6 +46,10 @@ export function LoginComponent(): React.JSX.Element {
             }
             login()
         }
+    }
+
+    function isSignInButtonDisabled() {
+        return username === "" || password === "" || loading
     }
 
     const login = async () => {
@@ -117,7 +121,7 @@ export function LoginComponent(): React.JSX.Element {
                     </Grid>
                     <Grid item xs={12}>
                         <Button
-                            disabled={username === "" || password === ""}
+                            disabled={isSignInButtonDisabled()}
                             className={"button-register-form"}
                             style={{marginTop: "15px"}}
                             onClick={(event) => submitLogin(event)}

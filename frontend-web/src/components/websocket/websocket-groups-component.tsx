@@ -57,6 +57,10 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
     }
 
     useEffect(() => {
+        console.log("GROUPS CHANGED", groups)
+    }, [groups])
+
+    useEffect(() => {
         if (groups) {
             if (groups.length !== 0) {
                 changeGroupName(groupUrl || "")
@@ -141,7 +145,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
             <Box style={{overflowY: "auto", height: "87%"}}>
                 <List disablePadding={true}>
                     {!loadingState && groups && groups.map((group) => (
-                        <ListItemButton sx={{borderRadius: 2, my: 1}} className={styleSelectedGroup(group.url)}
+                        <ListItemButton sx={{borderRadius: 2, mx: 1}} className={styleSelectedGroup(group.url)}
                                         key={group.id}
                                         onClick={() => redirectToGroup(group.id, group.url)}>
                             <Avatar>
@@ -196,7 +200,6 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
                     }
                 </List>
             </Box>
-
         </div>
     )
 }

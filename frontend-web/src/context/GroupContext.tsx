@@ -47,11 +47,12 @@ export const groupReducer = (state: GroupModel[], action: GroupActionType): Grou
             return state
         }
         case GroupContextAction.UPDATE_SEEN_MESSAGE: {
-            const index = state.findIndex((group) => group.url === action.payload.groupUrl)
+            const newState = [...state]
+            const index = newState.findIndex((group) => group.url === action.payload.groupUrl)
             if (index > -1) {
-                state[index].lastMessageSeen = action.payload.isMessageSeen
+                newState[index].lastMessageSeen = action.payload.isMessageSeen
             }
-            return state
+            return newState
         }
         case GroupContextAction.SET_GROUPS: {
             return action.payload
