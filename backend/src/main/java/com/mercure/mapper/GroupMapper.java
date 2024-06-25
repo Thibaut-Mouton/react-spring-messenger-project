@@ -41,7 +41,7 @@ public class GroupMapper {
                     String senderName = userId == msg.getUser_id() ? "You" : sender;
                     stringBuilder.append(senderName);
                     stringBuilder.append(" ");
-                    stringBuilder.append("have send a file");
+                    stringBuilder.append("has send a file");
                     grpDTO.setLastMessage(stringBuilder.toString());
                 } else {
                     grpDTO.setLastMessage(msg.getMessage());

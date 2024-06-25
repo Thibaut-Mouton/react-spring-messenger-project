@@ -11,8 +11,7 @@ export abstract class HttpMainService {
             baseURL
         })
         this.instance.interceptors.request.use((config) => {
-            const csrfToken = document.cookie.replace(/(?:^|.*;\s*)XSRF-TOKEN\s*=\s*([^;]*).*$|^.*$/, "$1")
-            config.headers["X-CSRF-TOKEN"] = csrfToken
+            config.headers["X-CSRF-TOKEN"] = document.cookie.replace(/(?:^|.*;\s*)XSRF-TOKEN\s*=\s*([^;]*).*$|^.*$/, "$1")
             return config
         })
         this.instance.interceptors.response.use((response) => {
@@ -23,7 +22,6 @@ export abstract class HttpMainService {
                     window.location.pathname = "/login"
                 }
             }
-            console.log("ERROR", error)
             return Promise.reject(error)
         })
     }

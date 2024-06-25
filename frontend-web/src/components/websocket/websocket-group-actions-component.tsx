@@ -19,8 +19,6 @@ import GroupIcon from "@mui/icons-material/Group"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import React, {useContext, useState} from "react"
 import {GroupActionEnum} from "./group-action-enum"
-import {useThemeContext} from "../../context/theme-context"
-import {generateClassName, generateIconColorMode} from "../utils/enable-dark-mode"
 import {TransportModel} from "../../interface-contract/transport-model"
 import {TransportActionEnum} from "../../utils/transport-action-enum"
 import {AllUsersDialog} from "../partials/all-users-dialog"
@@ -40,7 +38,6 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
     const [isCurrentUserAdmin, setCurrentUserIsAdmin] = useState(false)
     const [toolTipAction, setToolTipAction] = useState(false)
     const [openTooltipId, setToolTipId] = useState<number | null>(null)
-    const {theme} = useThemeContext()
     const {dispatch} = useContext(AlertContext)!
     const {ws} = useContext(WebSocketContext)!
     const httpService = new HttpGroupService()
@@ -225,8 +222,8 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
     }
 
     return (
-        <div style={{backgroundColor: "#f6f8fc"}}>
-            <div className={"sidebar"}>
+        <div className={"sidebar"}>
+            <div>
                 <List
                     component="nav">
                     <ListItemButton disabled={isDisabled()}
@@ -260,7 +257,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
                                     <ListItemText primary={value.firstName + " " + value.lastName}
                                                   secondary={
                                                       <React.Fragment>
-												<span className={generateClassName(theme)}>
+												<span>
 													{
 
                                                         value.admin
@@ -290,22 +287,19 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
                                                             {
                                                                 isCurrentUserAdmin && value.admin &&
                                                                 <MenuItem
-                                                                    onClick={() => removeUserFromAdminListInConversation(value.userId)}
-                                                                    dense={true}>Remove from administrator
+                                                                    onClick={() => removeUserFromAdminListInConversation(value.userId)}>Remove from administrator
                                                                 </MenuItem>
                                                             }
                                                             {
                                                                 isCurrentUserAdmin && !value.admin &&
                                                                 <MenuItem
-                                                                    onClick={() => grantUserAdminInConversation(value.userId)}
-                                                                    dense={true}>Grant
+                                                                    onClick={() => grantUserAdminInConversation(value.userId)}>Grant
                                                                     administrator</MenuItem>
                                                             }
                                                             {
                                                                 !(user?.id === value.userId) &&
                                                                 <MenuItem
-                                                                    onClick={() => removeUserFromConversation(value.userId)}
-                                                                    dense={true}>Remove from group</MenuItem>
+                                                                    onClick={() => removeUserFromConversation(value.userId)}>Remove from group</MenuItem>
                                                             }
                                                             {
                                                                 user?.id === value.userId &&
@@ -317,8 +311,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl?:
                                                     </React.Fragment>
                                                 }>
                                                 <IconButton
-                                                    onClick={event => handleTooltipAction(event, GroupActionEnum.OPEN)}
-                                                    style={{color: generateIconColorMode(theme)}}>
+                                                    onClick={event => handleTooltipAction(event, GroupActionEnum.OPEN)}>
                                                     <MoreHorizIcon/>
                                                 </IconButton>
                                             </Tooltip>

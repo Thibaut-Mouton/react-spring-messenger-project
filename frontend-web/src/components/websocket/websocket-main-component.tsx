@@ -20,7 +20,6 @@ export const WebSocketMainComponent: React.FunctionComponent = (): React.JSX.Ele
             <div style={{
                 height: "calc(100% - 64px)",
                 display: "flex",
-                justifyContent: "space-between"
             }}>
                 <WebsocketContextProvider>
                     <WebsocketGroupsComponent groupUrl={groupId}/>

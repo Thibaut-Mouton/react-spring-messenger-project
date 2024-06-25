@@ -18,6 +18,11 @@ export function SearchComponent() {
         setTextSearch(event.target.value)
     }
 
+    function resetSearch() {
+        setSearchText("")
+        setTextSearch("")
+    }
+
     async function startSearch(event: any) {
         if (event.key === undefined || event.key === "Enter") {
             if (search !== "") {
@@ -47,11 +52,14 @@ export function SearchComponent() {
 
     return <OutlinedInput
         endAdornment={<InputAdornment position="end">
-            <IconButton>
+            <IconButton onClick={resetSearch}>
                 <CloseIcon/>
             </IconButton>
         </InputAdornment>}
-        onChange={handleChange} value={search} onKeyDown={startSearch} style={{width: "50%"}}
+        type={"text"}
+        onChange={handleChange}
+        value={search}
+        onKeyDown={startSearch} style={{width: "50%"}}
         size={"small"}
         label={"Search in conversations"}/>
 }

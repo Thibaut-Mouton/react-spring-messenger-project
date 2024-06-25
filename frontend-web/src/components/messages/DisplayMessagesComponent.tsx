@@ -85,7 +85,7 @@ export function DisplayMessagesComponent({messages, groupUrl, updateMessages}: D
         )
     }
 
-    return <div style={{overflowY: "auto", flex: "1"}} onScroll={(event) => handleScroll(event)}>
+    return <div style={{overflowY: "auto", flex: "1 1 auto", height: "0px"}} onScroll={(event) => handleScroll(event)}>
         {
             !areAllMessagesFetched && loadingOldMessages && <div style={{
                 width: "inherit",
@@ -154,7 +154,7 @@ export function DisplayMessagesComponent({messages, groupUrl, updateMessages}: D
                         }
                         {
                             messageModel.type === TypeMessageEnum.TEXT &&
-                            <div style={{overflowWrap: "break-word"}}>
+                            <div style={{overflowWrap: "break-word", wordBreak: "break-all"}}>
                                 {messageModel.message}
                             </div>
                         }

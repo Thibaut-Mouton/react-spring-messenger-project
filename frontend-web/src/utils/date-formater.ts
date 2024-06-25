@@ -21,7 +21,7 @@ export function dateParser(date: string): string {
         return moment(date, "YYYY-MM-DD HH:mm:ss").fromNow(true)
     }
     if (messageDate.includes("seconds")) {
-        return "1 min"
+        return "now"
     }
     return ""
 }
