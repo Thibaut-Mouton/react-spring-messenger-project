@@ -2,7 +2,6 @@ import React from "react"
 import "./index.css"
 import * as serviceWorker from "./serviceWorker"
 import {createBrowserRouter, redirect, RouterProvider} from "react-router-dom"
-import {HomeComponent} from "./components/home"
 import {createRoot} from "react-dom/client"
 import {WebSocketMainComponent} from "./components/websocket/websocket-main-component"
 import {VideoComponent} from "./components/websocket/video-component"
@@ -13,8 +12,10 @@ import {HttpGroupService} from "./service/http-group-service"
 import {AlertContextProvider} from "./context/AlertContext"
 import {UserContextProvider} from "./context/UserContext"
 import {GroupContextProvider} from "./context/GroupContext"
-import {RegisterUserComponent} from "./components/register/RegisterUser"
 import {SearchProvider} from "./context/SearchContext"
+import {LoginWrapperComponent} from "./components/login/LoginWrapperComponent"
+import {RegisterUserWrapper} from "./components/register/RegisterUserWrapper"
+import {ResetPasswordComponent} from "./components/reset-password/ResetPasswordComponent"
 
 const router = createBrowserRouter([
     {
@@ -27,11 +28,11 @@ const router = createBrowserRouter([
     },
     {
         path: "login",
-        element: <HomeComponent/>,
+        element: <LoginWrapperComponent/>,
     },
     {
         path: "register",
-        element: <RegisterUserComponent/>
+        element: <RegisterUserWrapper/>
     },
     {
         path: "t/messages",
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
     {
         path: "room/:callUrl",
         element: <VideoComponent/>
+    },
+    {
+        path: "reset/password",
+        element: <ResetPasswordComponent/>
     }
 ])
 

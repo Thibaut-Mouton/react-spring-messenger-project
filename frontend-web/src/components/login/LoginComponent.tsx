@@ -1,5 +1,5 @@
 import {Button, Grid, TextField, Typography} from "@mui/material"
-import React, {useContext, useEffect, useState} from "react"
+import React, {useContext, useState} from "react"
 import {Link, useNavigate} from "react-router-dom"
 import {useThemeContext} from "../../context/theme-context"
 import {generateLinkColorMode} from "../utils/enable-dark-mode"
@@ -20,10 +20,6 @@ export function LoginComponent(): React.JSX.Element {
     const {loading, setLoading} = useContext(LoaderContext)
     const {theme} = useThemeContext()
     const httpService = new HttpGroupService()
-
-    useEffect(() => {
-        document.title = "Login | FLM"
-    }, [])
 
     function handleChange(e: any) {
         e.preventDefault()
@@ -135,7 +131,7 @@ export function LoginComponent(): React.JSX.Element {
                     <Grid container justifyContent={"space-between"}>
                         <Link className={"lnk"}
                               style={{color: generateLinkColorMode(theme)}}
-                              to={"/forgetpassword"}>
+                              to={"/reset/password"}>
                             Forgot your password ?
                         </Link>
                         <Link className={"lnk"}
