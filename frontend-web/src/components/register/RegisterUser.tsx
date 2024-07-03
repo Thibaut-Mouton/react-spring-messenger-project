@@ -1,12 +1,11 @@
+import React, {useContext} from "react"
 import CloseIcon from "@mui/icons-material/Close"
-import {Alert, Button, Card, CardContent, Collapse, Grid, IconButton, TextField, Typography} from "@mui/material"
-import React, {useContext, useEffect} from "react"
+import {Alert, Button, Collapse, Grid, IconButton, TextField, Typography} from "@mui/material"
 import {Link} from "react-router-dom"
 import {useThemeContext} from "../../context/theme-context"
 import {HttpGroupService} from "../../service/http-group-service"
 import "./register-form.css"
 import {generateLinkColorMode} from "../utils/enable-dark-mode"
-import {FooterComponent} from "../partials/footer-component"
 import {LoaderContext} from "../../context/loader-context"
 import {AlertAction, AlertContext} from "../../context/AlertContext"
 
@@ -26,10 +25,6 @@ export function RegisterUserComponent(): React.JSX.Element {
     const [errorArray, setErrorArray] = React.useState<string[]>([])
     const refWrapper = React.useRef()
     const httpService = new HttpGroupService()
-
-    useEffect(() => {
-        document.title = "Register | FLM"
-    }, [])
 
     function checkFormValidation(): string[] {
         const validationErrors: string[] = []
@@ -158,119 +153,114 @@ export function RegisterUserComponent(): React.JSX.Element {
                  alignItems: "center"
              }}>
             <Grid sx={{m: 2}} container xs={8}>
-                <Card variant="outlined">
-                    <CardContent>
-                        <div className={"main-register-form"}>
-                            <div style={{textAlign: "center"}}>
-                                <Typography component="h1" variant="h5">
-                                    Sign up
-                                </Typography>
-                            </div>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    {
-                                        <Collapse ref={refWrapper} in={displayFormValidationError}
-                                                  timeout={500}>
-                                            <Alert action={
-                                                <IconButton
-                                                    aria-label="close"
-                                                    color="inherit"
-                                                    size="small"
-                                                    onClick={(e) => closeAlert(e, "arrayErrors")}
-                                                >
-                                                    <CloseIcon fontSize="inherit"/>
-                                                </IconButton>
-                                            } severity="warning">
-                                                <ul>
-                                                    {errorArray.map((error: string, index: number) => (
-                                                        <li key={index}>
-                                                            {error}
-                                                        </li>
-                                                    ))
-                                                    }
-                                                </ul>
-                                            </Alert>
-                                        </Collapse>
-                                    }
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField id={"firstNameInput"}
-                                               label={"First Name"}
-                                               name={"firstName"}
-                                               fullWidth
-                                               value={username}
-                                               onChange={handleChange}
-                                               type={"text"}/>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <TextField id={"lastNameInput"}
-                                               label={"Last Name"}
-                                               fullWidth
-                                               name={"lastName"}
-                                               value={lastName}
-                                               onChange={handleChange}
-                                               type={"text"}/>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField id={"emailInput"}
-                                               fullWidth
-                                               error={displayEmailNotValid}
-                                               helperText={displayEmailNotValid ? "mail is not valid" : ""}
-                                               label={"Email Address"}
-                                               name={"email"}
-                                               value={email}
-                                               onChange={handleChange}
-                                               type={"text"}/>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField id={"passwordInput"}
-                                               label={"Password"}
-                                               fullWidth
-                                               name={"password"}
-                                               onChange={handleChange}
-                                               value={password}
-                                               type={"password"}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <TextField id={"repeatPasswordInput"}
-                                               label={"Repeat password"}
-                                               fullWidth
-                                               error={noMatchPasswordsError}
-                                               name={"repeatPassword"}
-                                               onChange={handleChange}
-                                               value={repeatPassword}
-                                               multiline={false}
-                                               helperText={noMatchPasswordsError ? "passwords does not match" : ""}
-                                               type={"password"}
-                                    />
-                                </Grid>
-                            </Grid>
-                            <div style={{marginTop: "10px"}}>
-                                <Button
-                                    disabled={username === "" || password === "" || lastName === "" || repeatPassword === "" || email === "" || loading}
-                                    className={"button-register-form clrcstm"}
-                                    fullWidth
-                                    variant="outlined"
-                                    color="primary"
-                                    onClick={(e) => registerUser(e)}
-                                >
-                                    Sign Up
-                                </Button>
-                            </div>
-                            <Grid container justifyContent="flex-end">
-                                <Grid item>
-                                    <Link className={"lnk"}
-                                          style={{color: generateLinkColorMode(theme)}}
-                                          to={"/login"}>
-                                        Already have an account? Sign in
-                                    </Link>
-                                </Grid>
-                            </Grid>
-                        </div>
-                        <FooterComponent/>
-                    </CardContent>
-                </Card>
+                <div className={"main-register-form"}>
+                    <div style={{textAlign: "center"}}>
+                        <Typography component="h1" variant="h5">
+                            Sign up
+                        </Typography>
+                    </div>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            {
+                                <Collapse ref={refWrapper} in={displayFormValidationError}
+                                          timeout={500}>
+                                    <Alert action={
+                                        <IconButton
+                                            aria-label="close"
+                                            color="inherit"
+                                            size="small"
+                                            onClick={(e) => closeAlert(e, "arrayErrors")}
+                                        >
+                                            <CloseIcon fontSize="inherit"/>
+                                        </IconButton>
+                                    } severity="warning">
+                                        <ul>
+                                            {errorArray.map((error: string, index: number) => (
+                                                <li key={index}>
+                                                    {error}
+                                                </li>
+                                            ))
+                                            }
+                                        </ul>
+                                    </Alert>
+                                </Collapse>
+                            }
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField id={"firstNameInput"}
+                                       label={"First Name"}
+                                       name={"firstName"}
+                                       fullWidth
+                                       value={username}
+                                       onChange={handleChange}
+                                       type={"text"}/>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField id={"lastNameInput"}
+                                       label={"Last Name"}
+                                       fullWidth
+                                       name={"lastName"}
+                                       value={lastName}
+                                       onChange={handleChange}
+                                       type={"text"}/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField id={"emailInput"}
+                                       fullWidth
+                                       error={displayEmailNotValid}
+                                       helperText={displayEmailNotValid ? "mail is not valid" : ""}
+                                       label={"Email Address"}
+                                       name={"email"}
+                                       value={email}
+                                       onChange={handleChange}
+                                       type={"text"}/>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField id={"passwordInput"}
+                                       label={"Password"}
+                                       fullWidth
+                                       name={"password"}
+                                       onChange={handleChange}
+                                       value={password}
+                                       type={"password"}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField id={"repeatPasswordInput"}
+                                       label={"Repeat password"}
+                                       fullWidth
+                                       error={noMatchPasswordsError}
+                                       name={"repeatPassword"}
+                                       onChange={handleChange}
+                                       value={repeatPassword}
+                                       multiline={false}
+                                       helperText={noMatchPasswordsError ? "passwords does not match" : ""}
+                                       type={"password"}
+                            />
+                        </Grid>
+                    </Grid>
+                    <div style={{marginTop: "10px"}}>
+                        <Button
+                            disabled={username === "" || password === "" || lastName === "" || repeatPassword === "" || email === "" || loading}
+                            className={"button-register-form clrcstm"}
+                            fullWidth
+                            variant="outlined"
+                            color="primary"
+                            onClick={(e) => registerUser(e)}
+                        >
+                            Sign Up
+                        </Button>
+                    </div>
+                    <Grid container justifyContent="flex-end">
+                        <Grid item>
+                            <Link className={"lnk"}
+                                  style={{color: generateLinkColorMode(theme)}}
+                                  to={"/login"}>
+                                Already have an account? Sign in
+                            </Link>
+                        </Grid>
+                    </Grid>
+                </div>
             </Grid>
         </div>
     )
