@@ -1,4 +1,4 @@
-package com.mercure.service;
+package com.mercure.service.cache;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
@@ -29,14 +29,13 @@ public class RoomCacheService {
     }
 
     public Object getRoomByKey(String groupUrl) {
-        HashMap<String, ArrayList<Integer>> hostsList = new HashMap<>();
         Cache roomsCache = this.getCache();
         if (roomsCache != null) {
             Cache.ValueWrapper valueWrapper = roomsCache.get(groupUrl);
             if (valueWrapper != null) {
-                hostsList = (HashMap<String, ArrayList<Integer>>) valueWrapper.get();
+                return valueWrapper.get();
             }
         }
-        return hostsList;
+        return null;
     }
 }

@@ -43,7 +43,7 @@ const router = createBrowserRouter([
         element: <WebSocketMainComponent/>
     },
     {
-        path: "room/:callUrl",
+        path: "room/:callUrl/:groupUrl",
         element: <VideoComponent/>
     },
     {

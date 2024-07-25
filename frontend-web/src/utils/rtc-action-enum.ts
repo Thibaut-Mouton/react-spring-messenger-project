@@ -5,8 +5,6 @@ export enum RtcActionEnum {
 
     JOIN_ROOM = "JOIN_ROOM",
 
-    SEND_OFFER = "SEND_OFFER",
-
     SEND_ANSWER = "SEND_ANSWER",
 
     RECEIVE_ANSWER = "RECEIVE_ANSWER",

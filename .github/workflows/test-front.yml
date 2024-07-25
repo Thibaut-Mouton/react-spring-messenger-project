@@ -14,5 +14,5 @@ jobs:
           node-version: 20.x
       - name: install
         run: npm --prefix ./frontend-web install
-      - name: build
-        run: npm --prefix ./frontend-web run build
+      - name: test
+        run: npm --prefix ./frontend-web run test

@@ -7,6 +7,8 @@ import com.mercure.entity.UserEntity;
 import com.mercure.mapper.UserMapper;
 import com.mercure.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.text.Normalizer;
 import java.util.*;
 
 @Service
+@Getter
+@Setter
 public class UserService {
 
     @Autowired
@@ -30,14 +34,6 @@ public class UserService {
     private GroupUserJoinService groupUserJoinService;
 
     private Map<Integer, String> wsSessions = new HashMap<>();
-
-    public Map<Integer, String> getWsSessions() {
-        return wsSessions;
-    }
-
-    public void setWsSessions(Map<Integer, String> wsSessions) {
-        this.wsSessions = wsSessions;
-    }
 
     public void deleteAll() {
         userRepository.deleteAll();
