@@ -24,7 +24,7 @@ public class MessageController {
     private GroupUserJoinService groupUserJoinService;
 
     @GetMapping(value = "{offset}/group/{groupUrl}")
-    public WrapperMessageDTO fetchGroupMessages(@PathVariable String groupUrl, @PathVariable int offset) {
+    public WrapperMessageDTO fetchGroupMessages(@PathVariable String groupUrl, @PathVariable int offset) throws Exception {
         this.log.debug("Fetching messages from conversation");
         return this.messageService.getConversationMessage(groupUrl, offset);
     }

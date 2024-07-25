@@ -26,10 +26,6 @@ export class HttpGroupService extends HttpMainService {
         return this.instance.get("fetch")
     }
 
-    public async ensureRoomExists(roomId?: string): Promise<AxiosResponse<boolean>> {
-        return this.instance.get(`room/ensure-room-exists/${roomId}`)
-    }
-
     public logout(): Promise<AxiosResponse> {
         return this.instance.get("logout")
     }

@@ -12,7 +12,6 @@ public class PingController {
 
     private final Logger log = LoggerFactory.getLogger(PingController.class);
 
-
     @GetMapping("health-check")
     public String testRoute() {
         log.debug("Ping base route");

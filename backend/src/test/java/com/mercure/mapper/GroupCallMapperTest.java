@@ -2,7 +2,7 @@ package com.mercure.mapper;
 
 import com.mercure.dto.user.GroupCallDTO;
 import com.mercure.entity.GroupEntity;
-import com.mercure.service.RoomCacheService;
+import com.mercure.service.cache.RoomCacheService;
 import org.junit.jupiter.api.*;
 
 
@@ -18,6 +18,5 @@ public class GroupCallMapperTest {
         GroupEntity groupEntity = new GroupEntity();
         GroupCallDTO groupCallDTO = groupCallMapper.toGroupCall(groupEntity);
         assertNotEquals("", groupCallDTO.getActiveCallUrl());
-        assertTrue(true);
     }
 }

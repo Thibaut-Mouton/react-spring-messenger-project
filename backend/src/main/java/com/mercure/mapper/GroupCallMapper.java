@@ -2,7 +2,7 @@ package com.mercure.mapper;
 
 import com.mercure.dto.user.GroupCallDTO;
 import com.mercure.entity.GroupEntity;
-import com.mercure.service.RoomCacheService;
+import com.mercure.service.cache.RoomCacheService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

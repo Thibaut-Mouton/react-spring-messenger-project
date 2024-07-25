@@ -97,7 +97,7 @@ export function CreateMessageComponent({groupUrl}: CreateMessageComponentProps):
     }
 
     function sendCallMessage(url: string) {
-        const callMessage = `http://localhost:3000/room/${url}`
+        const callMessage = `http://localhost:3000/room/${url}/${groupUrl}`
         setMessageType(TypeMessageEnum.CALL)
         setMessage(callMessage)
     }

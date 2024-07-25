@@ -8,7 +8,10 @@ import com.mercure.dto.search.FullTextSearchDatabaseResponseDTO;
 import com.mercure.dto.search.FullTextSearchResponseDTO;
 import com.mercure.entity.*;
 import com.mercure.repository.MessageRepository;
+import com.mercure.utils.DbInit;
 import com.mercure.utils.MessageTypeEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,14 +23,13 @@ import java.util.stream.Collectors;
 @Service
 public class MessageService {
 
+    private static Logger log = LoggerFactory.getLogger(MessageService.class);
+
     @Autowired
     private MessageRepository messageRepository;
 
     @Autowired
     private FileService fileService;
-
-    @Autowired
-    private MessageService messageService;
 
     @Autowired
     private GroupService groupService;
@@ -111,33 +113,6 @@ public class MessageService {
         return toSend;
     }
 
-    public NotificationDTO createNotificationDTO(MessageEntity msg) {
-        String groupUrl = groupService.getGroupUrlById(msg.getGroup_id());
-        NotificationDTO notificationDTO = new NotificationDTO();
-        notificationDTO.setGroupId(msg.getGroup_id());
-        notificationDTO.setGroupUrl(groupUrl);
-        if (msg.getType().equals(MessageTypeEnum.TEXT.toString())) {
-            notificationDTO.setType(MessageTypeEnum.TEXT);
-            notificationDTO.setMessage(msg.getMessage());
-        }
-        if (msg.getType().equals(MessageTypeEnum.CALL.toString())) {
-            notificationDTO.setType(MessageTypeEnum.CALL);
-            notificationDTO.setMessage(msg.getMessage());
-        }
-        if (msg.getType().equals(MessageTypeEnum.FILE.toString())) {
-            FileEntity fileEntity = fileService.findByFkMessageId(msg.getId());
-            notificationDTO.setType(MessageTypeEnum.FILE);
-            notificationDTO.setMessage(msg.getMessage());
-            notificationDTO.setFileUrl(fileEntity.getUrl());
-            notificationDTO.setFileName(fileEntity.getFilename());
-        }
-        notificationDTO.setFromUserId(msg.getUser_id());
-        notificationDTO.setLastMessageDate(msg.getCreatedAt().toString());
-        notificationDTO.setSenderName(userService.findFirstNameById(msg.getUser_id()));
-        notificationDTO.setMessageSeen(false);
-        return notificationDTO;
-    }
-
     public MessageDTO createNotificationMessageDTO(MessageEntity msg, int userId) {
         String groupUrl = groupService.getGroupUrlById(msg.getGroup_id());
         UserEntity user = userService.findById(userId);
@@ -191,17 +166,21 @@ public class MessageService {
         return result;
     }
 
-    public WrapperMessageDTO getConversationMessage(String url, int messageId) {
+    public WrapperMessageDTO getConversationMessage(String url, int messageId) throws Exception {
         WrapperMessageDTO wrapper = new WrapperMessageDTO();
         if (url != null) {
             List<MessageDTO> messageDTOS = new ArrayList<>();
             GroupEntity group = groupService.getGroupByUrl(url);
-            List<MessageEntity> newMessages = messageService.findByGroupId(group.getId(), messageId);
+            if (group == null) {
+                log.error("Group not found with URL {}", url);
+                throw new Exception("Group cannot be found by URL");
+            }
+            List<MessageEntity> newMessages = this.findByGroupId(group.getId(), messageId);
             int lastMessageId = newMessages != null && !newMessages.isEmpty() ? newMessages.get(0).getId() : 0;
-            List<MessageEntity> afterMessages = messageService.findByGroupId(group.getId(), lastMessageId);
+            List<MessageEntity> afterMessages = this.findByGroupId(group.getId(), lastMessageId);
             if (newMessages != null) {
                 newMessages.forEach(msg ->
-                        messageDTOS.add(messageService
+                        messageDTOS.add(this
                                 .createMessageDTO(msg.getId(), msg.getType(), msg.getUser_id(), msg.getCreatedAt().toString(), msg.getGroup_id(), msg.getMessage()))
                 );
             }
