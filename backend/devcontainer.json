@@ -1,0 +1,7 @@
+{
+  "image": "openjdk:17-alpine3.14",
+  "forwardPorts": [
+    3306,
+    9090
+  ]
+}

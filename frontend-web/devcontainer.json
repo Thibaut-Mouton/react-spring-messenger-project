@@ -1,0 +1,6 @@
+{
+  "image": "node:20",
+  "forwardPorts": [
+    3000,
+  ]
+}
