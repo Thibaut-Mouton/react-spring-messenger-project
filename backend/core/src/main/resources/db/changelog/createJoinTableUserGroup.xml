@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd
+         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd">
+
+    <changeSet id="createJoinTableUserGroup" author="TMN">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="group_user"/>
+            </not>
+        </preConditions>
+        <createTable tableName="group_user">
+            <column name="group_id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_group_user_table"/>
+            </column>
+            <column name="user_id" type="INT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_group_user_table"/>
+            </column>
+            <column name="role" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="group_user"
+                                 baseColumnNames="group_id"
+                                 constraintName="fk_group_join"
+                                 referencedTableName="chat_group"
+                                 referencedColumnNames="id"/>
+        <addForeignKeyConstraint baseTableName="group_user"
+                                 baseColumnNames="user_id"
+                                 constraintName="fk_user_join"
+                                 referencedTableName="users"
+                                 referencedColumnNames="id"/>
+        <rollback>
+            <dropTable tableName="group_user"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
