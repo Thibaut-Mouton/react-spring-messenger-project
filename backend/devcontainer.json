@@ -1,8 +1,5 @@
 {
   "image": "openjdk:17-alpine3.14",
   "name": "flm-backend",
-  "forwardPorts": [
-    3306,
-    9090
-  ]
+  "forwardPorts": [8080]
 }
