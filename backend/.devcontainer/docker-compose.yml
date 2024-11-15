@@ -1,23 +1,24 @@
 version: '3.8'
 services:
-  devcontainer:
+  flm-back:
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - ../..:/workspaces:cached
-    network_mode: service:db
     command: sleep infinity
     ports:
-      - "9090:9090"
+      - 9090:9090
+      - 3306:3306
 
-  db:
+  flm-db:
     image: mysql:8.0.40-debian
     restart: unless-stopped
+    network_mode: service:flm-back
     volumes:
       - mysql-data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_ROOT_PASSWORD: root
 
 volumes:
   mysql-data:
