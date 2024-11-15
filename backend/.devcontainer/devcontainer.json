@@ -1,5 +1,5 @@
 {
-  "name": "flm-backend",
+  "service": "flm-back",
   "dockerComposeFile": "docker-compose.yml",
   "workspaceFolder": "/workspace"
 }
