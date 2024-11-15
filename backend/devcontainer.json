@@ -1,5 +1,0 @@
-{
-  "image": "ubuntu:latest",
-  "name": "flm-backend",
-  "forwardPorts": [9090, 3306]
-}
