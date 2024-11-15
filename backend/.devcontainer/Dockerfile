@@ -13,8 +13,6 @@ RUN apt-get update && apt-get install -y curl  \
     && rm -rf /var/lib/apt/lists/*
 
 # confirm installation
-RUN node -v
-RUN npm -v
 RUN java --version
 
 ENTRYPOINT ["tail", "-f", "/dev/null"]
