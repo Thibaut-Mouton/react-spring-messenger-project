@@ -2,7 +2,5 @@
   "name": "flm-backend",
   "dockerComposeFile": "docker-compose.yml",
   "service": "flm-back",
-  "runServices": ["flm-db"],
-  "workspaceFolder": "/workspace",
   "postCreateCommand": "echo 'containers up'"
 }

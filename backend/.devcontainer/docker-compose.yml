@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   flm-back:
     build:
@@ -8,8 +7,8 @@ services:
       - ../..:/workspaces:cached
     command: sleep infinity
     ports:
-      - 9090:9090
-      - 3306:3306
+      - "9090:9090"
+      - "3306:3306"
 
   flm-db:
     image: mysql:8.0.40-debian
