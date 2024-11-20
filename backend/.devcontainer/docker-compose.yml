@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ../..:/workspaces:cached
+      - .:/workspace:cached
     command: sleep infinity
     ports:
       - "9090:9090"
