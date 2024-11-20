@@ -1,39 +1,20 @@
 import React from "react"
+import "./VideoCallMessageComponent.css"
 import {Card, CardHeader, IconButton} from "@mui/material"
 import PhoneInTalkIcon from "@mui/icons-material/PhoneInTalk"
 
 interface VideoCallMessageProps {
     url: string
+    groupUrl: string
 }
 
-export function VideoCallMessageComponent({url}: VideoCallMessageProps) {
+export function VideoCallMessageComponent({url, groupUrl}: VideoCallMessageProps) {
     function openPage() {
-        window.open(url, "_blank")
+        window.open(`${url}?u=${groupUrl}`, "_blank")
     }
 
-    // async function openCallPage(event: any) {
-    //     event.preventDefault()
-    //     const startedCallUrl = crypto.randomUUID()
-    //     if (ws) {
-    //         const transport = new RtcTransportDTO(user?.id || 0, groupUrl || "", RtcActionEnum.INIT_ROOM)
-    //         ws.publish({
-    //             destination: `/rtc/${startedCallUrl}`,
-    //             body: JSON.stringify(transport)
-    //         })
-    //         const callPage = window.open(`http://localhost:3000/call/${startedCallUrl}`, "_blank") as any
-    //         if (callPage) {
-    //             callPage.groupUrl = groupUrl
-    //             callPage.focus()
-    //         }
-    //         // dispatch(setGroupWithCurrentCall({
-    //         //     roomUrl: startedCallUrl,
-    //         //     groupUrl
-    //         // }))
-    //     }
-    // }
-
     return <>
-        <Card onClick={openPage} variant="outlined">
+        <Card className={"call-container"} onClick={openPage} variant="outlined">
             <CardHeader
                 avatar={
                     <IconButton>
