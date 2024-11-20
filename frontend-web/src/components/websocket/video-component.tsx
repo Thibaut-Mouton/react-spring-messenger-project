@@ -13,7 +13,7 @@ import {HttpGroupService} from "../../service/http-group-service"
 import {EmptyRoom} from "../partials/video/empty-room"
 
 export const VideoComponent = (): React.JSX.Element => {
-    const {callUrl, groupUrl} = useParams()
+    const {callUrl, u} = useParams()
     const [ws, setWs] = useState<Client | null>()
     const [currentUserId, setCurrentUserId] = useState<number>(-1)
     const [isPageAuthorized, setPageStatus] = useState<boolean>(true)
@@ -59,7 +59,7 @@ export const VideoComponent = (): React.JSX.Element => {
     peerConnection.addEventListener("icecandidate", (event) => {
         console.log("EVENT ICE candidate", event.candidate)
         if (ws && event.candidate) {
-            const iceCandidateResponse = new RtcTransportDTO(currentUserId, groupUrl ?? "", RtcActionEnum.ICE_CANDIDATE, undefined, undefined, event.candidate.toJSON())
+            const iceCandidateResponse = new RtcTransportDTO(currentUserId, u ?? "", RtcActionEnum.ICE_CANDIDATE, undefined, undefined, event.candidate)
             ws.publish({
                 destination: `/rtc/${callUrl}`,
                 body: JSON.stringify(iceCandidateResponse)
@@ -74,7 +74,7 @@ export const VideoComponent = (): React.JSX.Element => {
 
     peerConnection.addEventListener("track", (event) => {
         console.log("Track event", event)
-        const remoteVideo = document.querySelector("video#localVideo") as HTMLVideoElement
+        const remoteVideo = document.querySelector("video#remoteVideo") as HTMLVideoElement
         const [remoteStream] = event.streams
         remoteVideo.srcObject = remoteStream
     })
@@ -100,17 +100,16 @@ export const VideoComponent = (): React.JSX.Element => {
         wsObj.onConnect = async () => {
             wsObj.subscribe(`/topic/rtc/${user.id}`, async (res: IMessage) => {
                 const rtcTransportDto = JSON.parse(res.body) as RtcTransportDTO
+                console.log("RTC WS EVENT RECEIVED", res.body)
                 switch (rtcTransportDto.action) {
                     case RtcActionEnum.JOIN_ROOM: {
-                        console.log("JOIN ROOM")
                         if (rtcTransportDto.offer) {
-                            console.log("SET OFFER")
                             await peerConnection.setRemoteDescription(rtcTransportDto.offer)
                         }
                         const answer = await peerConnection.createAnswer()
                         await peerConnection.setLocalDescription(answer)
 
-                        const answerRtcResponse = new RtcTransportDTO(currentUserId, groupUrl ?? "", RtcActionEnum.SEND_ANSWER, undefined, answer)
+                        const answerRtcResponse = new RtcTransportDTO(currentUserId, u ?? "", RtcActionEnum.SEND_ANSWER, undefined, answer)
                         wsObj?.publish({
                             destination: `/rtc/${callUrl}`,
                             body: JSON.stringify(answerRtcResponse)
@@ -118,7 +117,6 @@ export const VideoComponent = (): React.JSX.Element => {
                         break
                     }
                     case RtcActionEnum.RECEIVE_ANSWER: {
-                        console.log("RECEIVE ANSWER")
                         if (rtcTransportDto.answer) {
                             const answer = new RTCSessionDescription(rtcTransportDto.answer)
                             await peerConnection.setRemoteDescription(answer)
@@ -126,7 +124,6 @@ export const VideoComponent = (): React.JSX.Element => {
                         break
                     }
                     case RtcActionEnum.ICE_CANDIDATE: {
-                        console.log("ICE CANDIDATE")
                         if (rtcTransportDto.iceCandidate) {
                             await peerConnection.addIceCandidate(rtcTransportDto.iceCandidate)
                         }
@@ -138,7 +135,7 @@ export const VideoComponent = (): React.JSX.Element => {
             })
             const offer = await peerConnection.createOffer()
             await peerConnection.setLocalDescription(offer)
-            const transport = new RtcTransportDTO(user.id, groupUrl ?? "", RtcActionEnum.INIT_ROOM, offer)
+            const transport = new RtcTransportDTO(user.id, u ?? "", RtcActionEnum.INIT_ROOM, offer)
             wsObj.publish({
                 destination: `/rtc/${callUrl}`,
                 body: JSON.stringify(transport)
@@ -148,7 +145,7 @@ export const VideoComponent = (): React.JSX.Element => {
     }
 
     function handleCloseTab() {
-        const transport = new RtcTransportDTO(currentUserId, groupUrl ?? "", RtcActionEnum.LEAVE_ROOM)
+        const transport = new RtcTransportDTO(currentUserId, u ?? "", RtcActionEnum.LEAVE_ROOM)
         if (ws) {
             ws.publish({
                 destination: `/rtc/${callUrl}`,
@@ -191,7 +188,7 @@ export const VideoComponent = (): React.JSX.Element => {
             const localStream = await navigator.mediaDevices.getUserMedia(constraints)
             setLocalStream(localStream)
             setLocalVideoState(true)
-            const videoElement = document.querySelector("video#localVideo") as HTMLVideoElement
+            const videoElement = document.querySelector("#localVideo") as HTMLVideoElement
             setActiveLocalVideo(true)
             localStream.getTracks().forEach((track) => {
                 peerConnection.addTrack(track, localStream)

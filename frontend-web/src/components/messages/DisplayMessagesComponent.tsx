@@ -150,7 +150,7 @@ export function DisplayMessagesComponent({messages, groupUrl, updateMessages}: D
                         }
                         {
                             messageModel.type === TypeMessageEnum.CALL &&
-                            <VideoCallMessageComponent url={messageModel.message}/>
+                            <VideoCallMessageComponent groupUrl={groupUrl} url={messageModel.message}/>
                         }
                         {
                             messageModel.type === TypeMessageEnum.TEXT &&
