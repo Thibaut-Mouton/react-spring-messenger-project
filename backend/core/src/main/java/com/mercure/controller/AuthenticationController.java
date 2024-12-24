@@ -7,7 +7,6 @@ import com.mercure.dto.user.GroupDTO;
 import com.mercure.dto.user.InitUserDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.UserEntity;
-import com.mercure.mapper.GroupMapper;
 import com.mercure.mapper.UserMapper;
 import com.mercure.service.CustomUserDetailsService;
 import com.mercure.service.GroupService;
@@ -20,7 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
 @RestController
-@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000", methods = {RequestMethod.GET, RequestMethod.POST})
 @AllArgsConstructor
 @Slf4j
 public class AuthenticationController {
@@ -45,13 +43,11 @@ public class AuthenticationController {
 
     private GroupService groupService;
 
-    private GroupMapper groupMapper;
-
-    private AuthenticationManager authenticationManager;
+    private AuthenticationProvider authenticationProvider;
 
     @PostMapping(value = "/auth")
     public AuthUserDTO createAuthenticationToken(@RequestBody JwtDTO authenticationRequest, HttpServletResponse response) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+        Authentication authentication = authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         if (authentication.isAuthenticated()) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
             UserEntity user = userService.findByNameOrEmail(authenticationRequest.getUsername(), authenticationRequest.getUsername());
@@ -60,7 +56,6 @@ public class AuthenticationController {
             jwtAuthToken.setHttpOnly(true);
             jwtAuthToken.setSecure(false);
             jwtAuthToken.setPath("/");
-//        cookie.setDomain("http://localhost");
             // TODO add to env vars
             jwtAuthToken.setMaxAge(2 * 60 * 60); // 2 hours
             response.addCookie(jwtAuthToken);
@@ -98,19 +93,12 @@ public class AuthenticationController {
         Gson gson = new Gson();
         GroupDTO groupDTO = gson.fromJson(payload, GroupDTO.class);
         GroupEntity groupEntity = groupService.createGroup(user.getId(), groupDTO.getName());
-        return groupMapper.toGroupDTO(groupEntity, user.getId());
+        return userMapper.toGroupDTO(groupEntity, user.getId());
     }
 
     private UserEntity getUserEntity(HttpServletRequest request) {
-        String username;
-        String jwtToken;
-        UserEntity user = new UserEntity();
         Cookie cookie = WebUtils.getCookie(request, StaticVariable.SECURE_COOKIE);
-        if (cookie != null) {
-            jwtToken = cookie.getValue();
-            username = jwtTokenUtil.getUserNameFromJwtToken(jwtToken);
-            user = userService.findByNameOrEmail(username, username);
-        }
-        return user;
+        String username = jwtTokenUtil.getUserNameFromJwtToken(cookie.getValue());
+        return userService.findByNameOrEmail(username, username);
     }
 }

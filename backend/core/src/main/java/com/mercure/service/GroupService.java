@@ -3,6 +3,7 @@ package com.mercure.service;
 import com.mercure.dto.GroupMemberDTO;
 import com.mercure.entity.*;
 import com.mercure.repository.GroupRepository;
+import com.mercure.repository.UserRepository;
 import com.mercure.utils.GroupTypeEnum;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -21,7 +22,7 @@ public class GroupService {
 
     private GroupRepository groupRepository;
 
-    private UserService userService;
+    private UserRepository userRepository;
 
     private GroupUserJoinService groupUserJoinService;
 
@@ -61,7 +62,7 @@ public class GroupService {
             log.info("Cannot add user in a single conversation");
             return new GroupMemberDTO();
         }
-        UserEntity user = userService.findById(userId);
+        UserEntity user = findUserById(userId);
         GroupUser groupUser = new GroupUser();
         groupUser.setGroupUsers(groupEntity.orElse(null));
         groupUser.setUserEntities(user);
@@ -85,7 +86,7 @@ public class GroupService {
         group.setUrl(UUID.randomUUID().toString());
         group.setGroupTypeEnum(GroupTypeEnum.GROUP);
         GroupEntity savedGroup = groupRepository.save(group);
-        UserEntity user = userService.findById(userId);
+        UserEntity user = findUserById(userId);
         GroupRoleKey groupRoleKey = new GroupRoleKey();
         groupRoleKey.setUserId(userId);
         groupRoleKey.setGroupId(savedGroup.getId());
@@ -112,8 +113,8 @@ public class GroupService {
         groupEntity.setGroupTypeEnum(GroupTypeEnum.SINGLE);
         GroupEntity savedGroup = groupRepository.save(groupEntity);
 
-        UserEntity user1 = userService.findById(id1);
-        UserEntity user2 = userService.findById(id2);
+        UserEntity user1 = findUserById(id1);
+        UserEntity user2 = findUserById(id2);
 
         GroupUser groupUser1 = new GroupUser();
         groupUser1.setGroupId(savedGroup.getId());
@@ -137,5 +138,10 @@ public class GroupService {
         // TODO delete group
         // TODO delete multimedia
         // TODO user join service
+    }
+
+    // TODO fix circular dependency
+    private UserEntity findUserById(int id) {
+        return userRepository.findById(id).orElse(null);
     }
 }

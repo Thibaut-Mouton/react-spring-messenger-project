@@ -7,7 +7,7 @@ import com.mercure.entity.GroupEntity;
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
-import com.mercure.mapper.GroupMapper;
+import com.mercure.mapper.UserMapper;
 import com.mercure.service.GroupService;
 import com.mercure.service.GroupUserJoinService;
 import com.mercure.service.UserService;
@@ -25,7 +25,6 @@ import org.springframework.web.util.WebUtils;
 import java.util.*;
 
 @RestController
-@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 @AllArgsConstructor
 @Slf4j
 public class ApiController {
@@ -34,7 +33,7 @@ public class ApiController {
 
     private GroupService groupService;
 
-    private GroupMapper groupMapper;
+    private UserMapper userMapper;
 
     private GroupUserJoinService groupUserJoinService;
 
@@ -68,7 +67,7 @@ public class ApiController {
         if (optionalGroupEntity.isPresent()) {
             GroupEntity group = optionalGroupEntity.get();
             Set<GroupUser> groupUsers = group.getGroupUsers();
-            groupUsers.forEach(groupUser -> toSend.add(groupMapper.toGroupMemberDTO(groupUser)));
+            groupUsers.forEach(groupUser -> toSend.add(userMapper.toGroupMemberDTO(groupUser)));
         }
         toSend.sort(Comparator.comparing(GroupMemberDTO::isAdmin).reversed());
         return toSend;

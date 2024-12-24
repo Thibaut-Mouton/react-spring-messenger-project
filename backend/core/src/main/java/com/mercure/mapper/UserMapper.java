@@ -1,13 +1,18 @@
 package com.mercure.mapper;
 
 import com.mercure.dto.AuthUserDTO;
+import com.mercure.dto.GroupMemberDTO;
 import com.mercure.dto.user.GroupDTO;
 import com.mercure.dto.user.GroupWrapperDTO;
 import com.mercure.dto.user.InitUserDTO;
-import com.mercure.entity.GroupEntity;
-import com.mercure.entity.UserEntity;
+import com.mercure.entity.*;
+import com.mercure.service.GroupUserJoinService;
+import com.mercure.service.MessageService;
+import com.mercure.service.UserSeenMessageService;
+import com.mercure.service.UserService;
 import com.mercure.utils.ComparatorListGroupDTO;
 import com.mercure.utils.ComparatorListWrapperGroupDTO;
+import com.mercure.utils.MessageTypeEnum;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +25,15 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserMapper {
 
-    private GroupMapper groupMapper;
-
     private GroupCallMapper groupCallMapper;
+
+    private MessageService messageService;
+
+    private UserSeenMessageService seenMessageService;
+
+    private GroupUserJoinService groupUserJoinService;
+
+    private UserService userService;
 
     /**
      * Map a UserEntity to a UserDTO
@@ -44,7 +55,7 @@ public class UserMapper {
 
         userEntity.getGroupSet().forEach(groupEntity -> {
                     GroupWrapperDTO groupWrapperDTO = new GroupWrapperDTO();
-                    groupWrapperDTO.setGroup(groupMapper.toGroupDTO(groupEntity, userEntity.getId()));
+                    groupWrapperDTO.setGroup(toGroupDTO(groupEntity, userEntity.getId()));
                     groupWrapperDTO.setGroupCall(groupCallMapper.toGroupCall(groupEntity));
                     groupWrapperDTOS.add(groupWrapperDTO);
                 }
@@ -63,10 +74,48 @@ public class UserMapper {
     public AuthUserDTO toLightUserDTO(UserEntity userEntity) {
         Set<GroupEntity> groups = userEntity.getGroupSet();
         List<GroupDTO> allUserGroups = new ArrayList<>(userEntity.getGroupSet().stream()
-                .map((groupEntity) -> groupMapper.toGroupDTO(groupEntity, userEntity.getId())).toList());
+                .map((groupEntity) -> toGroupDTO(groupEntity, userEntity.getId())).toList());
         Optional<GroupEntity> groupUrl = groups.stream().findFirst();
         String lastGroupUrl = groupUrl.isPresent() ? groupUrl.get().getUrl() : "";
         allUserGroups.sort(new ComparatorListGroupDTO());
         return new AuthUserDTO(userEntity.getId(), userEntity.getFirstName(), userEntity.getLastName(), lastGroupUrl, userEntity.getWsToken(), userEntity.getColor(), allUserGroups);
+    }
+
+    public GroupDTO toGroupDTO(GroupEntity grp, int userId) {
+        GroupDTO grpDTO = new GroupDTO();
+        grpDTO.setId(grp.getId());
+        grpDTO.setName(grp.getName());
+        grpDTO.setUrl(grp.getUrl());
+        grpDTO.setGroupType(grp.getGroupTypeEnum().toString());
+        GroupUser user = groupUserJoinService.findGroupUser(userId, grp.getId());
+        MessageEntity msg = messageService.findLastMessage(grp.getId());
+        if (msg != null) {
+            String sender = userService.findFirstNameById(msg.getUser_id());
+            MessageUserEntity messageUserEntity = seenMessageService.findByMessageId(msg.getId(), userId);
+            grpDTO.setLastMessageSender(sender);
+            if (messageUserEntity != null) {
+                if (msg.getType().equals(MessageTypeEnum.FILE.toString())) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String senderName = userId == msg.getUser_id() ? "You" : sender;
+                    stringBuilder.append(senderName);
+                    stringBuilder.append(" ");
+                    stringBuilder.append("has send a file");
+                    grpDTO.setLastMessage(stringBuilder.toString());
+                } else {
+                    grpDTO.setLastMessage(msg.getMessage());
+                }
+                grpDTO.setLastMessage(msg.getMessage());
+                grpDTO.setLastMessageSeen(msg.getCreatedAt().after(user.getLastMessageSeenDate()));
+                grpDTO.setLastMessageDate(msg.getCreatedAt().toString());
+            }
+        } else {
+            grpDTO.setLastMessageDate(grp.getCreatedAt().toString());
+            grpDTO.setLastMessageSeen(true);
+        }
+        return grpDTO;
+    }
+
+    public GroupMemberDTO toGroupMemberDTO(GroupUser groupUser) {
+        return new GroupMemberDTO(groupUser.getUserEntities().getId(), groupUser.getUserEntities().getFirstName(), groupUser.getUserEntities().getLastName(), groupUser.getRole() == 1);
     }
 }

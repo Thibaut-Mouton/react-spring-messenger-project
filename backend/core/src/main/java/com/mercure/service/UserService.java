@@ -4,7 +4,6 @@ import com.mercure.dto.GroupMemberDTO;
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
 import com.mercure.entity.UserEntity;
-import com.mercure.mapper.UserMapper;
 import com.mercure.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -22,23 +21,13 @@ import java.util.*;
 @AllArgsConstructor
 public class UserService {
 
-    private UserMapper userMapper;
-
-    private PasswordEncoder passwordEncoder;
+//    private PasswordEncoder passwordEncoder;
 
     private UserRepository userRepository;
 
     private GroupUserJoinService groupUserJoinService;
 
     private static Map<Integer, String> wsSessions = new HashMap<>();
-
-    public void deleteAll() {
-        userRepository.deleteAll();
-    }
-
-    public void flush() {
-        userRepository.flush();
-    }
 
     public List<UserEntity> findAll() {
         return userRepository.findAll();
@@ -54,14 +43,6 @@ public class UserService {
         List<UserEntity> list = userRepository.getAllUsersNotAlreadyInConversation(ids);
         list.forEach(user -> toSend.add(new GroupMemberDTO(user.getId(), user.getFirstName(), user.getLastName(), false)));
         return toSend;
-    }
-
-    public String findUsernameWithWsToken(String token) {
-        return userRepository.getUsernameWithWsToken(token);
-    }
-
-    public int findUserIdWithToken(String token) {
-        return userRepository.getUserIdWithWsToken(token);
     }
 
     public UserEntity findByNameOrEmail(String str0, String str1) {
@@ -108,7 +89,8 @@ public class UserService {
     }
 
     public String passwordEncoder(String str) {
-        return passwordEncoder.encode(str);
+//        return passwordEncoder.encode(str);
+        return str;
     }
 
     public boolean checkIfUserNameOrMailAlreadyUsed(String mail) {

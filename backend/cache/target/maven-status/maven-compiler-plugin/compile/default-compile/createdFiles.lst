@@ -1,1 +1,2 @@
-com/mercure/App.class
+com\mercure\cache\controller\HealthController.class
+com\mercure\CacheApplication.class

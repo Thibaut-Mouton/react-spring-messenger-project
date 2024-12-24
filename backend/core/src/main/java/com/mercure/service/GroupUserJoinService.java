@@ -2,6 +2,7 @@ package com.mercure.service;
 
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
+import com.mercure.repository.GroupRepository;
 import com.mercure.repository.GroupUserJoinRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -21,9 +22,7 @@ public class GroupUserJoinService {
 
     private GroupUserJoinRepository groupUserJoinRepository;
 
-    private MessageService messageService;
-
-    private GroupService groupService;
+    private GroupRepository groupRepository;
 
     public GroupUser save(GroupUser groupUser) {
         return groupUserJoinRepository.save(groupUser);
@@ -58,7 +57,7 @@ public class GroupUserJoinService {
     }
 
     public void saveLastMessageDate(int userId, String groupUrl) {
-        int groupId = groupService.findGroupByUrl(groupUrl);
+        int groupId = groupRepository.findGroupByUrl(groupUrl);
         GroupUser groupUser = groupUserJoinRepository.getGroupUser(userId, groupId);
         Date date = new Date();
         Timestamp ts = new Timestamp(date.getTime());
@@ -98,7 +97,8 @@ public class GroupUserJoinService {
             List<Integer> usersId = groupUserJoinRepository.getUsersIdInGroup(groupId);
             if (usersId.isEmpty()) {
                 log.info("All users have left the group [groupId => {}]. Deleting messages...", groupId);
-                messageService.deleteAllMessagesByGroupId(groupId);
+                // TODO fix circular dependency
+//                messageService.deleteAllMessagesByGroupId(groupId);
                 log.info("All messages have been successfully deleted");
             }
         } catch (Exception exception) {

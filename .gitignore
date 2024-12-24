@@ -1,9 +1,7 @@
 .idea/**
 /frontend-web/build/
 /frontend-web/.idea/**
-/backend/src/main/resources/public/images/
 livraison.sh
-/backend/uploads/
 
 # dependencies
 /frontend-web/node_modules
@@ -18,6 +16,7 @@ livraison.sh
 
 # misc
 /frontend-web/.DS_Store
+/frontend-web/.env
 /frontend-web/.env.local
 /frontend-web/.env.development.local
 /frontend-web/.env.test.local
@@ -26,37 +25,31 @@ livraison.sh
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
 
-
-/backend/HELP.md
-/backend/target/
-/backend/uploads/
-/backend/!.mvn/wrapper/maven-wrapper.jar
-/backend/!**/src/main/**/target/
-/backend/!**/src/test/**/target/
-
+*.jar
+target/
+uploads/
+*.properties
 
 ### IntelliJ IDEA ###
-/backend/.idea/**
-/backend/.mvn/**
-/backend/*.iws
-/backend/*.iml
-/backend/*.ipr
+.idea/**
+.mvn/**
+*.iws
+*.iml
+*.ipr
 
 ### NetBeans ###
-/backend/nbproject/private/
-/backend/nbbuild/
-/backend/dist/
-/backend/nbdist/
-/backend/.nb-gradle/
-/backend/build/
-/backend/!**/src/main/**/build/
-/backend/!**/src/test/**/build/
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 ### VS Code ###
-/backend/.vscode/
-/backend/src/main/resources/application-prod.properties
-/backend/src/main/resources/static/**
-/backend/src/main/resources/ssl/**
+.vscode/
+application-prod.properties
+static/**
+ssl/**
