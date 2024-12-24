@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/search")
-@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000")
 @AllArgsConstructor
 public class SearchController {
 

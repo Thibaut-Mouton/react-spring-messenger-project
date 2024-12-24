@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@CrossOrigin(allowCredentials = "true", origins = "http://localhost:3000", methods = {RequestMethod.GET, RequestMethod.POST})
 @AllArgsConstructor
 public class WsFileController {
 

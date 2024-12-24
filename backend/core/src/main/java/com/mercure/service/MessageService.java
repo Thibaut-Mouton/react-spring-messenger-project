@@ -7,6 +7,7 @@ import com.mercure.dto.search.FullTextSearchDatabaseResponseDTO;
 import com.mercure.dto.search.FullTextSearchResponseDTO;
 import com.mercure.entity.*;
 import com.mercure.repository.MessageRepository;
+import com.mercure.repository.UserRepository;
 import com.mercure.utils.MessageTypeEnum;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ public class MessageService {
 
     private GroupService groupService;
 
-    private UserService userService;
+    private UserRepository userRepository;
 
     private GroupUserJoinService groupUserJoinService;
 
@@ -75,7 +76,7 @@ public class MessageService {
      * @return a {@link MessageDTO}
      */
     public MessageDTO createMessageDTO(int id, String type, int userId, String date, int group_id, String message) {
-        UserEntity user = userService.findById(userId);
+        UserEntity user = userRepository.findById(userId).orElse(null);
         String fileUrl = "";
         String initials = user.getFirstName().substring(0, 1).toUpperCase() + user.getLastName().substring(0, 1).toUpperCase();
         String sender = StringUtils.capitalize(user.getFirstName()) +
@@ -107,9 +108,10 @@ public class MessageService {
 
     public MessageDTO createNotificationMessageDTO(MessageEntity msg, int userId) {
         String groupUrl = groupService.getGroupUrlById(msg.getGroup_id());
-        UserEntity user = userService.findById(userId);
-        String firstName = userService.findFirstNameById(msg.getUser_id());
-        String initials = userService.findUsernameById(msg.getUser_id());
+        // TODO handle null and circular dependency
+        UserEntity user = userRepository.findById(userId).orElse(null);
+        String firstName = userRepository.getFirstNameByUserId(msg.getUser_id());
+        String initials = userRepository.getFirstNameByUserId(msg.getUser_id());
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setId(msg.getId());
         if (msg.getType().equals(MessageTypeEnum.FILE.toString())) {

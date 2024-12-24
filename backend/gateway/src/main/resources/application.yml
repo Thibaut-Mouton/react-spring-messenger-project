@@ -1,0 +1,35 @@
+spring:
+  main:
+    web-application-type: reactive
+  liquibase:
+    enabled: false
+  datasource:
+    url: jdbc:mysql://localhost:3306/fastlitemessage_dev
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowCredentials: true
+            allowedHeaders: "*"
+            allowedMethods:
+              - GET
+              - POST
+        add-to-simple-url-handler-mapping: true
+      routes:
+        - id: authentication
+          uri: http://localhost:9090
+          predicates:
+            - Path=/core/**
+        - id: cache
+          uri: http://localhost:9092
+          predicates:
+            - Path=/service1/**
+        - id: service2
+          uri: http://localhost:8082
+          predicates:
+            - Path=/service2/**

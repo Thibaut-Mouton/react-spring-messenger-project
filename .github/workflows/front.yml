@@ -1,0 +1,58 @@
+name: front
+
+on: push
+
+jobs:
+  if: false
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: install
+        run: npm --prefix ./frontend-web install
+      - name: test front
+        id: test
+        run: npm --prefix ./frontend-web run test
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: install
+        run: npm --prefix ./frontend-web install
+      - name: build
+        run: npm --prefix frontend-web run build
+
+  push:
+    runs-on: ubuntu-latest
+    if: steps.build.outcome == 'success'
+
+    steps:
+      - uses: actions/setup-node@v4
+      - with:
+        node-version: 20.x
+      - name: Push registry
+        run: |
+          APP_VERSION=`cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]'`
+          docker build -t $SERVICE_NAME:$APP_VERSION .
+          docker push
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy dev
+        if: branch.
+        run: |
+          gcloud deploy DEV
+
+      - name: Deploy artifact
+        if: branch
+        run: |
+          gcloud deploy PROD
