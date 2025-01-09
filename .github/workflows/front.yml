@@ -1,6 +1,8 @@
 name: front
 
-on: push
+on:
+  push:
+    branches: [develop]
 
 jobs:
   test:
@@ -31,21 +33,30 @@ jobs:
       - name: build
         run: npm --prefix ./frontend-web run build
 
-  push:
+  login:
+    needs: build
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-      - name: Push registry
-        run: |
-          cat ${{ secrets.DOCKER_REGISTRY_SA }} | docker login -u _json_key --password-stdin ${{ secrets.DOCKER_HOST }}
-          APP_VERSION=`cat ./frontend-web/package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]'`
-          docker build -t ${{ secrets.SERVICE_NAME }}:$APP_VERSION .
-          docker push ${{ secrets.DOCKER_HOST }}/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE_NAME }}/${{ secrets.SERVICE_NAME }}:$APP_VERSION
-          docker tag ${{ secrets.SERVICE_NAME }}:$APP_VERSION ${{ secrets.DOCKER_HOST }}/${{ secrets.PROJECT_ID}}/${{ secrets.SERVICE_NAME}}/${{ secrets.SERVICE_NAME }}:$APP_VERSION
+      - name: Login to GAR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.DOCKER_HOST }}
+          username: _json_key
+          password: ${{ secrets.DOCKER_REGISTRY_SA }}
 
+  push:
+    needs: login
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend-web
+          push: true
+          tags: ${{ secrets.SERVICE_NAME }}:latest
 
   deploy:
+    needs: push
     runs-on: ubuntu-latest
 
     steps:
