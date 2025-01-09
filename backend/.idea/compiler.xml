@@ -12,12 +12,14 @@
         <module name="cache" />
         <module name="storage" />
         <module name="gateway" />
+        <module name="commons" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="cache" options="-parameters" />
+      <module name="commons" options="-parameters" />
       <module name="core" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="messenger" options="" />

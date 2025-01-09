@@ -25,6 +25,10 @@ spring:
           uri: http://localhost:9090
           predicates:
             - Path=/core/**
+        - id: websocket_route
+          uri: ws://localhost:9090
+          predicates:
+            - Path=/core/messenger/websocket/**
         - id: cache
           uri: http://localhost:9092
           predicates:
