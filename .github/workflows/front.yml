@@ -3,7 +3,6 @@ name: front
 on: push
 
 jobs:
-  if: false
   test:
     runs-on: ubuntu-latest
 
@@ -34,25 +33,29 @@ jobs:
     if: steps.build.outcome == 'success'
 
     steps:
-      - uses: actions/setup-node@v4
-      - with:
-        node-version: 20.x
+      - uses: actions/checkout@v2
       - name: Push registry
         run: |
-          APP_VERSION=`cat package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]'`
-          docker build -t $SERVICE_NAME:$APP_VERSION .
-          docker push
+          echo ${{ secrets.DOCKER_REGISTRY_SA }} | docker login -u _json_key --password-stdin ${{ secrets.DOCKER_HOST }}
+          APP_VERSION=`cat ./frontend-web/package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]'`
+          docker build -t ${{ secrets.SERVICE_NAME }}:$APP_VERSION .
+          docker push ${{ secrets.DOCKER_HOST }}/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE_NAME }}/${{ secrets.SERVICE_NAME }}:$APP_VERSION
+          docker tag ${{ secrets.SERVICE_NAME }}:$APP_VERSION ${{ secrets.DOCKER_HOST }}/${{ secrets.PROJECT_ID}}/${{ secrets.SERVICE_NAME}}/${{ secrets.SERVICE_NAME }}:$APP_VERSION
+
 
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy dev
-        if: branch.
-        run: |
-          gcloud deploy DEV
+      #- name: Deploy dev
+      #  if: branch.
+      #  run: |
+      #    gcloud deploy DEV
 
       - name: Deploy artifact
-        if: branch
+      - uses: actions/checkout@v2
+        #if: branch
         run: |
-          gcloud deploy PROD
+          gcloud auth activate-service-account ${{ secrets.CLOUD_RUN_SA }} --key-file=${{ secrets.CLOUD_RUN_SA_KEY }}
+          gcloud run deploy ${{ secrets.SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ PROJECT_ID }}/${{ SERVICE_NAME }}/${{ SERVICE_NAME }}:$APP_VERSION
+          gcloud beta run services add-iam-policy-binding --region=${{ secrets.REGION }} --member=allUsers --role=roles/run.invoker ${{ secrets.SERVICE_NAME }} --project=${{ secrets.PROJECT_ID}}

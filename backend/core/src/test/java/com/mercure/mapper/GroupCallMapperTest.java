@@ -1,8 +1,9 @@
 package com.mercure.mapper;
 
-import com.mercure.dto.user.GroupCallDTO;
-import com.mercure.entity.GroupEntity;
-import com.mercure.service.cache.RoomCacheService;
+import com.mercure.commons.dto.user.GroupCallDTO;
+import com.mercure.commons.entity.GroupEntity;
+import com.mercure.core.mapper.GroupCallMapper;
+import com.mercure.core.service.cache.RoomCacheService;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotEquals;
