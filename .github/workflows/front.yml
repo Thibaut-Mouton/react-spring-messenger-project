@@ -58,5 +58,5 @@ jobs:
         run: |
           APP_VERSION=`cat ./frontend-web/package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]'`
           gcloud auth activate-service-account ${{ secrets.CLOUD_RUN_SA }} --key-file=${{ secrets.CLOUD_RUN_SA_KEY }}
-          gcloud run deploy ${{ secrets.SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ PROJECT_ID }}/${{ SERVICE_NAME }}/${{ SERVICE_NAME }}:$APP_VERSION
+          gcloud run deploy ${{ secrets.SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ SERVICE_NAME }}/${{ SERVICE_NAME }}:$APP_VERSION
           gcloud beta run services add-iam-policy-binding --region=${{ secrets.REGION }} --member=allUsers --role=roles/run.invoker ${{ secrets.SERVICE_NAME }} --project=${{ secrets.PROJECT_ID}}
