@@ -19,7 +19,6 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: setup node 20
         uses: actions/setup-node@v4
@@ -32,7 +31,6 @@ jobs:
 
   push:
     runs-on: ubuntu-latest
-    if: steps.build.outcome == 'success'
 
     steps:
       - name: Push registry
