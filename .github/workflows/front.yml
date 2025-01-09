@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: setup node 20
         uses: actions/setup-node@v4
         with:
@@ -20,6 +21,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: setup node 20
         uses: actions/setup-node@v4
         with:
@@ -33,9 +35,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: Push registry
         run: |
-          echo ${{ secrets.DOCKER_REGISTRY_SA }} | docker login -u _json_key --password-stdin ${{ secrets.DOCKER_HOST }}
+          cat ${{ secrets.DOCKER_REGISTRY_SA }} | docker login -u _json_key --password-stdin ${{ secrets.DOCKER_HOST }}
           APP_VERSION=`cat ./frontend-web/package.json | grep version | head -1 | awk -F= "{ print $2 }" | sed 's/[version:,\",]//g' | tr -d '[[:space:]]'`
           docker build -t ${{ secrets.SERVICE_NAME }}:$APP_VERSION .
           docker push ${{ secrets.DOCKER_HOST }}/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE_NAME }}/${{ secrets.SERVICE_NAME }}:$APP_VERSION
@@ -50,7 +53,7 @@ jobs:
       #  if: branch.
       #  run: |
       #    gcloud deploy DEV
-
+      - uses: actions/checkout@v4
       - name: Deploy artifact
         #if: branch
         run: |
