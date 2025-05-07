@@ -34,7 +34,7 @@ jobs:
         run: npm --prefix ./frontend-web run build
 
   login:
-    needs: build
+    needs: [build, test]
     runs-on: ubuntu-latest
     steps:
       - name: Login to GAR
