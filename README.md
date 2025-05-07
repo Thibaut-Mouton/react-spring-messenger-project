@@ -3,11 +3,6 @@
 ![coverage back](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/test-back/badge.svg?branch=develop)
 ![coverage front](https://github.com/Thibaut-Mouton/react-spring-messenger-project/workflows/test-front/badge.svg?branch=develop)
 
-<p align="center">
-   <img src="/assets/react.png" alt="React logo"/>
-   <img src="/assets/springboot.png" alt="Spring boot logo"/>
-</p>
-
 # FastLiteMessage
 
 Real time chat application group oriented built with React and Spring Boot. Talk with your friends, create and add users to conversation, send messages or images, set groups administrators and start video calls ! (coming soon)
@@ -55,7 +50,9 @@ Warning : Be sure that no other app is running on port 3000, 9090 or 3306
 
 # Project overview
 
-![Project overview](assets/messenger.jpg?raw=true "Project overview")
+![Project overview](assets/flm.PNG?raw=true "Project overview 1")
+
+![Project overview](assets/flm2.PNG?raw=true "Project overview 2")
 
 * Simple chat group application
 * Send images
@@ -64,4 +61,3 @@ Warning : Be sure that no other app is running on port 3000, 9090 or 3306
 * Room discussion
 * Chat group administrators
 * Add / remove users from conversation 
-* Dark / Light Mode
