@@ -35,7 +35,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: backend
+          context: "{{defaultContext}}:backend"
           push: true
           tags: ${{ secrets.SERVICE_NAME }}:latest
 
