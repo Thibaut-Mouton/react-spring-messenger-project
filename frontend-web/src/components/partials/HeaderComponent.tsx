@@ -1,5 +1,5 @@
 import ClearAllIcon from "@mui/icons-material/ClearAll"
-import {Toolbar, Typography} from "@mui/material"
+import { Toolbar, Typography } from "@mui/material"
 import React, {useContext} from "react"
 import {AccountMenu} from "../user-account/UseAccountComponent"
 import {UserContext} from "../../context/UserContext"

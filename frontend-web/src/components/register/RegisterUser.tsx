@@ -1,6 +1,6 @@
 import React, {useContext} from "react"
 import CloseIcon from "@mui/icons-material/Close"
-import {Alert, Button, Collapse, Grid, IconButton, TextField, Typography} from "@mui/material"
+import {Alert, Box, Button, Collapse, Grid, IconButton, TextField, Typography} from "@mui/material"
 import {Link} from "react-router-dom"
 import {useThemeContext} from "../../context/theme-context"
 import {HttpGroupService} from "../../service/http-group-service"
@@ -152,7 +152,7 @@ export function RegisterUserComponent(): React.JSX.Element {
                  justifyContent: "center",
                  alignItems: "center"
              }}>
-            <Grid sx={{m: 2}} container xs={8}>
+            <Box sx={{m: 2}}>
                 <div className={"main-register-form"}>
                     <div style={{textAlign: "center"}}>
                         <Typography component="h1" variant="h5">
@@ -160,7 +160,7 @@ export function RegisterUserComponent(): React.JSX.Element {
                         </Typography>
                     </div>
                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             {
                                 <Collapse ref={refWrapper} in={displayFormValidationError}
                                           timeout={500}>
@@ -186,7 +186,8 @@ export function RegisterUserComponent(): React.JSX.Element {
                                 </Collapse>
                             }
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+				  <Grid container>
+                        <Grid size={6}>
                             <TextField id={"firstNameInput"}
                                        label={"First Name"}
                                        name={"firstName"}
@@ -195,7 +196,7 @@ export function RegisterUserComponent(): React.JSX.Element {
                                        onChange={handleChange}
                                        type={"text"}/>
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={6}>
                             <TextField id={"lastNameInput"}
                                        label={"Last Name"}
                                        fullWidth
@@ -204,7 +205,8 @@ export function RegisterUserComponent(): React.JSX.Element {
                                        onChange={handleChange}
                                        type={"text"}/>
                         </Grid>
-                        <Grid item xs={12}>
+				  </Grid>
+                        <Grid size={{ xs: 12 }}>
                             <TextField id={"emailInput"}
                                        fullWidth
                                        error={displayEmailNotValid}
@@ -215,7 +217,7 @@ export function RegisterUserComponent(): React.JSX.Element {
                                        onChange={handleChange}
                                        type={"text"}/>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <TextField id={"passwordInput"}
                                        label={"Password"}
                                        fullWidth
@@ -225,7 +227,7 @@ export function RegisterUserComponent(): React.JSX.Element {
                                        type={"password"}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <TextField id={"repeatPasswordInput"}
                                        label={"Repeat password"}
                                        fullWidth
@@ -252,7 +254,7 @@ export function RegisterUserComponent(): React.JSX.Element {
                         </Button>
                     </div>
                     <Grid container justifyContent="flex-end">
-                        <Grid item>
+                        <Grid>
                             <Link className={"lnk"}
                                   style={{color: generateLinkColorMode(theme)}}
                                   to={"/login"}>
@@ -261,7 +263,7 @@ export function RegisterUserComponent(): React.JSX.Element {
                         </Grid>
                     </Grid>
                 </div>
-            </Grid>
+            </Box>
         </div>
     )
 }

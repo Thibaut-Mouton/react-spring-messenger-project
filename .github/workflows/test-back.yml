@@ -15,4 +15,4 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: build
-        run: mvn clean test -f backend/pom.xml
+        run: mvn test -f backend/pom.xml

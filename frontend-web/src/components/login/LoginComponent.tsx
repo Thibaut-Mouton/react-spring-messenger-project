@@ -93,7 +93,7 @@ export function LoginComponent(): React.JSX.Element {
                 </Typography>
                 <Grid>
                     <Grid container>
-                        <Grid item sx={{my: 1}} xs={12}>
+                        <Grid size={{ xs: 12 }} sx={{my: 1}}>
                             <TextField label={"Username"}
                                        name={"username"}
                                        value={username}
@@ -103,7 +103,7 @@ export function LoginComponent(): React.JSX.Element {
                                        multiline={false}
                                        type={"text"}/>
                         </Grid>
-                        <Grid item sx={{my: 1}} xs={12}>
+				  <Grid size={{ xs: 12 }} sx={{ my: 1 }}>
                             <TextField label={"Password"}
                                        name={"password"}
                                        value={password}
@@ -115,7 +115,7 @@ export function LoginComponent(): React.JSX.Element {
                             />
                         </Grid>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid size={{ xs: 12 }}>
                         <Button
                             disabled={isSignInButtonDisabled()}
                             className={"button-register-form"}
