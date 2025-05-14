@@ -17,7 +17,6 @@ jobs:
       - name: compile
         run: mvn install -f backend/pom.xml
         
-        
   login:
     needs: [build, test]
     runs-on: ubuntu-latest
