@@ -27,20 +27,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.azure</groupId>
-            <artifactId>azure-storage-blob</artifactId>
-            <version>12.29.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.mercure</groupId>
             <artifactId>commons</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.mercure</groupId>
-            <artifactId>core</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
