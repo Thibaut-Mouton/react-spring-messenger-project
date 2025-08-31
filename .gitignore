@@ -32,7 +32,6 @@ uploads/
 *.properties
 
 ### IntelliJ IDEA ###
-.idea/**
 .mvn/**
 *.iws
 *.iml

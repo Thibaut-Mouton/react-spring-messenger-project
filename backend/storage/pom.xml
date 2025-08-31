@@ -31,11 +31,11 @@
             <artifactId>commons</artifactId>
             <version>1.4.0</version>
         </dependency>
+
         <dependency>
             <groupId>com.mercure</groupId>
             <artifactId>core</artifactId>
             <version>1.4.0</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
