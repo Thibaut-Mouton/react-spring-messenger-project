@@ -30,7 +30,7 @@ jobs:
         run: npm --prefix ./frontend-web ci
       - name: build
         run: npm --prefix ./frontend-web run build
-      - name: cache build folder
+      - name: artifact
         uses: actions/upload-artifact@v4
         with:
           name: build
