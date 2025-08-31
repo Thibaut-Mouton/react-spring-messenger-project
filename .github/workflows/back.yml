@@ -28,19 +28,30 @@ jobs:
           username: _json_key
           password: ${{ secrets.DOCKER_REGISTRY_SA }}
 
-  push:
+  push-gateway:
     needs: login
     runs-on: ubuntu-latest
     steps:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}:backend"
+          context: "{{defaultContext}}:backend/gateway"
           push: true
-          tags: ${{ secrets.SERVICE_NAME }}:latest
+          tags: ${{ secrets.GATEWAY_SERVICE_NAME }}:latest
 
-  deploy:
-    needs: push
+  push-storage:
+    needs: login
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:backend/storage"
+          push: true
+          tags: ${{ secrets.STORAGE_SERVICE_NAME }}:latest
+
+  deploy-gateway:
+    needs: push-gateway
     runs-on: ubuntu-latest
 
     steps:
@@ -48,5 +59,17 @@ jobs:
       - name: Deploy artifact
         run: |
           gcloud auth activate-service-account ${{ secrets.CLOUD_RUN_SA }} --key-file=${{ secrets.CLOUD_RUN_SA_KEY }}
-          gcloud run deploy ${{ secrets.SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE_NAME }}/${{ secrets.SERVICE_NAME }}:latest
-          gcloud beta run services add-iam-policy-binding --region=${{ secrets.REGION }} --member=allUsers --role=roles/run.invoker ${{ secrets.SERVICE_NAME }} --project=${{ secrets.PROJECT_ID}}
+          gcloud run deploy ${{ secrets.GATEWAY_SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.GATEWAY_SERVICE_NAME }}/${{ secrets.GATEWAY_SERVICE_NAME }}:latest
+          gcloud beta run services add-iam-policy-binding --region=${{ secrets.REGION }} --member=allUsers --role=roles/run.invoker ${{ secrets.GATEWAY_SERVICE_NAME }} --project=${{ secrets.PROJECT_ID}}
+
+  deploy-storage:
+    needs: push-storage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy artifact
+        run: |
+          gcloud auth activate-service-account ${{ secrets.CLOUD_RUN_SA }} --key-file=${{ secrets.CLOUD_RUN_SA_KEY }}
+          gcloud run deploy ${{ secrets.STORAGE_SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.STORAGE_SERVICE_NAME }}/${{ secrets.STORAGE_SERVICE_NAME }}:latest
+          gcloud beta run services add-iam-policy-binding --region=${{ secrets.REGION }} --member=allUsers --role=roles/run.invoker ${{ secrets.STORAGE_SERVICE_NAME }} --project=${{ secrets.PROJECT_ID}}
