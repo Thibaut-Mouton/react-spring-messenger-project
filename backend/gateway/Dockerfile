@@ -1,4 +1,5 @@
-FROM ubuntu:latest
-LABEL authors="thiba"
+FROM openjdk:17-alpine3.14
 
-ENTRYPOINT ["top", "-b"]
+COPY ./targets/gateway-1.4.0.jar flm.jar
+
+ENTRYPOINT ["java","-jar","/flm.jar"]

@@ -57,14 +57,12 @@ jobs:
         with:
           name: build
           path: ./build
-      - name: debug
-        run: ls -l
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: "{{defaultContext}}:frontend-web"
           push: true
-          tags: ${{ secrets.SERVICE_NAME }}:latest
+          tags: ${{ secrets.SERVICE_NAME }}:1.0.0
 
   deploy:
     needs: push
