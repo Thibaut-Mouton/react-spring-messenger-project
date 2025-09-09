@@ -2,6 +2,10 @@ name: front
 
 on: push
 
+defaults:
+  run:
+    working-directory: frontend-web
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -13,10 +17,10 @@ jobs:
         with:
           node-version: 20.x
       - name: install dependencies
-        run: npm --prefix ./frontend-web install
+        run: npm install
       - name: test front
         id: test
-        run: npm --prefix ./frontend-web run test
+        run: npm run test
      
   build:
     runs-on: ubuntu-latest
@@ -27,16 +31,16 @@ jobs:
         with:
           node-version: 20.x
       - name: install
-        run: npm --prefix ./frontend-web ci
+        run: npm ci
       - name: build
-        run: npm --prefix ./frontend-web run build
+        run: npm run build
       - name: artifact
         uses: actions/upload-artifact@v4
         with:
           name: build
-          path: frontend-web/build/
+          path: build/
           retention-days: 2
-          
+
   login:
     needs: [build, test]
     runs-on: ubuntu-latest
@@ -56,11 +60,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build
-          path: ./build
+          path: build
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}:frontend-web"
           push: true
           tags: ${{ secrets.FRONT_SERVICE_NAME }}:1.0.0
 
