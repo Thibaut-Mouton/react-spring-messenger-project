@@ -60,11 +60,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build
-          path: build
+          path: frontend-web/build
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: frontend-web
+          context: "{{defaultContext}}:frontend-web"
           push: true
           tags: ${{ secrets.FRONT_SERVICE_NAME }}:1.0.0
 
