@@ -62,7 +62,7 @@ jobs:
         with:
           context: "{{defaultContext}}:frontend-web"
           push: true
-          tags: ${{ secrets.SERVICE_NAME }}:1.0.0
+          tags: ${{ secrets.FRONT_SERVICE_NAME }}:1.0.0
 
   deploy:
     needs: push
