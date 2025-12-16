@@ -46,6 +46,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
+          platforms: linux/amd64
           context: "{{defaultContext}}:backend/gateway"
           push: true
           tags: ${{ secrets.GATEWAY_SERVICE_NAME }}:1.0.0
@@ -62,6 +63,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
+          platforms: linux/amd64
           context: "{{defaultContext}}:backend/storage"
           push: true
           tags: ${{ secrets.STORAGE_SERVICE_NAME }}:1.0.0
