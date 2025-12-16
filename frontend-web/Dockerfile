@@ -14,5 +14,5 @@ RUN echo 'server { \
               } \
           }' >> /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/*
-RUN ls -l
+
 COPY build /usr/share/nginx/html
