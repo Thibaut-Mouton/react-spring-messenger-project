@@ -1,4 +1,4 @@
-FROM openjdk:17-alpine3.14
+FROM eclipse-temurin:17-nanoserver
 
 COPY ./targets/gateway/gateway-1.4.0.jar flm.jar
 

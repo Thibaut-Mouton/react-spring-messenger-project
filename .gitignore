@@ -1,6 +1,6 @@
-.idea/**
 /frontend-web/build/
 /frontend-web/.idea/**
+/backend/.idea/**
 livraison.sh
 
 # dependencies

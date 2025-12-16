@@ -60,7 +60,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: build
-          path: frontend-web/build
+          path: frontend-web
       - name: Build and push
         uses: docker/build-push-action@v6
         with:

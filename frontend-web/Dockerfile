@@ -1,6 +1,6 @@
 FROM nginx:mainline-alpine3.18-slim
 
-MAINTAINER Thibaut MOUTON <thibautmouton22@gmail.com>
+LABEL maintainer="Thibaut MOUTON <thibautmouton22@gmail.com>"
 
 RUN rm /etc/nginx/conf.d/default.conf
 RUN echo 'server { \
