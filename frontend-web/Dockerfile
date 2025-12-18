@@ -1,4 +1,7 @@
 FROM node:20-alpine AS build
+
+LABEL maintainer="Thibaut MOUTON <thibautmouton22@gmail.com>"
+
 COPY package*.json ./
 RUN npm ci
 COPY . .

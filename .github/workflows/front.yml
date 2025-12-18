@@ -1,8 +1,8 @@
 name: front
 
-on:
-  push:
-    paths: ["frontend-web/**"]
+on: push
+#  push:
+#    paths: ["frontend-web/**"]
 
 defaults:
   run:

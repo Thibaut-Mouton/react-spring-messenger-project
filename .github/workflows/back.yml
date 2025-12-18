@@ -1,8 +1,8 @@
 name: back
 
-on:
-  push:
-    paths: ["backend/**"]
+on: push
+#  push:
+#    paths: ["backend/**"]
 
 jobs:
   login:
@@ -19,11 +19,6 @@ jobs:
     needs: login
     runs-on: ubuntu-latest
     steps:
-      - name: Download gateway jar
-        uses: actions/download-artifact@v4
-        with:
-          name: targets
-          path: ./targets
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -36,11 +31,6 @@ jobs:
     needs: login
     runs-on: ubuntu-latest
     steps:
-      - name: Download storage jar
-        uses: actions/download-artifact@v4
-        with:
-          name: targets
-          path: ./targets
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
