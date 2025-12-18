@@ -5,28 +5,7 @@ on:
     paths: ["backend/**"]
 
 jobs:
-  test-build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: setup java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: maven
-      - name: compile
-        run: mvn install -f backend/pom.xml
-      - name: upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: targets
-          path: backend/**/*.jar
-          retention-days: 1
-        
   login:
-    needs: test-build
     runs-on: ubuntu-latest
     steps:
       - name: Login to GAR

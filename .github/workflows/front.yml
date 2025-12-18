@@ -24,27 +24,8 @@ jobs:
         id: test
         run: npm run test
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: setup node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-      - name: install
-        run: npm ci
-      - name: build
-        run: npm run build
-      - name: artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: frontend-web/build/
-          retention-days: 2
-
-  login:
-    needs: [ build, test ]
+  push:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Login to registry
@@ -53,16 +34,6 @@ jobs:
           registry: ${{ secrets.DOCKER_HOST }}
           username: _json_key
           password: ${{ secrets.DOCKER_REGISTRY_SA }}
-
-  push:
-    needs: login
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download front artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: build
-          path: frontend-web
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
