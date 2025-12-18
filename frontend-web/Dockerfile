@@ -1,3 +1,9 @@
+FROM node:20-alpine AS build
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm build
+
 FROM nginx:mainline-alpine3.18-slim
 
 LABEL maintainer="Thibaut MOUTON <thibautmouton22@gmail.com>"
@@ -15,4 +21,4 @@ RUN echo 'server { \
           }' >> /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/*
 
-COPY build /usr/share/nginx/html
+COPY --from=build /build /usr/share/nginx/html
