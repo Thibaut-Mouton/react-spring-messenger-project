@@ -85,7 +85,7 @@ jobs:
 
       - name: Build image
         run: docker build . --tag ${{ secrets.STORAGE_SERVICE_NAME }}:1.0.0
-        working-directory: "{{defaultContext}}:backend/storage"
+        working-directory: "backend/storage"
 
       - name: Push image
         run: docker push ${{ secrets.REGISTRY_AREA }}
