@@ -1,6 +1,6 @@
 FROM maven:3.9-amazoncorretto-8-alpine as build
 COPY . .
-RUN mvn package -f backend/pom.xml
+RUN mvn package -f backend/gateway/pom.xml
 
 FROM amazoncorretto:17.0.17-al2023-headless
 
