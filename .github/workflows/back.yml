@@ -84,7 +84,7 @@ jobs:
           gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev --quiet
 
       - name: Build image
-        run: docker build . --tag ${{ secrets.STORAGE_SERVICE_NAME }}:1.0.0
+        run: docker build .  --platform linux/arm64 --tag ${{ secrets.STORAGE_SERVICE_NAME }}:1.0.0
         working-directory: "backend/storage"
 
       - name: Push image
