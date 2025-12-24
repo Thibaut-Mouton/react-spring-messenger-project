@@ -72,7 +72,6 @@ jobs:
         working-directory: "frontend-web"
 
       - name: Push image
-        run: docker push ${{ secrets.REGISTRY_AREA }}:1.0.0
-#        run: |-
-#          docker tag my-image username/my-repo
-#          docker push ${{ secrets.REGISTRY_AREA }}:1.0.0
+        run: |-
+          docker tag ${{ secrets.FRONT_SERVICE_NAME }} ${{ secrets.REGISTRY_AREA }}/${{ secrets.FRONT_SERVICE_NAME }}
+          docker push ${{ secrets.REGISTRY_AREA }}/${{ secrets.FRONT_SERVICE_NAME }}
