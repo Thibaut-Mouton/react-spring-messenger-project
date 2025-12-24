@@ -85,7 +85,7 @@ jobs:
 
       - name: Build image
         run: docker build .  --platform linux/amd64 --tag ${{ secrets.STORAGE_SERVICE_NAME }}:1.0.0
-        working-directory: "backend/gateway"
+        working-directory: "backend"
 
       - name: Push image
         run: docker push ${{ secrets.REGISTRY_AREA }}
