@@ -10,45 +10,70 @@ defaults:
 
 jobs:
   test:
+#    runs-on: ubuntu-latest
+
+#    steps:
+#      - uses: actions/checkout@v4
+#      - name: setup node 20
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: 20.x
+#      - name: install dependencies
+#        run: npm install
+#      - name: test front
+#        id: test
+#        run: npm run test
+#
+#  push:
+#    needs: test
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Login to registry
+#        uses: docker/login-action@v3
+#        with:
+#          registry: ${{ secrets.DOCKER_HOST }}
+#          username: _json_key
+#          password: ${{ secrets.DOCKER_REGISTRY_SA }}
+#      - name: Build and push
+#        uses: docker/build-push-action@v6
+#        with:
+#          platforms: linux/amd64
+#          context: "{{defaultContext}}:frontend-web"
+#          push: true
+#          tags: ${{ secrets.FRONT_SERVICE_NAME }}:1.0.0
+#
+#  deploy:
+#    needs: push
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - name: Deploy artifact
+#        run: |
+#          gcloud auth activate-service-account ${{ secrets.CLOUD_RUN_SA }} --key-file=${{ secrets.CLOUD_RUN_SA_KEY }}
+#          gcloud run deploy ${{ secrets.SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE_NAME }}/${{ secrets.SERVICE_NAME }}:latest
+#          gcloud beta run services add-iam-policy-binding --region=${{ secrets.REGION }} --member=allUsers --role=roles/run.invoker ${{ secrets.SERVICE_NAME }} --project=${{ secrets.PROJECT_ID}}
+
+  build-push-artifact:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-      - name: setup node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-      - name: install dependencies
-        run: npm install
-      - name: test front
-        id: test
-        run: npm run test
+      - name: "Checkout"
+        uses: actions/checkout@v4
 
-  push:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Login to registry
-        uses: docker/login-action@v3
+      - id: "auth"
+        uses: google-github-actions/auth@v2
         with:
-          registry: ${{ secrets.DOCKER_HOST }}
-          username: _json_key
-          password: ${{ secrets.DOCKER_REGISTRY_SA }}
-      - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          platforms: linux/amd64
-          context: "{{defaultContext}}:frontend-web"
-          push: true
-          tags: ${{ secrets.FRONT_SERVICE_NAME }}:1.0.0
+          credentials_json: "${{ secrets.CLOUD_RUN_SA_KEY }}"
 
-  deploy:
-    needs: push
-    runs-on: ubuntu-latest
+      - name: "Set up Cloud SDK"
+        uses: google-github-actions/setup-gcloud@v3
 
-    steps:
-      - name: Deploy artifact
-        run: |
-          gcloud auth activate-service-account ${{ secrets.CLOUD_RUN_SA }} --key-file=${{ secrets.CLOUD_RUN_SA_KEY }}
-          gcloud run deploy ${{ secrets.SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE_NAME }}/${{ secrets.SERVICE_NAME }}:latest
-          gcloud beta run services add-iam-policy-binding --region=${{ secrets.REGION }} --member=allUsers --role=roles/run.invoker ${{ secrets.SERVICE_NAME }} --project=${{ secrets.PROJECT_ID}}
+      - name: "Docker auth"
+        run: |-
+          gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev --quiet
+
+      - name: Build image
+        run: docker build . --platform linux/amd64 --tag ${{ secrets.STORAGE_SERVICE_NAME }}:1.0.0
+        working-directory: "frontend-web"
+
+      - name: Push image
+        run: docker push ${{ secrets.REGISTRY_AREA }}

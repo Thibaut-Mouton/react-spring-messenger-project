@@ -3,7 +3,7 @@ COPY . .
 # At this level, we already are in backend
 RUN mvn package
 
-FROM amazoncorretto:17.0.17-al2023-headless
+FROM amazoncorretto:23.0.2-al2023-headless
 
 LABEL maintainer="Thibaut MOUTON <thibautmouton22@gmail.com>"
 
