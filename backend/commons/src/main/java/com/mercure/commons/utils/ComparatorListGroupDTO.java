@@ -16,9 +16,6 @@ public class ComparatorListGroupDTO implements Comparator<GroupDTO> {
         if (group2.getLastMessageDate() == null) {
             return 1;
         }
-        if (group2.getLastMessageDate() == null && group1.getLastMessageDate() == null) {
-            return group1.getName().compareTo(group2.getName());
-        }
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             if (sdf.parse(group1.getLastMessageDate()).before(sdf.parse(group2.getLastMessageDate()))) {

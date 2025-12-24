@@ -16,9 +16,6 @@ public class ComparatorListWrapperGroupDTO implements Comparator<GroupWrapperDTO
         if (group2.getGroup().getLastMessageDate() == null) {
             return 1;
         }
-        if (group2.getGroup().getLastMessageDate() == null && group1.getGroup().getLastMessageDate() == null) {
-            return group1.getGroup().getName().compareTo(group2.getGroup().getName());
-        }
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             if (sdf.parse(group1.getGroup().getLastMessageDate()).before(sdf.parse(group2.getGroup().getLastMessageDate()))) {

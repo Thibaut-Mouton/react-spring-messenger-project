@@ -4,12 +4,8 @@ on: push
 #  push:
 #    paths: ["frontend-web/**"]
 
-defaults:
-  run:
-    working-directory: frontend-web
-
 jobs:
-  test:
+#  test:
 #    runs-on: ubuntu-latest
 
 #    steps:
