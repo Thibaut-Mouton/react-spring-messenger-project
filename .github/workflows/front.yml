@@ -73,5 +73,4 @@ jobs:
 
       - name: Push image
         run: |-
-          docker tag ${{ secrets.FRONT_SERVICE_NAME }} ${{ secrets.REGISTRY_AREA }}/${{ secrets.FRONT_SERVICE_NAME }}
-          docker push ${{ secrets.FRONT_SERVICE_NAME }}
+          docker push ${{ secrets.REGISTRY_AREA }}/${{ secrets.FRONT_SERVICE_NAME }}
