@@ -68,7 +68,7 @@ jobs:
           gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev --quiet
 
       - name: Build image
-        run: docker build . --platform linux/amd64 --tag ${{ secrets.FRONT_SERVICE_NAME }}
+        run: docker build . --platform linux/amd64 --tag ${{ secrets.REGISTRY_AREA }}/${{ secrets.FRONT_SERVICE_NAME }}
         working-directory: "frontend-web"
 
       - name: Push image
