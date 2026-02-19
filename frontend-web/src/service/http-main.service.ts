@@ -7,7 +7,7 @@ export abstract class HttpMainService {
   protected constructor () {
     this.instance = axios.create({
 	 withCredentials: true,
-	 baseURL: process.env.REACT_APP_API_URL ?? "",
+	 baseURL: process.env.REACT_APP_API_URL ?? "http://localhost:8080",
     })
     this.instance.interceptors.request.use((config) => {
 	 config.headers["X-CSRF-TOKEN"] = document.cookie.replace(/(?:^|.*;\s*)XSRF-TOKEN\s*=\s*([^;]*).*$|^.*$/, "$1")

@@ -31,7 +31,7 @@ export class HttpGroupService extends HttpMainService {
     }
 
     public createGroup(groupName: string): Promise<AxiosResponse<GroupModel>> {
-        return this.instance.post("create", {name: groupName})
+        return this.instance.post("groups", {name: groupName})
     }
 
     public addUserToGroup(userId: number | string, groupUrl: string): Promise<AxiosResponse> {

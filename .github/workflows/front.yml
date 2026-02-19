@@ -79,5 +79,5 @@ jobs:
 
       - name: Deploy artifact
         run: |
-          gcloud run deploy ${{ secrets.SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE_NAME }}/${{ secrets.SERVICE_NAME }}:latest
+          gcloud run deploy ${{ secrets.FRONT_SERVICE_NAME }} --service-account=${{ secrets.CLOUD_RUN_SA }} --allow-unauthenticated --region=${{ secrets.REGION }} --project=${{ secrets.REGION }} --port=80 --image=${{ secrets.REGION }}-docker.pkg.dev/${{ secrets.PROJECT_ID }}/${{ secrets.SERVICE_NAME }}/${{ secrets.SERVICE_NAME }}:latest
           gcloud beta run services add-iam-policy-binding --region=${{ secrets.REGION }} --member=allUsers --role=roles/run.invoker ${{ secrets.SERVICE_NAME }} --project=${{ secrets.PROJECT_ID}}
